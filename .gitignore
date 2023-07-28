@@ -1,0 +1,7 @@
+.vscode
+analysis/
+bin/
+data/
+difficulty_exports/
+map_outputs/
+obj/
