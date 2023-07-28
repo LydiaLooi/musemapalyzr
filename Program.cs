@@ -36,14 +36,14 @@ namespace MuseMapalyzr
 
     public class InputData
     {
-        public void CalculateAndExportAllDifficulties(string dataDir, bool outputNotes = false)
+        public void CalculateAndExportAllDifficulties(string dataDir)
         {
             string[] allFiles = Directory.GetFiles(dataDir);
             // foreach (string file in allFiles)
             // {
             //     Console.WriteLine(file);
             // }
-            ProcessDifficulties(allFiles, outputNotes);
+            ProcessDifficulties(allFiles);
         }
 
         public WeightingResults CalculateDifficulty(List<Note> notes, StreamWriter outfile, int SampleRate)
@@ -59,7 +59,7 @@ namespace MuseMapalyzr
             return weightResults;
         }
 
-        public void ProcessDifficulties(string[] files, bool outputNotes = false)
+        public void ProcessDifficulties(string[] files)
         {
 
             DateTime now = DateTime.Now;
@@ -80,10 +80,6 @@ namespace MuseMapalyzr
                             WeightingResults weightResults = CalculateDifficulty(mMap.Notes, outfile, mMap.SampleRate);
                             writer.WriteLine($"{filename.Split(new string[] { charSeparator }, StringSplitOptions.None)[^1].Split(".asset")[0]}||{weightResults.WeightedDifficulty:F2}||{weightResults.Weighting:F2}||{weightResults.Difficulty:F2}");
 
-                            if (outputNotes)
-                            {
-                                mMap.OutputNotes($"{name}.txt");
-                            }
                         }
                     }
                     catch (Exception e)
