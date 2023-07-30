@@ -73,7 +73,7 @@ namespace MuseMapalyzr
         public override double CalcPatternMultiplier()
         {
             double nps = Pattern.Segments[0].NotesPerSecond;
-            double multiplier = VaryingStacksMultiplier(nps); // assuming you have a method for this
+            double multiplier = PatternMultiplier.VaryingStacksMultiplier(nps); // assuming you have a method for this
             return multiplier;
         }
     }

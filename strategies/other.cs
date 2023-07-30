@@ -49,19 +49,19 @@ namespace MuseMapalyzr
                         multipliers.Add(ConfigReader.GetConfig()["other_switch_multiplier"]);
                         break;
                     case Constants.ZigZag:
-                        multipliers.Add(ZigZagMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
+                        multipliers.Add(PatternMultiplier.ZigZagMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
                         break;
                     case Constants.TwoStack:
-                        multipliers.Add(TwoStackMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
+                        multipliers.Add(PatternMultiplier.TwoStackMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
                         break;
                     case Constants.ThreeStack:
-                        multipliers.Add(ThreeStackMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
+                        multipliers.Add(PatternMultiplier.ThreeStackMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
                         break;
                     case Constants.FourStack:
-                        multipliers.Add(FourStackMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
+                        multipliers.Add(PatternMultiplier.FourStackMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
                         break;
                     case Constants.SingleStreams:
-                        multipliers.Add(StreamMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
+                        multipliers.Add(PatternMultiplier.StreamMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
                         break;
                     case Constants.ShortInterval:
                         multipliers.Add(ConfigReader.GetConfig()["other_short_int_multiplier"]);

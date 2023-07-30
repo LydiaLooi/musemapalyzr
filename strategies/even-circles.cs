@@ -97,7 +97,7 @@ namespace MuseMapalyzr
         public override double CalcPatternMultiplier()
         {
             double nps = Pattern.Segments[0].NotesPerSecond;  // Even Circle should have consistent NPS
-            double multiplier = EvenCircleMultiplier(nps);  // You'll need to define the EvenCircleMultiplier method
+            double multiplier = PatternMultiplier.EvenCircleMultiplier(nps);  // You'll need to define the EvenCircleMultiplier method
             return multiplier;
         }
     }

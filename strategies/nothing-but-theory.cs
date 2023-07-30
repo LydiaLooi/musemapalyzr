@@ -153,7 +153,7 @@ namespace MuseMapalyzr
         public override double CalcPatternMultiplier()
         {
             double nps = Pattern.Segments[0].NotesPerSecond;
-            double multiplier = NothingButTheoryMultiplier(nps);
+            double multiplier = PatternMultiplier.NothingButTheoryMultiplier(nps);
             return multiplier;
         }
     }
