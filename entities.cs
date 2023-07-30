@@ -34,7 +34,21 @@ namespace MuseMapalyzr
 
         public int? TimeDifference { get; set; }
 
-        public int SampleRate { get; set; } = Constants.DEFAULT_SAMPLE_RATE;
+        public int SampleRate { get; set; } = Constants.DefaultSampleRate;
+
+        public float NotesPerSecond
+        {
+            get
+            {
+                if (TimeDifference == 0)
+                    return 0;
+                if (TimeDifference == null)
+                {
+                    throw new ArgumentNullException(nameof(TimeDifference));
+                }
+                return (float)SampleRate / (float)TimeDifference;
+            }
+        }
 
         public Segment(
             string segmentName,
@@ -61,23 +75,6 @@ namespace MuseMapalyzr
             }
 
         }
-
-        public double GetNotesPerSecond()
-        {
-            if (TimeDifference == 0)
-            {
-                return 0;
-            }
-            if (TimeDifference != null)
-            {
-                double notesPerSecond = (double)SampleRate / (double)TimeDifference;
-                return notesPerSecond;
-            }
-            Console.WriteLine("Getting NPS failed due to null TimeDifference");
-            throw new ArgumentNullException(nameof(TimeDifference));
-
-        }
-
 
         public override string ToString()
         {

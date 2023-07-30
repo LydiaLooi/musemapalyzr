@@ -38,7 +38,7 @@ namespace MuseMapalyzr
 
             DateTime now = DateTime.Now;
             DifficultyCalculation difficultyCalculation = new();
-            string outputFile = Path.Combine(Constants.OUTPUT_DIR, $"{now.ToString("yyyy-MM-dd_HH-mm-ss")}_difficulties_data.txt");
+            string outputFile = Path.Combine(Constants.OutputDir, $"{now.ToString("yyyy-MM-dd_HH-mm-ss")}_difficulties_data.txt");
 
             using (StreamWriter writer = new StreamWriter(outputFile, false, Encoding.UTF8))
             {
@@ -76,13 +76,13 @@ namespace MuseMapalyzr
             if (args.Length == 0)
             {
                 // If no arguments are provided, run export all difficulties
-                inputData.CalculateAndExportAllDifficulties(Constants.DATA_DIR);
+                inputData.CalculateAndExportAllDifficulties(Constants.DataDir);
             }
             else
             {
                 // If any argument is provided, run filtered difficulties
                 string filterBy = string.Join(" ", args);
-                inputData.CalculateAndExportFilteredDifficulties(filterBy, Constants.DATA_DIR);
+                inputData.CalculateAndExportFilteredDifficulties(filterBy, Constants.DataDir);
             }
         }
     }

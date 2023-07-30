@@ -16,7 +16,7 @@ namespace MuseMapalyzr
             List<Note> notes, int sectionThresholdSeconds = 1, int? sampleRate = null
         )
         {
-            if (sampleRate == null) { sampleRate = Constants.DEFAULT_SAMPLE_RATE; }
+            if (sampleRate == null) { sampleRate = Constants.DefaultSampleRate; }
 
             int sectionThreshold = sectionThresholdSeconds * (int)sampleRate;
             int songStartSamples = notes.Min(note => note.SampleTime);
@@ -72,6 +72,57 @@ namespace MuseMapalyzr
             return movingAverages;
         }
 
+
+        public static double WeightedAverageOfValues(List<double> values, double topPercentage = 0.3, double topWeight = 0.7, double bottomWeight = 0.3)
+        {
+            if (values == null || values.Count == 0)
+            {
+                throw new ArgumentException("The input list 'values' cannot be empty.");
+            }
+
+            // Find the threshold that separates the top 30% highest densities from the rest
+            List<double> movingAveragesSorted = new List<double>(values);
+            movingAveragesSorted.Sort();
+            movingAveragesSorted.Reverse();
+
+            int thresholdIndex = (int)(values.Count * (1 - topPercentage));
+            if (thresholdIndex >= movingAveragesSorted.Count)
+            {
+                thresholdIndex = movingAveragesSorted.Count - 1;
+            }
+            double threshold = movingAveragesSorted[thresholdIndex];
+
+            // Calculate the weighted average
+            double totalWeight = 0;
+            double weightedSum = 0;
+
+            foreach (double avg in values)
+            {
+                double weight;
+                if (avg >= threshold)
+                {
+                    weight = topWeight;
+                }
+                else
+                {
+                    weight = bottomWeight;
+                }
+
+                weightedSum += avg * weight;
+                totalWeight += weight;
+            }
+
+            double weightedAverage = weightedSum / totalWeight;
+            return weightedAverage;
+        }
+
+        public double GetPatternWeighting(List<Note> notes)
+        {
+            double temp = 1;
+            // Need Mapalyzr Class that identifies patterns
+            return temp;
+        }
+
         public WeightingResults CalculateDifficulty(List<Note> notes, StreamWriter outfile, int sampleRate)
         {
             dynamic config = ConfigReader.GetConfig();
@@ -82,6 +133,18 @@ namespace MuseMapalyzr
             int movingAverageWindow = int.Parse(config["moving_avg_window"]);
 
             List<double> movingAvg = MovingAverageNoteDensity(sections, movingAverageWindow);
+
+            if (outfile != null)
+            {
+                foreach (var s in movingAvg)
+                {
+                    outfile.WriteLine($"{s}");
+                }
+            }
+
+            double difficulty = WeightedAverageOfValues(movingAvg);
+
+            double weighting = GetPatternWeighting(notes);
 
             // TODO: Implement this
             WeightingResults weightResults = new();
