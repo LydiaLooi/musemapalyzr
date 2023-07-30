@@ -34,7 +34,7 @@ namespace MuseMapalyzr
             Pattern = pattern;
         }
 
-        public abstract float CalcVariationScore();
+        public abstract double CalcVariationScore();
     }
 
     public abstract class CalcPatternMultiplierStrategy
@@ -46,7 +46,7 @@ namespace MuseMapalyzr
             Pattern = pattern;
         }
 
-        public abstract float CalcPatternMultiplier();
+        public abstract double CalcPatternMultiplier();
     }
 
     public abstract class CalcPatternLengthMultiplierStrategy
@@ -58,6 +58,6 @@ namespace MuseMapalyzr
             Pattern = pattern;
         }
 
-        public abstract float CalcPatternLengthMultiplier();
+        public abstract double CalcPatternLengthMultiplier();
     }
 }

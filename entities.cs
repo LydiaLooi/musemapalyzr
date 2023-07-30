@@ -36,7 +36,7 @@ namespace MuseMapalyzr
 
         public int SampleRate { get; set; } = Constants.DefaultSampleRate;
 
-        public float NotesPerSecond
+        public double NotesPerSecond
         {
             get
             {
@@ -46,7 +46,7 @@ namespace MuseMapalyzr
                 {
                     throw new ArgumentNullException(nameof(TimeDifference));
                 }
-                return (float)SampleRate / (float)TimeDifference;
+                return (double)SampleRate / (double)TimeDifference;
             }
         }
 

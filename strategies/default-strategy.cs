@@ -4,7 +4,7 @@ namespace MuseMapalyzr
     {
         public DefaultCalcVariationScore(Pattern pattern) : base(pattern) { }
 
-        public override float CalcVariationScore()
+        public override double CalcVariationScore()
         {
             if (!Pattern.Segments.Any())
                 return 0;
@@ -16,7 +16,7 @@ namespace MuseMapalyzr
             var patternCounts = Pattern.GetSegmentTypeCounts(tempLst);
 
             // Check for intervals:
-            // Implement the logic here.
+            // TODO: Implement the logic here.
 
             var n = segmentNames.Count;
             var freq = segmentNames.GroupBy(x => x).Select(g => (double)g.Count() / n);
@@ -36,7 +36,7 @@ namespace MuseMapalyzr
             if (entropy == 0)  // Temp?
                 return 1;
 
-            return (float)entropy;
+            return (double)entropy;
         }
     }
 
@@ -44,7 +44,7 @@ namespace MuseMapalyzr
     {
         public DefaultCalcPatternMultiplier(Pattern pattern) : base(pattern) { }
 
-        public override float CalcPatternMultiplier()
+        public override double CalcPatternMultiplier()
         {
             return 1;
         }
@@ -54,7 +54,7 @@ namespace MuseMapalyzr
     {
         public DefaultCalcPatternLengthMultiplier(Pattern pattern) : base(pattern) { }
 
-        public override float CalcPatternLengthMultiplier()
+        public override double CalcPatternLengthMultiplier()
         {
             return 1;
         }

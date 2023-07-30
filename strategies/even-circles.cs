@@ -79,12 +79,12 @@ namespace MuseMapalyzr
     {
         public EvenCirclesCalcVariationScore(Pattern pattern) : base(pattern) { }
 
-        public override float CalcVariationScore()
+        public override double CalcVariationScore()
         {
-            float variationScore = base.CalcVariationScore();
+            double variationScore = base.CalcVariationScore();
 
             // Make a minor change to the return value
-            float modifiedVariationScore = Math.Max(1, variationScore);
+            double modifiedVariationScore = Math.Max(1, variationScore);
 
             return modifiedVariationScore;
         }
@@ -94,17 +94,11 @@ namespace MuseMapalyzr
     {
         public EvenCirclesCalcPatternMultiplier(Pattern pattern) : base(pattern) { }
 
-        public override float CalcPatternMultiplier()
+        public override double CalcPatternMultiplier()
         {
-            float nps = Pattern.Segments[0].NotesPerSecond;  // Even Circle should have consistent NPS
-            float multiplier = EvenCircleMultiplier(nps);  // You'll need to define the EvenCircleMultiplier method
+            double nps = Pattern.Segments[0].NotesPerSecond;  // Even Circle should have consistent NPS
+            double multiplier = EvenCircleMultiplier(nps);  // You'll need to define the EvenCircleMultiplier method
             return multiplier;
-        }
-
-        private float EvenCircleMultiplier(float nps)
-        {
-            // Implement the logic for calculating the multiplier based on nps
-            throw new NotImplementedException();
         }
     }
 

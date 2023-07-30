@@ -18,7 +18,7 @@ namespace MuseMapalyzr
             PatternAppended = false;
             PatternAppendedName = "";
             Groups = new List<Pattern>();
-            OtherPattern = new OtherPattern(Constants.Other, new List<Pattern>());
+            OtherPattern = new OtherPattern(Constants.Other, new List<Segment>());
             ResetGroups();
             Added = false;
             Reset = false;

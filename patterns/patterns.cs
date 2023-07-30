@@ -13,11 +13,11 @@ namespace MuseMapalyzr
         public double PatternWeighting { get; set; }
         public Dictionary<string, double> Intervals { get; set; }
         public double EndExtraDebuff { get; set; }
-        public object CheckSegmentStrategy { get; set; }
-        public object IsAppendableStrategy { get; set; }
-        public object CalcVariationScoreStrategy { get; set; }
-        public object CalcPatternMultiplierStrategy { get; set; }
-        public object CalcPatternLengthMultiplierStrategy { get; set; }
+        public CheckSegmentStrategy CheckSegmentStrategy { get; set; }
+        public IsAppendableStrategy IsAppendableStrategy { get; set; }
+        public CalcVariationScoreStrategy CalcVariationScoreStrategy { get; set; }
+        public CalcPatternMultiplierStrategy CalcPatternMultiplierStrategy { get; set; }
+        public CalcPatternLengthMultiplierStrategy CalcPatternLengthMultiplierStrategy { get; set; }
         public int? TotalNotes { get; set; }
 
         public Pattern(string patternName, List<Segment> segments, int startSample = 0, int endSample = 0, int sampleRate = 0)
@@ -27,7 +27,14 @@ namespace MuseMapalyzr
             StartSample = startSample;
             EndSample = endSample;
             IsActive = true;
-            SampleRate = sampleRate;
+            if (sampleRate == 0)
+            {
+                SampleRate = Constants.DefaultSampleRate;
+            }
+            else
+            {
+                SampleRate = sampleRate;
+            }
             Tolerance = 0; // Initialize with your value
             VariationWeighting = 0; // Initialize with your value
             PatternWeighting = 0; // Initialize with your value
@@ -149,16 +156,57 @@ namespace MuseMapalyzr
             }
         }
 
-    }
-
-    public class OtherPattern
-    {
-        // Assuming OtherPattern is a class. Define it according to your needs.
-        // You need to provide the constructor for OtherPattern similar to Python's OtherPattern(OTHER, []).
-
-        public OtherPattern(string other, List<Pattern> list)
+        public void SetCheckSegmentStrategy(CheckSegmentStrategy strategy)
         {
-            // Initialize the OtherPattern object here.
+            CheckSegmentStrategy = strategy;
         }
+
+        public void SetIsAppendableStrategy(IsAppendableStrategy strategy)
+        {
+            IsAppendableStrategy = strategy;
+        }
+
+        public void SetCalcVariationScoreStrategy(CalcVariationScoreStrategy strategy)
+        {
+            CalcVariationScoreStrategy = strategy;
+        }
+
+        public void SetCalcPatternMultiplierStrategy(CalcPatternMultiplierStrategy strategy)
+        {
+            CalcPatternMultiplierStrategy = strategy;
+        }
+
+        public void SetCalcPatternLengthMultiplierStrategy(CalcPatternLengthMultiplierStrategy strategy)
+        {
+            CalcPatternLengthMultiplierStrategy = strategy;
+        }
+
+        // Use strategy pattern to delegate method calls
+        public bool? CheckSegment(Segment currentSegment)
+        {
+            return CheckSegmentStrategy.CheckSegment(currentSegment);
+        }
+
+        public bool IsAppendable()
+        {
+            return IsAppendableStrategy.IsAppendable();
+        }
+
+        public double CalcVariationScore()
+        {
+            return CalcVariationScoreStrategy.CalcVariationScore();
+        }
+
+        public double CalcPatternMultiplier()
+        {
+            return CalcPatternMultiplierStrategy.CalcPatternMultiplier();
+        }
+
+        public double CalcPatternLengthMultiplier()
+        {
+            return CalcPatternLengthMultiplierStrategy.CalcPatternLengthMultiplier();
+        }
+
     }
+
 }
