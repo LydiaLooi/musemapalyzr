@@ -44,9 +44,9 @@ namespace MuseMapalyzr
             {
                 foreach (string filename in files)
                 {
-                    try
-                    {
-                        string charSeparator = "\\";
+                    // try
+                    // {
+                    string charSeparator = "\\";
                         MuseSwiprMap mMap = MuseSwiprMap.FromKoreographAsset(filename);
                         string name = filename.Split(new string[] { charSeparator }, StringSplitOptions.None)[^1].Split(".asset")[0];
 
@@ -55,13 +55,14 @@ namespace MuseMapalyzr
                             DifficultyCalculation.WeightingResults weightResults = difficultyCalculation.CalculateDifficulty(mMap.Notes, outfile, mMap.SampleRate);
                             writer.WriteLine($"{filename.Split(new string[] { charSeparator }, StringSplitOptions.None)[^1].Split(".asset")[0]}||{weightResults.WeightedDifficulty:F2}||{weightResults.Weighting:F2}||{weightResults.Difficulty:F2}");
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        // Log the error
-                        Console.WriteLine($"ERROR parsing a file: {e.Message}");
-                        continue;
-                    }
+                    // }
+                    // catch (Exception e)
+                    // {
+                    //     // Log the error
+                    //     Console.WriteLine($"ERROR parsing a file: {e.Message}");
+                    //     throw e;
+                    //     // continue;
+                    // }
                 }
             }
         }

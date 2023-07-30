@@ -116,12 +116,27 @@ namespace MuseMapalyzr
             return weightedAverage;
         }
 
-        public double GetPatternWeighting(List<Note> notes)
+        public double GetPatternWeighting(List<Note> notes, int sampleRate)
         {
             double temp = 1;
             // Need Mapalyzr Class that identifies patterns
+            Mapalyzr mpg = new();
+
+            // TODO: AnalyseSegments
+            List<Segment> segments = SegmentAnalyser.AnalyseSegments(notes, sampleRate);
+
+            foreach (Segment segment in segments)
+            {
+                Console.WriteLine(segment.ToString());
+            }
+
+            // TODO: mpg.IdentifyPatterns(segments)
+
+            // TODO: CalculateScoresFromPatterns(patterns)
+
             return temp;
         }
+
 
         public WeightingResults CalculateDifficulty(List<Note> notes, StreamWriter outfile, int sampleRate)
         {
@@ -144,7 +159,7 @@ namespace MuseMapalyzr
 
             double difficulty = WeightedAverageOfValues(movingAvg);
 
-            double weighting = GetPatternWeighting(notes);
+            double weighting = GetPatternWeighting(notes, sampleRate);
 
             // TODO: Implement this
             WeightingResults weightResults = new();
