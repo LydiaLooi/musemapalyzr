@@ -34,7 +34,7 @@ namespace MuseMapalyzr
 
         public int? TimeDifference { get; set; }
 
-        public int SampleRate { get; set; } = Constants.defaultSampleRate;
+        public int SampleRate { get; set; } = Constants.DEFAULT_SAMPLE_RATE;
 
         public Segment(
             string segmentName,
@@ -108,7 +108,7 @@ namespace MuseMapalyzr
             museMap.Title = firstKey;
             museMap.TempoSections = data[firstKey]["value"]["mTempoSections"];
             museMap.Tracks = data[firstKey]["value"]["mTracks"];
-            museMap.SampleRate = (int)data[firstKey]["value"]["mSampleRate"];
+            museMap.SampleRate = int.Parse(data[firstKey]["value"]["mSampleRate"].ToString());
 
             museMap.ParseNotes();
 
@@ -135,7 +135,6 @@ namespace MuseMapalyzr
                     }
                 }
             }
-
             this.Notes = this.Notes.OrderBy(note => note.SampleTime).ToList();
         }
 
