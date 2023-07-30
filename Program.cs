@@ -7,25 +7,8 @@ using System.Text;
 namespace MuseMapalyzr
 {
 
-    public static class Constants
-    {
-        public static string dataDir = "data";
-        public static string outputDir = "difficulty_exports";
-        public static string mapOutputs = "map_outputs";
-    }
 
-    public class Note
-    {
-        public int Lane { get; set; }
-        public int SampleTime { get; set; }
 
-        public Note(int lane, int sampleTime)
-        {
-            this.Lane = lane;
-            this.SampleTime = sampleTime;
-        }
-
-    }
 
     public class WeightingResults // Named Tuple "Weighting" in python code
     {
@@ -39,11 +22,26 @@ namespace MuseMapalyzr
         public void CalculateAndExportAllDifficulties(string dataDir)
         {
             string[] allFiles = Directory.GetFiles(dataDir);
-            // foreach (string file in allFiles)
-            // {
-            //     Console.WriteLine(file);
-            // }
+
             ProcessDifficulties(allFiles);
+        }
+
+        public void CalculateAndExportFilteredDifficulties(string filterBy, string dataDir)
+        {
+            string[] allFiles = Directory.GetFiles(dataDir);
+
+            List<string> filtered = new List<string>();
+            // Get only files with the specified string in their names (case-insensitive)
+            foreach (string file in allFiles)
+            {
+                if (file.ToLower().Contains(filterBy.ToLower()))
+                {
+                    filtered.Add(file);
+                }
+            }
+
+            ProcessDifficulties(filtered.ToArray());
+
         }
 
         public WeightingResults CalculateDifficulty(List<Note> notes, StreamWriter outfile, int SampleRate)
@@ -79,7 +77,6 @@ namespace MuseMapalyzr
                         {
                             WeightingResults weightResults = CalculateDifficulty(mMap.Notes, outfile, mMap.SampleRate);
                             writer.WriteLine($"{filename.Split(new string[] { charSeparator }, StringSplitOptions.None)[^1].Split(".asset")[0]}||{weightResults.WeightedDifficulty:F2}||{weightResults.Weighting:F2}||{weightResults.Difficulty:F2}");
-
                         }
                     }
                     catch (Exception e)
@@ -88,21 +85,28 @@ namespace MuseMapalyzr
                         Console.WriteLine($"ERROR parsing a file: {e.Message}");
                         continue;
                     }
-                    break;
                 }
             }
         }
-
     }
 
     class MainProgram
     {
-
         static void Main(string[] args)
         {
             InputData inputData = new();
-            inputData.CalculateAndExportAllDifficulties(Constants.dataDir);
 
+            if (args.Length == 0)
+            {
+                // If no arguments are provided, run export all difficulties
+                inputData.CalculateAndExportAllDifficulties(Constants.dataDir);
+            }
+            else
+            {
+                // If any argument is provided, run filtered difficulties
+                string filterBy = string.Join(" ", args);
+                inputData.CalculateAndExportFilteredDifficulties(filterBy, Constants.dataDir);
+            }
         }
     }
 }
