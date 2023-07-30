@@ -49,6 +49,29 @@ namespace MuseMapalyzr
 
         }
 
+        public static List<double> MovingAverageNoteDensity(List<List<Note>> sections, int windowSize)
+        {
+            int numSections = sections.Count;
+            List<int> noteDensities = new List<int>();
+            foreach (var section in sections)
+            {
+                noteDensities.Add(section.Count);
+            }
+
+            List<double> movingAverages = new List<double>();
+
+            for (int i = 0; i < numSections; i++)
+            {
+                int start = Math.Max(0, i - windowSize + 1);
+                int end = i + 1;
+                List<int> window = noteDensities.GetRange(start, end - start);
+                double average = window.Average();
+                movingAverages.Add(average);
+            }
+
+            return movingAverages;
+        }
+
         public WeightingResults CalculateDifficulty(List<Note> notes, StreamWriter outfile, int sampleRate)
         {
             dynamic config = ConfigReader.GetConfig();
@@ -56,15 +79,9 @@ namespace MuseMapalyzr
 
             List<List<Note>> sections = CreateSections(notes, sampleWindowSecs, sampleRate);
 
-            foreach (List<Note> listOfNotes in sections)
-            {
-                int startSampleTime = -1;
-                if (listOfNotes.Count > 0)
-                {
-                    startSampleTime = listOfNotes[0].SampleTime;
-                }
-                Console.WriteLine(listOfNotes.Count + "   " + startSampleTime);
-            }
+            int movingAverageWindow = int.Parse(config["moving_avg_window"]);
+
+            List<double> movingAvg = MovingAverageNoteDensity(sections, movingAverageWindow);
 
             // TODO: Implement this
             WeightingResults weightResults = new();
