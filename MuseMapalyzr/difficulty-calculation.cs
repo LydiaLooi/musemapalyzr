@@ -19,13 +19,13 @@ namespace MuseMapalyzr
             if (sampleRate == null) { sampleRate = Constants.DefaultSampleRate; }
 
             int sectionThreshold = sectionThresholdSeconds * (int)sampleRate;
-            int songStartSamples = notes.Min(note => note.SampleTime);
-            int songDurationSamples = notes.Max(note => note.SampleTime);
+            double songStartSamples = notes.Min(note => note.SampleTime);
+            double songDurationSamples = notes.Max(note => note.SampleTime);
 
             // Sorting the 'notes' list based on the 'SampleTime' property
             notes = notes.OrderBy(note => note.SampleTime).ToList();
 
-            int numSections = (songDurationSamples - songStartSamples + sectionThreshold) / sectionThreshold;
+            int numSections = (int)(songDurationSamples - songStartSamples + sectionThreshold) / sectionThreshold;
 
             List<List<Note>> sections = new List<List<Note>>();
 
@@ -38,7 +38,7 @@ namespace MuseMapalyzr
             // Fill sections with notes
             foreach (Note note in notes)
             {
-                int sectionIndex = (note.SampleTime - songStartSamples) / sectionThreshold;
+                int sectionIndex = (int)(note.SampleTime - songStartSamples) / sectionThreshold;
                 if (0 <= sectionIndex && sectionIndex < sections.Count)
                 {
                     sections[sectionIndex].Add(note);

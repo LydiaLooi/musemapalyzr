@@ -14,7 +14,7 @@ namespace MuseMapalyzr
                 Note prevNote = notes[i - 1];
                 Note note = notes[i];
 
-                int timeDifference = note.SampleTime - prevNote.SampleTime;
+                double timeDifference = note.SampleTime - prevNote.SampleTime;
 
                 // Get the name of the next segment and the notes required to complete it
                 (string nextSegmentName, int nextRequiredNotes) = GetNextSegmentAndRequiredNotes(prevNote, note, timeDifference, sampleRate);
@@ -73,7 +73,7 @@ namespace MuseMapalyzr
             }
             return segments;
         }
-        public static Tuple<string, int> GetNextSegmentAndRequiredNotes(Note prevNote, Note note, int timeDifference, int sampleRate)
+        public static Tuple<string, int> GetNextSegmentAndRequiredNotes(Note prevNote, Note note, double timeDifference, int sampleRate)
         {
             double notesPerSecond = sampleRate / timeDifference;
 

@@ -9,9 +9,9 @@ namespace MuseMapalyzr
     public class Note
     {
         public int Lane { get; set; }
-        public int SampleTime { get; set; }
+        public double SampleTime { get; set; }
 
-        public Note(int lane, int sampleTime)
+        public Note(int lane, double sampleTime)
         {
             this.Lane = lane;
             this.SampleTime = sampleTime;
@@ -32,7 +32,7 @@ namespace MuseMapalyzr
 
         public int RequiredNotes { get; set; } = 0;
 
-        public int? TimeDifference { get; set; }
+        public double? TimeDifference { get; set; }
 
         public int SampleRate { get; set; } = Constants.DefaultSampleRate;
 
@@ -54,7 +54,7 @@ namespace MuseMapalyzr
             string segmentName,
             List<Note> notes,
             int requiredNotes = 0,
-            int? timeDifference = null,
+            double? timeDifference = null,
             int? sampleRate = null
             )
         {
