@@ -49,6 +49,12 @@ namespace MuseMapalyzr
             List<Pattern> pattern = new List<Pattern>();
             return pattern;
         }
+
+        public List<Pattern> ReturnFinalPatterns(bool mergeMergable = true)
+        {
+            List<Pattern> pattern = new List<Pattern>();
+            return pattern;
+        }
     }
 
 }
