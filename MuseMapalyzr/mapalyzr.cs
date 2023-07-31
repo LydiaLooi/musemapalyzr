@@ -135,12 +135,7 @@ namespace MuseMapalyzr
             {
                 if (lastCheckPattern.IsAppendable())
                 {
-                    Pattern lastPatternCopy = new Pattern(
-                        lastCheckPattern.PatternName,
-                        new List<Segment>(lastCheckPattern.Segments),
-                        lastCheckPattern.StartSample,
-                        lastCheckPattern.EndSample
-                    );
+                    Pattern lastPatternCopy = lastCheckPattern.CreateCopy();
                     Patterns.Add(lastPatternCopy);
                     return ReturnFinalPatterns(mergeMergable);
                 }
@@ -209,13 +204,7 @@ namespace MuseMapalyzr
                 );
                 Patterns.Add(otherGroup);
             }
-
-            Pattern groupCopy = new Pattern(
-                group.PatternName,
-                new List<Segment>(group.Segments),
-                group.StartSample,
-                group.EndSample
-            );
+            Pattern groupCopy = group.CreateCopy();
             Patterns.Add(groupCopy);
             // Reset all groups with current pattern.
             foreach (Pattern group2 in Groups)

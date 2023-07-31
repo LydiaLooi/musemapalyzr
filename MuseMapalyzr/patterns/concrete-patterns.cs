@@ -11,6 +11,11 @@ namespace MuseMapalyzr
             SetCalcPatternMultiplierStrategy(new EvenCirclesCalcPatternMultiplier(this));
             SetCalcPatternLengthMultiplierStrategy(new DefaultCalcPatternLengthMultiplier(this));
         }
+        public override Pattern CreateCopy()
+        {
+            return new EvenCirclesGroup(PatternName, Segments, StartSample, EndSample, SampleRate);
+        }
+
     }
 
 
@@ -25,6 +30,10 @@ namespace MuseMapalyzr
             SetCalcPatternMultiplierStrategy(new SkewedCirclesCalcPatternMultiplier(this));
             SetCalcPatternLengthMultiplierStrategy(new DefaultCalcPatternLengthMultiplier(this));
         }
+        public override Pattern CreateCopy()
+        {
+            return new SkewedCirclesGroup(PatternName, Segments, StartSample, EndSample, SampleRate);
+        }
     }
 
     public class NothingButTheoryGroup : Pattern
@@ -37,6 +46,10 @@ namespace MuseMapalyzr
             SetCalcVariationScoreStrategy(new NothingButTheoryCalcVariationScore(this));
             SetCalcPatternMultiplierStrategy(new NothingButTheoryCalcPatternMultiplier(this));
             SetCalcPatternLengthMultiplierStrategy(new DefaultCalcPatternLengthMultiplier(this));
+        }
+        public override Pattern CreateCopy()
+        {
+            return new NothingButTheoryGroup(PatternName, Segments, StartSample, EndSample, SampleRate);
         }
     }
 
@@ -51,6 +64,10 @@ namespace MuseMapalyzr
             SetCalcPatternMultiplierStrategy(new SlowStretchPatternMultiplier(this));
             SetCalcPatternLengthMultiplierStrategy(new DefaultCalcPatternLengthMultiplier(this));
         }
+        public override Pattern CreateCopy()
+        {
+            return new SlowStretchPattern(PatternName, Segments, StartSample, EndSample, SampleRate);
+        }
     }
 
     public class VaryingStacksPattern : Pattern
@@ -64,6 +81,10 @@ namespace MuseMapalyzr
             SetCalcPatternMultiplierStrategy(new VaryingStacksCalcPatternMultiplier(this));
             SetCalcPatternLengthMultiplierStrategy(new DefaultCalcPatternLengthMultiplier(this));
         }
+        public override Pattern CreateCopy()
+        {
+            return new VaryingStacksPattern(PatternName, Segments, StartSample, EndSample, SampleRate);
+        }
     }
 
     public class OtherPattern : Pattern
@@ -76,6 +97,10 @@ namespace MuseMapalyzr
             SetCalcVariationScoreStrategy(new OtherCalcVariationScore(this));
             SetCalcPatternMultiplierStrategy(new OtherCalcPatternMultiplier(this));
             SetCalcPatternLengthMultiplierStrategy(new DefaultCalcPatternLengthMultiplier(this));
+        }
+        public override Pattern CreateCopy()
+        {
+            return new OtherPattern(PatternName, Segments, StartSample, EndSample, SampleRate);
         }
     }
 

@@ -46,7 +46,7 @@ namespace MuseMapalyzr
                 switch (segment.SegmentName)
                 {
                     case Constants.Switch:
-                        multipliers.Add(ConfigReader.GetConfig()["other_switch_multiplier"]);
+                        multipliers.Add(double.Parse(ConfigReader.GetConfig()["other_switch_multiplier"]));
                         break;
                     case Constants.ZigZag:
                         multipliers.Add(PatternMultiplier.ZigZagMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
@@ -64,13 +64,13 @@ namespace MuseMapalyzr
                         multipliers.Add(PatternMultiplier.StreamMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
                         break;
                     case Constants.ShortInterval:
-                        multipliers.Add(ConfigReader.GetConfig()["other_short_int_multiplier"]);
+                        multipliers.Add(double.Parse(ConfigReader.GetConfig()["other_short_int_multiplier"]));
                         break;
                     case Constants.MedInterval:
-                        multipliers.Add(ConfigReader.GetConfig()["other_med_int_multiplier"]);
+                        multipliers.Add(double.Parse(ConfigReader.GetConfig()["other_med_int_multiplier"]));
                         break;
                     case Constants.LongInterval:
-                        multipliers.Add(ConfigReader.GetConfig()["other_long_int_multiplier"]);
+                        multipliers.Add(double.Parse(ConfigReader.GetConfig()["other_long_int_multiplier"]));
                         break;
                     default:
                         Console.WriteLine($"WARNING: Did not recognise pattern: {segment.SegmentName}");

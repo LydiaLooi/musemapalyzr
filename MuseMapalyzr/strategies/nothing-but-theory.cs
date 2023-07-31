@@ -94,7 +94,7 @@ namespace MuseMapalyzr
             var intervalList = new List<double>();
             var segmentNames = new List<string>();
 
-            var segmentCounts = Pattern.GetSegmentTypeCounts((List<string>)Pattern.Segments.Select(s => s.SegmentName));
+            var segmentCounts = Pattern.GetSegmentTypeCounts(Pattern.Segments.Select(s => s.SegmentName).ToList());
 
             // Check for intervals:
             for (int i = 0; i < tempLst.Count; i++)

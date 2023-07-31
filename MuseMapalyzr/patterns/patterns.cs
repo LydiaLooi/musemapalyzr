@@ -18,7 +18,22 @@ namespace MuseMapalyzr
         public CalcVariationScoreStrategy CalcVariationScoreStrategy { get; set; }
         public CalcPatternMultiplierStrategy CalcPatternMultiplierStrategy { get; set; }
         public CalcPatternLengthMultiplierStrategy CalcPatternLengthMultiplierStrategy { get; set; }
-        public int? TotalNotes { get; set; }
+        public int TotalNotes { get; set; } = 0;
+
+        public bool HasIntervalSegment
+        {
+            get
+            {
+                foreach (var seg in Segments)
+                {
+                    if (seg.SegmentName.Contains("Interval"))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
 
         public Pattern(string patternName, List<Segment> segments, int startSample = 0, int endSample = 0, int sampleRate = 0)
         {
@@ -45,7 +60,11 @@ namespace MuseMapalyzr
             CalcVariationScoreStrategy = null;
             CalcPatternMultiplierStrategy = null;
             CalcPatternLengthMultiplierStrategy = null;
-            TotalNotes = null;
+        }
+
+        public virtual Pattern CreateCopy()
+        {
+            return new Pattern(PatternName, Segments, StartSample, EndSample);
         }
 
         public Dictionary<string, int> GetSegmentTypeCounts(List<string> segmentNames)
@@ -191,6 +210,27 @@ namespace MuseMapalyzr
             }
         }
 
+        public double CalculatePatternDifficulty()
+        {
+            Console.WriteLine($"{PatternName,25} {"Difficulty",-25}");
+            double variationMultiplier = CalcVariationScore();
+            double patternMultiplier = CalcPatternMultiplier();
+
+            double final = (VariationWeighting * variationMultiplier) + (PatternWeighting * patternMultiplier);
+
+            if (PatternName == Constants.SlowStretch)
+            {
+                Console.WriteLine($"{"Segments:",25} {Segments}");
+            }
+
+            Console.WriteLine($"{"Variation Multiplier:",25} {variationMultiplier}");
+            Console.WriteLine($"{"Pattern Multiplier:",25} {patternMultiplier}");
+            Console.WriteLine($"{"After Weighting:",25} {final}");
+
+            return final;
+        }
+
+
         public void SetCheckSegmentStrategy(CheckSegmentStrategy strategy)
         {
             CheckSegmentStrategy = strategy;
@@ -240,6 +280,11 @@ namespace MuseMapalyzr
         public double CalcPatternLengthMultiplier()
         {
             return CalcPatternLengthMultiplierStrategy.CalcPatternLengthMultiplier();
+        }
+
+        public override string ToString()
+        {
+            return $"{PatternName} Segments: {Segments.Count}";
         }
 
     }

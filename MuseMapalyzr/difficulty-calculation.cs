@@ -4,9 +4,31 @@ namespace MuseMapalyzr
     {
         public class WeightingResults // Named Tuple "Weighting" in python code
         {
-            public int Weighting;
-            public int Difficulty;
-            public int WeightedDifficulty;
+            public double Weighting;
+            public double Difficulty;
+            public double WeightedDifficulty;
+
+            public WeightingResults(double weighting, double difficulty, double weightedDifficulty)
+            {
+                Weighting = weighting;
+                Difficulty = difficulty;
+                WeightedDifficulty = weightedDifficulty;
+            }
+        }
+
+        public class PatternScore
+        {
+            public string PatternName;
+            public double Score;
+            public bool HasInterval;
+            public int TotalNotes;
+            public PatternScore(string patternName, double score, bool hasInterval, int totalNotes)
+            {
+                PatternName = patternName;
+                Score = score;
+                HasInterval = hasInterval;
+                TotalNotes = totalNotes;
+            }
         }
 
 
@@ -118,21 +140,22 @@ namespace MuseMapalyzr
 
         public double GetPatternWeighting(List<Note> notes, int sampleRate)
         {
-            double temp = 1;
             // Need Mapalyzr Class that identifies patterns
             Mapalyzr mpg = new();
 
-            // TODO: AnalyseSegments
             List<Segment> segments = SegmentAnalyser.AnalyseSegments(notes, sampleRate);
 
+            List<Pattern> patterns = mpg.IdentifyPatterns(segments);
 
-            // TODO: mpg.IdentifyPatterns(segments)
-            // COMMENTED OUT FOR NOW....
-            // List<Pattern> patterns = mpg.IdentifyPatterns(segments);
+            List<double> scores = CalculateScoresFromPatterns(patterns);
+            double difficulty = DifficultyCalculation.WeightedAverageOfValues(
+                scores,
+                double.Parse(ConfigReader.GetConfig()["get_pattern_weighting_top_percentage"]),
+                double.Parse(ConfigReader.GetConfig()["get_pattern_weighting_top_weight"]),
+                double.Parse(ConfigReader.GetConfig()["get_pattern_weighting_bottom_weight"])
+                );
 
-            // TODO: CalculateScoresFromPatterns(patterns)
-
-            return temp;
+            return difficulty;
         }
 
 
@@ -159,16 +182,83 @@ namespace MuseMapalyzr
 
             double weighting = GetPatternWeighting(notes, sampleRate);
 
-            // TODO: Implement this
-            WeightingResults weightResults = new();
+            double weightedDifficulty = weighting * difficulty;
 
-            // Temp
-            weightResults.Weighting = 1;
-            weightResults.Difficulty = 1;
-            weightResults.WeightedDifficulty = 1;
+            WeightingResults weightResults = new(weighting, difficulty, weightedDifficulty);
+
+
 
             return weightResults;
         }
+
+        public static List<double> CalculateScoresFromPatterns(List<Pattern> patterns)
+        {
+            List<PatternScore> patternScores = new List<PatternScore>();
+
+            foreach (Pattern pattern in patterns)
+            {
+                if (pattern.Segments != null && pattern.Segments.Count > 0) // check if pattern has segments
+                {
+                    double score = pattern.CalculatePatternDifficulty();
+                    patternScores.Add(
+                        new PatternScore(
+                            pattern.PatternName,
+                            score,
+                            pattern.HasIntervalSegment,
+                            pattern.TotalNotes
+                        )
+                    );
+                }
+            }
+
+            List<double> scores = new List<double>();
+            List<PatternScore> chunk = new List<PatternScore>();
+
+            foreach (PatternScore patternScore in patternScores)
+            {
+                if (patternScore.HasInterval && chunk.Count > 0)
+                {
+                    List<double> multiplied = ApplyMultiplierToPatternChunk(chunk);
+                    scores.AddRange(multiplied);
+                    chunk.Clear();
+                }
+                else
+                {
+                    chunk.Add(patternScore);
+                }
+            }
+
+            if (chunk.Count > 0)
+            {
+                List<double> multiplied = ApplyMultiplierToPatternChunk(chunk);
+                scores.AddRange(multiplied);
+            }
+
+            return scores;
+        }
+
+        public static List<double> ApplyMultiplierToPatternChunk(List<PatternScore> chunk)
+        {
+            int totalNotes = chunk.Sum(ps => ps.TotalNotes);
+
+            double multiplier = 1;
+            if (chunk.Count > 2)
+            {
+                multiplier = PatternMultiplier.PatternStreamLengthMultiplier(totalNotes);
+            }
+
+            List<double> multiplied = new List<double>();
+            foreach (PatternScore c_ps in chunk)
+            {
+                double score = c_ps.PatternName != Constants.ZigZag ? c_ps.Score * multiplier : c_ps.Score;
+                multiplied.Add(score);
+            }
+
+            Console.WriteLine($"Applying multiplier ({multiplier}x) - Chunk ({totalNotes} notes): {string.Join(", ", chunk)}");
+
+            return multiplied;
+        }
     }
+
 
 }
