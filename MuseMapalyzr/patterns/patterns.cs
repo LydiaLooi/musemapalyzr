@@ -18,7 +18,38 @@ namespace MuseMapalyzr
         public CalcVariationScoreStrategy CalcVariationScoreStrategy { get; set; }
         public CalcPatternMultiplierStrategy CalcPatternMultiplierStrategy { get; set; }
         public CalcPatternLengthMultiplierStrategy CalcPatternLengthMultiplierStrategy { get; set; }
-        public int TotalNotes { get; set; } = 0;
+
+        private int? _totalNotes;
+
+        public int TotalNotes
+        {
+            get
+            {
+                if (_totalNotes.HasValue)
+                {
+                    return _totalNotes.Value;
+                }
+
+                int count = 0;
+                HashSet<int> uniqueTimestamps = new HashSet<int>();
+
+                foreach (Segment segment in Segments)
+                {
+                    foreach (Note note in segment.Notes)
+                    {
+                        if (!uniqueTimestamps.Contains((int)note.SampleTime))
+                        {
+                            count++;
+                            uniqueTimestamps.Add((int)note.SampleTime);
+                        }
+                    }
+                }
+
+                _totalNotes = count;
+                return _totalNotes.Value;
+            }
+        }
+
 
         public bool HasIntervalSegment
         {
