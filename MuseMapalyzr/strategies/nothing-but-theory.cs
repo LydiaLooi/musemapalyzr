@@ -88,7 +88,7 @@ namespace MuseMapalyzr
         public NothingButTheoryCalcVariationScore(Pattern pattern) : base(pattern) { }
         public override double CalcVariationScore()
         {
-            Console.WriteLine("Note: Nothing but theory overrode calc_variation_score");
+            // Console.WriteLine("Note: Nothing but theory overrode calc_variation_score");
 
             var tempLst = Pattern.Segments.Select(s => $"{s.SegmentName} {s.Notes.Count}").ToList();
             var intervalList = new List<double>();
@@ -118,7 +118,7 @@ namespace MuseMapalyzr
                 }
             }
 
-            Console.WriteLine($"Checking entropy of: {string.Join(", ", segmentNames)}");
+            // Console.WriteLine($"Checking entropy of: {string.Join(", ", segmentNames)}");
 
             int n = segmentNames.Count;
             var freqDict = new Dictionary<string, int>();
@@ -138,7 +138,7 @@ namespace MuseMapalyzr
                 double averageDebuff = intervalList.Average();
                 entropy *= averageDebuff;
 
-                Console.WriteLine($">>> Debuffing (due to Intervals) by {averageDebuff} <<<");
+                // Console.WriteLine($">>> Debuffing (due to Intervals) by {averageDebuff} <<<");
             }
 
             entropy = Pattern.CalcSwitchDebuff(segmentCounts, entropy);

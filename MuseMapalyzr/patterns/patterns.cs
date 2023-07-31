@@ -142,7 +142,7 @@ namespace MuseMapalyzr
                 }
 
                 // Log the switch proportion and debuff.
-                Console.WriteLine($">>> Switch (proportion {switchProportion}) debuff by {switchDebuff:.2f} <<<");
+                // Console.WriteLine($">>> Switch (proportion {switchProportion}) debuff by {switchDebuff:.2f} <<<");
                 entropy *= switchDebuff;
             }
 
@@ -161,7 +161,11 @@ namespace MuseMapalyzr
 
         public bool SegmentIsInterval(Segment segment)
         {
-            return segment.SegmentName.Contains("Interval");
+            if (segment != null)
+            {
+                return segment.SegmentName.Contains("Interval");
+            }
+            return false;
         }
 
         public bool TimeDifferenceIsTolerable(Segment previousSegment, Segment currentSegment)

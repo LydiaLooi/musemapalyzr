@@ -40,7 +40,7 @@ namespace MuseMapalyzr
                 }
             }
 
-            Console.WriteLine($"Checking entropy of: {string.Join(", ", segmentNames)}");
+            // Console.WriteLine($"Checking entropy of: {string.Join(", ", segmentNames)}");
 
             double n = segmentNames.Count;
             var freq = segmentNames.GroupBy(x => x)
@@ -54,7 +54,7 @@ namespace MuseMapalyzr
                 double averageDebuff = intervalList.Average();
                 entropy *= averageDebuff;
 
-                Console.WriteLine($">>> Debuffing (due to Intervals) by {averageDebuff} <<<");
+                // Console.WriteLine($">>> Debuffing (due to Intervals) by {averageDebuff} <<<");
             }
 
             entropy = this.Pattern.CalcSwitchDebuff(patternCounts, entropy);

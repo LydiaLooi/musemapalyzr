@@ -50,6 +50,8 @@ namespace MuseMapalyzr
                     MuseSwiprMap mMap = MuseSwiprMap.FromKoreographAsset(filename);
                     string name = filename.Split(new string[] { charSeparator }, StringSplitOptions.None)[^1].Split(".asset")[0];
 
+                    Console.WriteLine($"Analysing : {name}");
+
                     using (StreamWriter outfile = new StreamWriter($"{Constants.AnalysisDir}/{name}", false, Encoding.UTF8))
                     {
                         DifficultyCalculation.WeightingResults weightResults = difficultyCalculation.CalculateDifficulty(mMap.Notes, outfile, mMap.SampleRate);
@@ -59,7 +61,7 @@ namespace MuseMapalyzr
                     // catch (Exception e)
                     // {
                     //     // Log the error
-                    //     Console.WriteLine($"ERROR parsing a file: {e.Message}");
+                    //     // Console.WriteLine($"ERROR parsing a file: {e.Message}");
                     //     throw e;
                     //     // continue;
                     // }

@@ -73,13 +73,13 @@ namespace MuseMapalyzr
                         multipliers.Add(double.Parse(ConfigReader.GetConfig()["other_long_int_multiplier"]));
                         break;
                     default:
-                        Console.WriteLine($"WARNING: Did not recognise pattern: {segment.SegmentName}");
+                        // Console.WriteLine($"WARNING: Did not recognise pattern: {segment.SegmentName}");
                         multipliers.Add(1);
                         break;
                 }
             }
 
-            Console.WriteLine($"Other Pattern Multipliers: {multipliers}");
+            Console.WriteLine($"Other Pattern Multipliers: [{string.Join(", ", multipliers)}]");
             double weightedAverage = DifficultyCalculation.WeightedAverageOfValues(multipliers); // assuming you have a method for this
 
             return weightedAverage;

@@ -21,7 +21,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/MuseMapalyzr/bin/Debug/net7.0/musemapalyzr-csharp.dll",
-            "args": ["big", "black"],
+            "args": ["no", "spear", "second"],
             "cwd": "${workspaceFolder}/MuseMapalyzr/",
             "console": "internalConsole",
             "stopAtEntry": false

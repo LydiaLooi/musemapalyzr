@@ -194,9 +194,11 @@ namespace MuseMapalyzr
         public static List<double> CalculateScoresFromPatterns(List<Pattern> patterns)
         {
             List<PatternScore> patternScores = new List<PatternScore>();
+            Console.WriteLine($"Checking {patterns.Count} Patterns");
 
             foreach (Pattern pattern in patterns)
             {
+                Console.WriteLine($"----------{pattern.PatternName} {pattern.Segments.Count}----------");
                 if (pattern.Segments != null && pattern.Segments.Count > 0) // check if pattern has segments
                 {
                     double score = pattern.CalculatePatternDifficulty();
