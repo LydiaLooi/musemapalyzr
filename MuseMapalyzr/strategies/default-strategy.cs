@@ -6,37 +6,65 @@ namespace MuseMapalyzr
 
         public override double CalcVariationScore()
         {
-            if (!Pattern.Segments.Any())
-                return 0;
-
-            var tempLst = Pattern.Segments.Select(s => s.SegmentName).ToList();
-            var intervalList = new List<double>();
-            var segmentNames = new List<string>();
-
-            var patternCounts = Pattern.GetSegmentTypeCounts(tempLst);
-
-            // Check for intervals:
-            // TODO: Implement the logic here.
-
-            var n = segmentNames.Count;
-            var freq = segmentNames.GroupBy(x => x).Select(g => (double)g.Count() / n);
-            var entropy = -freq.Sum(p => p * Math.Log2(p));
-
-            if (intervalList.Any())
+            // If there are no segments, return 0
+            if (this.Pattern.Segments.Count == 0)
             {
-                // average interval debuffs and multiply that by the entropy
-                var averageDebuff = intervalList.Average();
-                entropy *= averageDebuff;
-
-                // Log the debuffing due to Intervals.
+                return 0;
             }
 
-            entropy = Pattern.CalcSwitchDebuff(patternCounts, entropy);
+            List<string> tempLst = this.Pattern.Segments.Select(s => s.SegmentName).ToList();
+            List<double> intervalList = new List<double>();
+            List<string> segmentNames = new List<string>();
 
-            if (entropy == 0)  // Temp?
+            Dictionary<string, int> patternCounts = this.Pattern.GetSegmentTypeCounts(tempLst);
+
+            // Check for intervals
+            for (int i = 0; i < tempLst.Count; i++)
+            {
+                string name = tempLst[i];
+                if (this.Pattern.Intervals.ContainsKey(name))
+                {
+                    if (i == 0 || i == tempLst.Count - 1)
+                    {
+                        intervalList.Add(this.Pattern.Intervals[name] * this.Pattern.EndExtraDebuff);
+                    }
+                    else
+                    {
+                        intervalList.Add(this.Pattern.Intervals[name]);
+                        segmentNames.Add("Interval");
+                    }
+                }
+                else
+                {
+                    segmentNames.Add(name);
+                }
+            }
+
+            Console.WriteLine($"Checking entropy of: {string.Join(", ", segmentNames)}");
+
+            double n = segmentNames.Count;
+            var freq = segmentNames.GroupBy(x => x)
+                                   .ToDictionary(g => g.Key, g => g.Count() / n)
+                                   .Values;
+
+            double entropy = -freq.Sum(p => p * Math.Log2(p));
+
+            if (intervalList.Count != 0)
+            {
+                double averageDebuff = intervalList.Average();
+                entropy *= averageDebuff;
+
+                Console.WriteLine($">>> Debuffing (due to Intervals) by {averageDebuff} <<<");
+            }
+
+            entropy = this.Pattern.CalcSwitchDebuff(patternCounts, entropy);
+
+            if (entropy == 0)
+            {
                 return 1;
+            }
 
-            return (double)entropy;
+            return entropy;
         }
     }
 

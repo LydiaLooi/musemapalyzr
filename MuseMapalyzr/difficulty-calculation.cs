@@ -127,7 +127,8 @@ namespace MuseMapalyzr
 
 
             // TODO: mpg.IdentifyPatterns(segments)
-            List<Pattern> patterns = mpg.IdentifyPatterns(segments);
+            // COMMENTED OUT FOR NOW....
+            // List<Pattern> patterns = mpg.IdentifyPatterns(segments);
 
             // TODO: CalculateScoresFromPatterns(patterns)
 

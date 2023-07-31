@@ -11,6 +11,9 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="YamlDotNet" Version="13.1.1" />
+    <None Update="config\config.yaml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

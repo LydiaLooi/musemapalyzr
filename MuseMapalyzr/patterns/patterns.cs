@@ -35,11 +35,11 @@ namespace MuseMapalyzr
             {
                 SampleRate = sampleRate;
             }
-            Tolerance = 0; // Initialize with your value
-            VariationWeighting = 0; // Initialize with your value
-            PatternWeighting = 0; // Initialize with your value
-            Intervals = new Dictionary<string, double>(); // Initialize with your values
-            EndExtraDebuff = 0; // Initialize with your value
+            Tolerance = int.Parse(ConfigReader.GetConfig()["pattern_tolerance_ms"]) * SampleRate / 1000; ;
+            VariationWeighting = double.Parse(ConfigReader.GetConfig()["default_variation_weighting"]);
+            PatternWeighting = double.Parse(ConfigReader.GetConfig()["default_pattern_weighting"]);
+            Intervals = new Dictionary<string, double>() { }; // Initialize with your values
+            EndExtraDebuff = double.Parse(ConfigReader.GetConfig()["extra_int_end_debuff"]);
             CheckSegmentStrategy = null;
             IsAppendableStrategy = null;
             CalcVariationScoreStrategy = null;
@@ -153,6 +153,41 @@ namespace MuseMapalyzr
             {
                 Segments.Add(intervalSegment);
                 return false;
+            }
+        }
+
+        public void ResetGroup(Segment previousSegment, Segment currentSegment)
+        {
+            IsActive = true;
+            Segments = new List<Segment>();
+
+            // If previous or currentSegment is an Interval, then only add that one (prioritise the latest one).
+            if (SegmentIsInterval(currentSegment))
+            {
+                CheckSegment(currentSegment);
+            }
+            else if (SegmentIsInterval(previousSegment))
+            {
+                CheckSegment(previousSegment);
+                CheckSegment(currentSegment);
+            }
+            // If not, then attempt to add the previous one first, then the current one too
+            // If it fails at any point, set the group to inactive
+            else
+            {
+                if (previousSegment != null)
+                {
+                    bool added = CheckSegment(previousSegment).Value;
+                    if (added)
+                    {
+                        added = CheckSegment(currentSegment).Value;
+                    }
+
+                    if (!added)
+                    {
+                        IsActive = false;
+                    }
+                }
             }
         }
 
