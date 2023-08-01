@@ -81,10 +81,16 @@ namespace MuseMapalyzr
             {
                 SampleRate = sampleRate;
             }
-            Tolerance = int.Parse(ConfigReader.GetConfig()["pattern_tolerance_ms"]) * SampleRate / 1000; ;
+            Tolerance = Constants.GetTolerance();
+
             VariationWeighting = double.Parse(ConfigReader.GetConfig()["default_variation_weighting"]);
             PatternWeighting = double.Parse(ConfigReader.GetConfig()["default_pattern_weighting"]);
-            Intervals = new Dictionary<string, double>() { }; // Initialize with your values
+            Intervals = new Dictionary<string, double>()
+            {
+                {Constants.ShortInterval, double.Parse(ConfigReader.GetConfig()["short_int_debuff"])},
+                {Constants.MedInterval, double.Parse(ConfigReader.GetConfig()["med_int_debuff"])},
+                {Constants.LongInterval, double.Parse(ConfigReader.GetConfig()["long_int_debuff"])},
+            }; // Initialize with your values
             EndExtraDebuff = double.Parse(ConfigReader.GetConfig()["extra_int_end_debuff"]);
             CheckSegmentStrategy = null;
             IsAppendableStrategy = null;
@@ -159,7 +165,7 @@ namespace MuseMapalyzr
             return stackNames.Contains(segment.SegmentName);
         }
 
-        public bool SegmentIsInterval(Segment segment)
+        public bool SegmentIsInterval(Segment? segment)
         {
             if (segment != null)
             {
@@ -210,7 +216,7 @@ namespace MuseMapalyzr
             }
         }
 
-        public void ResetGroup(Segment previousSegment, Segment currentSegment)
+        public void ResetGroup(Segment? previousSegment, Segment currentSegment)
         {
             IsActive = true;
             Segments = new List<Segment>();
@@ -292,7 +298,7 @@ namespace MuseMapalyzr
         }
 
         // Use strategy pattern to delegate method calls
-        public bool? CheckSegment(Segment currentSegment)
+        public bool? CheckSegment(Segment? currentSegment)
         {
             return CheckSegmentStrategy.CheckSegment(currentSegment);
         }

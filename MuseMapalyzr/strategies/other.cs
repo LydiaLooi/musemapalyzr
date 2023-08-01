@@ -4,7 +4,7 @@ namespace MuseMapalyzr
     {
         public OtherCheckSegment(Pattern pattern) : base(pattern) { }
 
-        public override bool? CheckSegment(Segment currentSegment)
+        public override bool? CheckSegment(Segment? currentSegment)
         {
             Pattern.Segments.Add(currentSegment);
             return true;

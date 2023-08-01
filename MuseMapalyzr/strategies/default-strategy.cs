@@ -40,7 +40,7 @@ namespace MuseMapalyzr
                 }
             }
 
-            // Console.WriteLine($"Checking entropy of: {string.Join(", ", segmentNames)}");
+            Console.WriteLine($"Checking entropy of: {string.Join(", ", segmentNames)}");
 
             double n = segmentNames.Count;
             var freq = segmentNames.GroupBy(x => x)
@@ -92,7 +92,7 @@ namespace MuseMapalyzr
     {
         public DefaultCheckSegment(Pattern pattern) : base(pattern) { }
 
-        public override bool? CheckSegment(Segment currentSegment)
+        public override bool? CheckSegment(Segment? currentSegment)
         {
             throw new NotImplementedException("You should use an actual strategy!");
         }

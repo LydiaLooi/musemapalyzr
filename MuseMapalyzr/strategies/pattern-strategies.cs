@@ -10,7 +10,7 @@ namespace MuseMapalyzr
             Pattern = pattern;
         }
 
-        public abstract bool? CheckSegment(Segment currentSegment);
+        public abstract bool? CheckSegment(Segment? currentSegment);
     }
 
     public abstract class IsAppendableStrategy

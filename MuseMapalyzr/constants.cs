@@ -30,7 +30,7 @@ namespace MuseMapalyzr
         public static int GetTolerance()
         {
             dynamic config = ConfigReader.GetConfig();
-            int tolerance = config["pattern_tolerance_ms"] * DefaultSampleRate / 1000;
+            int tolerance = int.Parse(config["pattern_tolerance_ms"]) * DefaultSampleRate / 1000;
             return tolerance;
         }
 

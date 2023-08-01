@@ -202,6 +202,7 @@ namespace MuseMapalyzr
                 if (pattern.Segments != null && pattern.Segments.Count > 0) // check if pattern has segments
                 {
                     double score = pattern.CalculatePatternDifficulty();
+                    Console.WriteLine($"SCORE: {score}");
                     patternScores.Add(
                         new PatternScore(
                             pattern.PatternName,

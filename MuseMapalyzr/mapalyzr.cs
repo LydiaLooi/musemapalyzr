@@ -93,7 +93,7 @@ namespace MuseMapalyzr
             return ReturnFinalPatterns(mergeMergable);
         }
 
-        private void HandleEachGroup(Segment previousSegment, Segment currentSegment)
+        private void HandleEachGroup(Segment? previousSegment, Segment currentSegment)
         {
             Added = false;  // has this pattern been added?
             Reset = false;  // have we done a reset?
@@ -160,7 +160,7 @@ namespace MuseMapalyzr
         public List<Pattern> ReturnFinalPatterns(bool mergeMergable = true)
         {
             // Console.WriteLine($"_return_final_patterns : {mergeMergable}");
-            // Console.WriteLine($"Patterns ({Patterns.Count}): {string.Join(", ", Patterns.Select(p => $"{p.PatternName} ({p.Segments.Count})"))}");
+            Console.WriteLine($"Patterns ({Patterns.Count}): {string.Join(", ", Patterns.Select(p => $"{p.PatternName} ({p.Segments.Count})"))}");
 
             if (!mergeMergable)
             {

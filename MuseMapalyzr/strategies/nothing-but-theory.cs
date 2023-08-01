@@ -7,7 +7,7 @@ namespace MuseMapalyzr
     {
         public NothingButTheoryCheckSegment(Pattern pattern) : base(pattern) { }
 
-        public override bool? CheckSegment(Segment currentSegment)
+        public override bool? CheckSegment(Segment? currentSegment)
         {
             if (!Pattern.IsActive)
                 return false;
@@ -118,7 +118,7 @@ namespace MuseMapalyzr
                 }
             }
 
-            // Console.WriteLine($"Checking entropy of: {string.Join(", ", segmentNames)}");
+            Console.WriteLine($"Checking entropy of: {string.Join(", ", segmentNames)}");
 
             int n = segmentNames.Count;
             var freqDict = new Dictionary<string, int>();

@@ -4,7 +4,7 @@ namespace MuseMapalyzr
     {
         public EvenCirclesCheckSegment(Pattern pattern) : base(pattern) { }
 
-        public override bool? CheckSegment(Segment currentSegment)
+        public override bool? CheckSegment(Segment? currentSegment)
         {
             if (!Pattern.IsActive)
                 return false;
