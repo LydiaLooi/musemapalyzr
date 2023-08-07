@@ -71,10 +71,11 @@ pattern_stream_length_low_clamp: 6.5
 pattern_stream_length_up_clamp: 20
 
 # zig_zag_length_multiplier
-zig_zag_length_low_bound: 1.0
-zig_zag_length_up_bound: 1.2
-zig_zag_length_low_clamp: 10
-zig_zag_length_up_clamp: 30
+zig_zag_length_low_bound: 1
+zig_zag_length_up_bound: 15
+zig_zag_length_low_clamp: 15
+zig_zag_length_up_clamp: 50
+zig_zag_length_nps_threshold: 17 # Slightly faster than EWF
 
 # four_stack_multiplier
 four_stack_low_bound: 1.0

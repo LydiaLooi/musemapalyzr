@@ -31,9 +31,15 @@ namespace MuseMapalyzr
         }
     }
 
+
+
     public class OtherCalcPatternMultiplier : CalcPatternMultiplierStrategy
     {
         public OtherCalcPatternMultiplier(Pattern pattern) : base(pattern) { }
+
+
+
+
 
         public override double CalcPatternMultiplier()
         {
@@ -41,27 +47,42 @@ namespace MuseMapalyzr
             // of the segment difficulties within the Other pattern.
             List<double> multipliers = new List<double>();
 
-            foreach (var segment in Pattern.Segments)
+            foreach (Segment segment in Pattern.Segments)
             {
                 switch (segment.SegmentName)
                 {
                     case Constants.Switch:
-                        multipliers.Add(double.Parse(ConfigReader.GetConfig()["other_switch_multiplier"]));
+                        double switchMultiplier = double.Parse(ConfigReader.GetConfig()["other_switch_multiplier"]);
+                        // Console.WriteLine($"Switch: {switchMultiplier,-40} NPS: {segment.NotesPerSecond}");
+                        multipliers.Add(switchMultiplier);
                         break;
                     case Constants.ZigZag:
-                        multipliers.Add(PatternMultiplier.ZigZagMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
+                        // Zig zags are special as they can have many notes in them.
+                        double zigZagMultiplier = PatternMultiplier.ZigZagMultiplier(segment.NotesPerSecond);
+                        double zigZagLengthMultiplier = PatternMultiplier.ZigZagLengthMultiplier(segment.Notes.Count, segment.NotesPerSecond);
+                        // Console.WriteLine($"ZIG ZAG MULTIPLIER: {multiplier} * {extra} = {multiplier * extra}");
+                        // Console.WriteLine($"Zig Zag: {zigZagMultiplier * zigZagLengthMultiplier,-40} NPS: {segment.NotesPerSecond}");
+                        multipliers.Add(zigZagMultiplier * zigZagLengthMultiplier);
                         break;
                     case Constants.TwoStack:
-                        multipliers.Add(PatternMultiplier.TwoStackMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
+                        double twoStackMultiplier = PatternMultiplier.TwoStackMultiplier(segment.NotesPerSecond);
+                        // Console.WriteLine($"Two Stack: {twoStackMultiplier,-40} NPS: {segment.NotesPerSecond}");
+                        multipliers.Add(twoStackMultiplier);
                         break;
                     case Constants.ThreeStack:
-                        multipliers.Add(PatternMultiplier.ThreeStackMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
+                        double threeStackMultiplier = PatternMultiplier.ThreeStackMultiplier(segment.NotesPerSecond);
+                        // Console.WriteLine($"Three Stack: {threeStackMultiplier,-40} NPS: {segment.NotesPerSecond}");
+                        multipliers.Add(threeStackMultiplier);
                         break;
                     case Constants.FourStack:
-                        multipliers.Add(PatternMultiplier.FourStackMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
+                        double fourStackMultiplier = PatternMultiplier.FourStackMultiplier(segment.NotesPerSecond);
+                        // Console.WriteLine($"Four Stack: {fourStackMultiplier,-40} NPS: {segment.NotesPerSecond}");
+                        multipliers.Add(fourStackMultiplier);
                         break;
                     case Constants.SingleStreams:
-                        multipliers.Add(PatternMultiplier.StreamMultiplier(segment.NotesPerSecond)); // assuming you have a method for this
+                        double streamMultiplier = PatternMultiplier.StreamMultiplier(segment.NotesPerSecond);
+                        // Console.WriteLine($"Stream multiplier: {streamMultiplier,-40} NPS: {segment.NotesPerSecond}");
+                        multipliers.Add(streamMultiplier);
                         break;
                     case Constants.ShortInterval:
                         multipliers.Add(double.Parse(ConfigReader.GetConfig()["other_short_int_multiplier"]));
@@ -73,15 +94,15 @@ namespace MuseMapalyzr
                         multipliers.Add(double.Parse(ConfigReader.GetConfig()["other_long_int_multiplier"]));
                         break;
                     default:
-                        // Console.WriteLine($"WARNING: Did not recognise pattern: {segment.SegmentName}");
+                        // // Console.WriteLine($"WARNING: Did not recognise pattern: {segment.SegmentName}");
                         multipliers.Add(1);
                         break;
                 }
             }
 
-            Console.WriteLine($"Other Pattern Multipliers: [{string.Join(", ", multipliers)}]");
+            // Console.WriteLine($"Other Pattern Multipliers: [{string.Join(", ", multipliers)}]");
             double weightedAverage = DifficultyCalculation.WeightedAverageOfValues(multipliers); // assuming you have a method for this
-
+            Console.WriteLine($"Other Pattern Multiplier Weighted Average: {weightedAverage}");
             return weightedAverage;
         }
     }

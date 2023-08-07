@@ -40,7 +40,7 @@ namespace MuseMapalyzr
                 }
             }
 
-            Console.WriteLine($"Checking entropy of: {string.Join(", ", segmentNames)}");
+            // Console.WriteLine($"Checking entropy of: {string.Join(", ", segmentNames)}");
 
             double n = segmentNames.Count;
             var freq = segmentNames.GroupBy(x => x)

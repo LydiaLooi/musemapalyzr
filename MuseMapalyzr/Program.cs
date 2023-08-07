@@ -61,7 +61,7 @@ namespace MuseMapalyzr
                     // catch (Exception e)
                     // {
                     //     // Log the error
-                    //     // Console.WriteLine($"ERROR parsing a file: {e.Message}");
+                    //     // // Console.WriteLine($"ERROR parsing a file: {e.Message}");
                     //     throw e;
                     //     // continue;
                     // }

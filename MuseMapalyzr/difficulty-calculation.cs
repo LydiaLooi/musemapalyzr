@@ -148,6 +148,7 @@ namespace MuseMapalyzr
             List<Pattern> patterns = mpg.IdentifyPatterns(segments);
 
             List<double> scores = CalculateScoresFromPatterns(patterns);
+
             double difficulty = DifficultyCalculation.WeightedAverageOfValues(
                 scores,
                 double.Parse(ConfigReader.GetConfig()["get_pattern_weighting_top_percentage"]),
@@ -186,7 +187,7 @@ namespace MuseMapalyzr
 
             WeightingResults weightResults = new(weighting, difficulty, weightedDifficulty);
 
-
+            Console.WriteLine($"difficulty: {difficulty} weighting: {weighting} weightedDifficulty: {weightedDifficulty}");
 
             return weightResults;
         }
@@ -194,15 +195,15 @@ namespace MuseMapalyzr
         public static List<double> CalculateScoresFromPatterns(List<Pattern> patterns)
         {
             List<PatternScore> patternScores = new List<PatternScore>();
-            Console.WriteLine($"Checking {patterns.Count} Patterns");
+            // Console.WriteLine($"Checking {patterns.Count} Patterns");
 
             foreach (Pattern pattern in patterns)
             {
-                Console.WriteLine($"----------{pattern.PatternName} {pattern.Segments.Count}----------");
+                // Console.WriteLine($"----------{pattern.PatternName} {pattern.Segments.Count}----------");
                 if (pattern.Segments != null && pattern.Segments.Count > 0) // check if pattern has segments
                 {
                     double score = pattern.CalculatePatternDifficulty();
-                    Console.WriteLine($"SCORE: {score}");
+                    // Console.WriteLine($"Pattern Difficulty Score: {score}");
                     patternScores.Add(
                         new PatternScore(
                             pattern.PatternName,
@@ -257,7 +258,7 @@ namespace MuseMapalyzr
                 multiplied.Add(score);
             }
 
-            Console.WriteLine($"Applying multiplier ({multiplier}x) - Chunk ({totalNotes} notes): {string.Join(", ", chunk)}");
+            // Console.WriteLine($"Applying multiplier ({multiplier}x) - Chunk ({totalNotes} notes): {string.Join(", ", chunk)}");
 
             return multiplied;
         }

@@ -160,7 +160,7 @@ namespace MuseMapalyzr
         public List<Pattern> ReturnFinalPatterns(bool mergeMergable = true)
         {
             // Console.WriteLine($"_return_final_patterns : {mergeMergable}");
-            Console.WriteLine($"Patterns ({Patterns.Count}): {string.Join(", ", Patterns.Select(p => $"{p.PatternName} ({p.Segments.Count})"))}");
+            // Console.WriteLine($"Patterns ({Patterns.Count}): {string.Join(", ", Patterns.Select(p => $"{p.PatternName} ({p.Segments.Count})"))}");
 
             if (!mergeMergable)
             {
@@ -188,7 +188,7 @@ namespace MuseMapalyzr
                 newGroups.Add(currentMergable);
             }
 
-            Console.WriteLine($"Merged patterns ({newGroups.Count}): {string.Join(", ", newGroups.Select(p => $"{p.PatternName} ({p.Segments.Count})"))}");
+            // Console.WriteLine($"Merged patterns ({newGroups.Count}): {string.Join(", ", newGroups.Select(p => $"{p.PatternName} ({p.Segments.Count})"))}");
             return newGroups;
         }
 

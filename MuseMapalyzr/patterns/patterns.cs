@@ -148,7 +148,7 @@ namespace MuseMapalyzr
                 }
 
                 // Log the switch proportion and debuff.
-                // Console.WriteLine($">>> Switch (proportion {switchProportion}) debuff by {switchDebuff:.2f} <<<");
+                // // Console.WriteLine($">>> Switch (proportion {switchProportion}) debuff by {switchDebuff:.2f} <<<");
                 entropy *= switchDebuff;
             }
 
@@ -253,20 +253,16 @@ namespace MuseMapalyzr
 
         public double CalculatePatternDifficulty()
         {
-            Console.WriteLine($"{PatternName,25} {"Difficulty",-25}");
+            // Console.WriteLine($"{PatternName,25} {"Difficulty",-25}");
             double variationMultiplier = CalcVariationScore();
             double patternMultiplier = CalcPatternMultiplier();
 
             double final = (VariationWeighting * variationMultiplier) + (PatternWeighting * patternMultiplier);
 
-            if (PatternName == Constants.SlowStretch)
-            {
-                Console.WriteLine($"{"Segments:",25} {Segments}");
-            }
 
-            Console.WriteLine($"{"Variation Multiplier:",25} {variationMultiplier}");
-            Console.WriteLine($"{"Pattern Multiplier:",25} {patternMultiplier}");
-            Console.WriteLine($"{"After Weighting:",25} {final}");
+            // Console.WriteLine($"{"Variation Multiplier:",25} {variationMultiplier}");
+            // Console.WriteLine($"{"Pattern Multiplier:",25} {patternMultiplier}");
+            // Console.WriteLine($"{"After Weighting:",25} {final}");
 
             return final;
         }

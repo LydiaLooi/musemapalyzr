@@ -98,6 +98,7 @@ namespace MuseMapalyzr
         {
             double nps = Pattern.Segments[0].NotesPerSecond;  // Even Circle should have consistent NPS
             double multiplier = PatternMultiplier.EvenCircleMultiplier(nps);  // You'll need to define the EvenCircleMultiplier method
+            Console.WriteLine($"EvenCirclesCalcPatternMultiplier: {multiplier}");
             return multiplier;
         }
     }

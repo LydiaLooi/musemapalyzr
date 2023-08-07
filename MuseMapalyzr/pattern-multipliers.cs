@@ -102,16 +102,22 @@ namespace MuseMapalyzr
             return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
         }
 
-        public static double ZigZagLengthMultiplier(double numNotes)
+        public static double ZigZagLengthMultiplier(double numNotes, double nps)
         {
             double lowerBound = double.Parse(conf["zig_zag_length_low_bound"]);
             double upperBound = double.Parse(conf["zig_zag_length_up_bound"]);
             double lowerClamp = double.Parse(conf["zig_zag_length_low_clamp"]);
             double upperClamp = double.Parse(conf["zig_zag_length_up_clamp"]);
+            double npsThreshold = double.Parse(conf["zig_zag_length_nps_threshold"]);
+            // Console.WriteLine($"NPS: {nps}, NOTES: {numNotes}");
+            if (nps > npsThreshold)
+            {
+                double t = (numNotes - lowerClamp) / (upperClamp - lowerClamp);
+                t = Clamp(t, 0, 1);
+                return lowerBound + (upperBound - lowerBound) * EaseInCubic(t);
 
-            double t = (numNotes - lowerClamp) / (upperClamp - lowerClamp);
-            t = Math.Max(Math.Min(t, 1), 0);
-            return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
+            }
+            return 1;
         }
 
         public static double FourStackMultiplier(double nps)
@@ -162,7 +168,5 @@ namespace MuseMapalyzr
             t = Math.Max(Math.Min(t, 1), 0);
             return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
         }
-
-
     }
 }
