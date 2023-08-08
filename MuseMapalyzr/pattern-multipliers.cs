@@ -1,8 +1,11 @@
+using System;
+using static MuseMapalyzr.ConfigReader;
+
 namespace MuseMapalyzr
 {
     public class PatternMultiplier
     {
-        private static dynamic conf = ConfigReader.GetConfig();
+        private static MuseMapalyzrConfig conf = ConfigReader.GetConfig();
 
         private static double SmoothStep(double x)
         {
@@ -26,10 +29,10 @@ namespace MuseMapalyzr
 
         public static double NothingButTheoryMultiplier(double nps)
         {
-            double lowerBound = double.Parse(conf["nothing_but_theory_low_bound"]);
-            double upperBound = double.Parse(conf["nothing_but_theory_up_bound"]);
-            double lowerClamp = double.Parse(conf["nothing_but_theory_low_clamp"]);
-            double upperClamp = double.Parse(conf["nothing_but_theory_up_clamp"]);
+            double lowerBound = conf.NothingButTheoryLowBound;
+            double upperBound = conf.NothingButTheoryUpBound;
+            double lowerClamp = conf.NothingButTheoryLowClamp;
+            double upperClamp = conf.NothingButTheoryUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Clamp(t, 0, 1);
@@ -38,10 +41,10 @@ namespace MuseMapalyzr
 
         public static double VaryingStreams(double nps)
         {
-            double lowerBound = double.Parse(conf["varying_streams_low_bound"]);
-            double upperBound = double.Parse(conf["varying_streams_up_bound"]);
-            double lowerClamp = double.Parse(conf["varying_streams_low_clamp"]);
-            double upperClamp = double.Parse(conf["varying_streams_up_clamp"]);
+            double lowerBound = conf.VaryingStreamsLowBound;
+            double upperBound = conf.VaryingStreamsUpBound;
+            double lowerClamp = conf.VaryingStreamsLowClamp;
+            double upperClamp = conf.VaryingStreamsUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Clamp(t, 0, 1);
@@ -50,10 +53,10 @@ namespace MuseMapalyzr
 
         public static double ZigZagMultiplier(double nps)
         {
-            double lowerBound = double.Parse(conf["zig_zag_low_bound"]);
-            double upperBound = double.Parse(conf["zig_zag_up_bound"]);
-            double lowerClamp = double.Parse(conf["zig_zag_low_clamp"]);
-            double upperClamp = double.Parse(conf["zig_zag_up_clamp"]);
+            double lowerBound = conf.ZigZagLowBound;
+            double upperBound = conf.ZigZagUpBound;
+            double lowerClamp = conf.ZigZagLowClamp;
+            double upperClamp = conf.ZigZagUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Clamp(t, 0, 1);
@@ -62,8 +65,8 @@ namespace MuseMapalyzr
 
         public static double EvenCircleMultiplier(double nps)
         {
-            double lowerBound = double.Parse(conf["even_circle_low_bound"]);
-            double upperBound = double.Parse(conf["even_circle_up_bound"]);
+            double lowerBound = conf.EvenCircleLowBound;
+            double upperBound = conf.EvenCircleUpBound;
 
             double t = Clamp(nps / 30, 0, 1);
             return lowerBound + (upperBound - lowerBound) * EaseInOut(t);
@@ -71,8 +74,8 @@ namespace MuseMapalyzr
 
         public static double SkewedCircleMultiplier(double nps)
         {
-            double lowerBound = double.Parse(conf["skewed_circle_low_bound"]);
-            double upperBound = double.Parse(conf["skewed_circle_up_bound"]);
+            double lowerBound = conf.SkewedCircleLowBound;
+            double upperBound = conf.SkewedCircleUpBound;
 
             double t = Clamp(nps / 30, 0, 1);
             return lowerBound + (upperBound - lowerBound) * EaseInOut(t);
@@ -80,10 +83,10 @@ namespace MuseMapalyzr
 
         public static double StreamMultiplier(double nps)
         {
-            double lowerBound = double.Parse(conf["stream_low_bound"]);
-            double upperBound = double.Parse(conf["stream_up_bound"]);
-            double lowerClamp = double.Parse(conf["stream_low_clamp"]);
-            double upperClamp = double.Parse(conf["stream_up_clamp"]);
+            double lowerBound = conf.StreamLowBound;
+            double upperBound = conf.StreamUpBound;
+            double lowerClamp = conf.StreamLowClamp;
+            double upperClamp = conf.StreamUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Clamp(t, 0, 1);
@@ -92,10 +95,10 @@ namespace MuseMapalyzr
 
         public static double PatternStreamLengthMultiplier(double numNotes)
         {
-            double lowerBound = double.Parse(conf["pattern_stream_length_low_bound"]);
-            double upperBound = double.Parse(conf["pattern_stream_length_up_bound"]);
-            double lowerClamp = double.Parse(conf["pattern_stream_length_low_clamp"]);
-            double upperClamp = double.Parse(conf["pattern_stream_length_up_clamp"]);
+            double lowerBound = conf.PatternStreamLengthLowBound;
+            double upperBound = conf.PatternStreamLengthUpBound;
+            double lowerClamp = conf.PatternStreamLengthLowClamp;
+            double upperClamp = conf.PatternStreamLengthUpClamp;
 
             double t = (numNotes - lowerClamp) / (upperClamp - lowerClamp);
             t = Clamp(t, 0, 1);
@@ -104,18 +107,17 @@ namespace MuseMapalyzr
 
         public static double ZigZagLengthMultiplier(double numNotes, double nps)
         {
-            double lowerBound = double.Parse(conf["zig_zag_length_low_bound"]);
-            double upperBound = double.Parse(conf["zig_zag_length_up_bound"]);
-            double lowerClamp = double.Parse(conf["zig_zag_length_low_clamp"]);
-            double upperClamp = double.Parse(conf["zig_zag_length_up_clamp"]);
-            double npsThreshold = double.Parse(conf["zig_zag_length_nps_threshold"]);
-            // Console.WriteLine($"NPS: {nps}, NOTES: {numNotes}");
+            double lowerBound = conf.ZigZagLengthLowBound;
+            double upperBound = conf.ZigZagLengthUpBound;
+            double lowerClamp = conf.ZigZagLengthLowClamp;
+            double upperClamp = conf.ZigZagLengthUpClamp;
+            double npsThreshold = conf.ZigZagLengthNpsThreshold;
+
             if (nps > npsThreshold)
             {
                 double t = (numNotes - lowerClamp) / (upperClamp - lowerClamp);
                 t = Clamp(t, 0, 1);
                 return lowerBound + (upperBound - lowerBound) * EaseInCubic(t);
-
             }
             return 1;
         }
@@ -136,13 +138,12 @@ namespace MuseMapalyzr
             return 1 + newAddtional;
         }
 
-
         public static double FourStackMultiplier(double nps)
         {
-            double lowerBound = double.Parse(conf["four_stack_low_bound"]);
-            double upperBound = double.Parse(conf["four_stack_up_bound"]);
-            double lowerClamp = double.Parse(conf["four_stack_low_clamp"]);
-            double upperClamp = double.Parse(conf["four_stack_up_clamp"]);
+            double lowerBound = conf.FourStackLowBound;
+            double upperBound = conf.FourStackUpBound;
+            double lowerClamp = conf.FourStackLowClamp;
+            double upperClamp = conf.FourStackUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Math.Max(Math.Min(t, 1), 0);
@@ -152,10 +153,10 @@ namespace MuseMapalyzr
 
         public static double ThreeStackMultiplier(double nps)
         {
-            double lowerBound = double.Parse(conf["three_stack_low_bound"]);
-            double upperBound = double.Parse(conf["three_stack_up_bound"]);
-            double lowerClamp = double.Parse(conf["three_stack_low_clamp"]);
-            double upperClamp = double.Parse(conf["three_stack_up_clamp"]);
+            double lowerBound = conf.ThreeStackLowBound;
+            double upperBound = conf.ThreeStackUpBound;
+            double lowerClamp = conf.ThreeStackLowClamp;
+            double upperClamp = conf.ThreeStackUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Math.Max(Math.Min(t, 1), 0);
@@ -164,10 +165,10 @@ namespace MuseMapalyzr
 
         public static double TwoStackMultiplier(double nps)
         {
-            double lowerBound = double.Parse(conf["two_stack_low_bound"]);
-            double upperBound = double.Parse(conf["two_stack_up_bound"]);
-            double lowerClamp = double.Parse(conf["two_stack_low_clamp"]);
-            double upperClamp = double.Parse(conf["two_stack_up_clamp"]);
+            double lowerBound = conf.TwoStackLowBound;
+            double upperBound = conf.TwoStackUpBound;
+            double lowerClamp = conf.TwoStackLowClamp;
+            double upperClamp = conf.TwoStackUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Math.Max(Math.Min(t, 1), 0);
@@ -176,14 +177,16 @@ namespace MuseMapalyzr
 
         public static double VaryingStacksMultiplier(double nps)
         {
-            double lowerBound = double.Parse(conf["varying_stacks_low_bound"]);
-            double upperBound = double.Parse(conf["varying_stacks_up_bound"]);
-            double lowerClamp = double.Parse(conf["varying_stacks_low_clamp"]);
-            double upperClamp = double.Parse(conf["varying_stacks_up_clamp"]);
+            double lowerBound = conf.VaryingStacksLowBound;
+            double upperBound = conf.VaryingStacksUpBound;
+            double lowerClamp = conf.VaryingStacksLowClamp;
+            double upperClamp = conf.VaryingStacksUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Math.Max(Math.Min(t, 1), 0);
             return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
         }
+
+
     }
 }

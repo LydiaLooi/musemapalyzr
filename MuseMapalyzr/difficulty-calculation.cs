@@ -149,16 +149,13 @@ namespace MuseMapalyzr
 
             List<double> scores = CalculateScoresFromPatterns(patterns);
 
-            // Console.WriteLine("Before Weighting: " + scores.Average());
-
             double difficulty = DifficultyCalculation.WeightedAverageOfValues(
                 scores,
-                double.Parse(ConfigReader.GetConfig()["get_pattern_weighting_top_percentage"]),
-                double.Parse(ConfigReader.GetConfig()["get_pattern_weighting_top_weight"]),
-                double.Parse(ConfigReader.GetConfig()["get_pattern_weighting_bottom_weight"])
+                ConfigReader.GetConfig().GetPatternWeightingTopPercentage,
+                ConfigReader.GetConfig().GetPatternWeightingTopWeight,
+                ConfigReader.GetConfig().GetPatternWeightingBottomWeight
                 );
-            // Console.WriteLine("After Weighting: " + difficulty);
-            // Console.WriteLine(string.Join(", ", scores));
+
             return difficulty;
         }
 
@@ -166,11 +163,11 @@ namespace MuseMapalyzr
         public WeightingResults CalculateDifficulty(List<Note> notes, StreamWriter outfile, int sampleRate)
         {
             dynamic config = ConfigReader.GetConfig();
-            int sampleWindowSecs = int.Parse(config["sample_window_secs"]);
+            int sampleWindowSecs = config.SampleWindowSecs;
 
             List<List<Note>> sections = CreateSections(notes, sampleWindowSecs, sampleRate);
 
-            int movingAverageWindow = int.Parse(config["moving_avg_window"]);
+            int movingAverageWindow = config.MovingAvgWindow;
 
             List<double> movingAvg = MovingAverageNoteDensity(sections, movingAverageWindow);
 
@@ -219,29 +216,11 @@ namespace MuseMapalyzr
             }
 
             List<double> scores = new List<double>();
-            List<PatternScore> chunk = new List<PatternScore>();
 
             foreach (PatternScore patternScore in patternScores)
             {
                 scores.Add(patternScore.Score);
-                // if (patternScore.HasInterval && chunk.Count > 0)
-                // {
-                //     List<double> multiplied = ApplyMultiplierToPatternChunk(chunk);
-                //     scores.AddRange(multiplied);
-                //     chunk.Clear();
-                // }
-                // else
-                // {
-                //     chunk.Add(patternScore);
-                // }
             }
-
-            // if (chunk.Count > 0)
-            // {
-            //     List<double> multiplied = ApplyMultiplierToPatternChunk(chunk);
-            //     scores.AddRange(multiplied);
-            // }
-
             return scores;
         }
 

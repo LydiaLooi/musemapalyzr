@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace MuseMapalyzr
 {
     public class SegmentAnalyser
@@ -7,7 +10,7 @@ namespace MuseMapalyzr
         {
             List<Segment> segments = new List<Segment>();
             Segment? currentSegment = null;
-            double tolerance = int.Parse(ConfigReader.GetConfig()["segment_tolerance_ms"]) * sampleRate / 1000;  // 10ms in sample time
+            double tolerance = ConfigReader.GetConfig().SegmentToleranceMs * sampleRate / 1000;  // 10ms in sample time
 
             for (int i = 1; i < notes.Count; i++)  // Starts at second note
             {
@@ -77,7 +80,7 @@ namespace MuseMapalyzr
         {
             double notesPerSecond = sampleRate / timeDifference;
 
-            if (notesPerSecond >= double.Parse(ConfigReader.GetConfig()["short_interval_nps"]))
+            if (notesPerSecond >= ConfigReader.GetConfig().ShortIntervalNps)
             {
                 if (note.Lane != prevNote.Lane)
                 {
@@ -88,15 +91,15 @@ namespace MuseMapalyzr
                     return new Tuple<string, int>(Constants.SingleStreams, 2);
                 }
             }
-            else if (notesPerSecond < double.Parse(ConfigReader.GetConfig()["long_interval_nps"]))
+            else if (notesPerSecond < ConfigReader.GetConfig().LongIntervalNps)
             {
                 return new Tuple<string, int>(Constants.LongInterval, 0);
             }
-            else if (notesPerSecond < double.Parse(ConfigReader.GetConfig()["med_interval_nps"]))
+            else if (notesPerSecond < ConfigReader.GetConfig().MedIntervalNps)
             {
                 return new Tuple<string, int>(Constants.MedInterval, 0);
             }
-            else if (notesPerSecond < double.Parse(ConfigReader.GetConfig()["short_interval_nps"]))
+            else if (notesPerSecond < ConfigReader.GetConfig().ShortIntervalNps)
             {
                 return new Tuple<string, int>(Constants.ShortInterval, 0);
             }

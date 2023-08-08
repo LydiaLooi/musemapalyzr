@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MuseMapalyzr
 {
@@ -82,17 +85,16 @@ namespace MuseMapalyzr
             {
                 SampleRate = sampleRate;
             }
-            Tolerance = Constants.GetTolerance();
-
-            VariationWeighting = double.Parse(ConfigReader.GetConfig()["default_variation_weighting"]);
-            PatternWeighting = double.Parse(ConfigReader.GetConfig()["default_pattern_weighting"]);
+            Tolerance = ConfigReader.GetConfig().PatternToleranceMs * SampleRate / 1000; ;
+            VariationWeighting = ConfigReader.GetConfig().DefaultVariationWeighting;
+            PatternWeighting = ConfigReader.GetConfig().DefaultPatternWeighting;
             Intervals = new Dictionary<string, double>()
             {
-                {Constants.ShortInterval, double.Parse(ConfigReader.GetConfig()["short_int_debuff"])},
-                {Constants.MedInterval, double.Parse(ConfigReader.GetConfig()["med_int_debuff"])},
-                {Constants.LongInterval, double.Parse(ConfigReader.GetConfig()["long_int_debuff"])},
-            }; // Initialize with your values
-            EndExtraDebuff = double.Parse(ConfigReader.GetConfig()["extra_int_end_debuff"]);
+                {Constants.ShortInterval, ConfigReader.GetConfig().ShortIntDebuff},
+                {Constants.MedInterval, ConfigReader.GetConfig().MedIntDebuff},
+                {Constants.LongInterval, ConfigReader.GetConfig().LongIntDebuff},
+            };
+            EndExtraDebuff = ConfigReader.GetConfig().ExtraIntEndDebuff;
             CheckSegmentStrategy = null;
             IsAppendableStrategy = null;
             CalcVariationScoreStrategy = null;
@@ -149,7 +151,6 @@ namespace MuseMapalyzr
                 }
 
                 // Log the switch proportion and debuff.
-                // // Console.WriteLine($">>> Switch (proportion {switchProportion}) debuff by {switchDebuff:.2f} <<<");
                 entropy *= switchDebuff;
             }
 
@@ -217,7 +218,7 @@ namespace MuseMapalyzr
             }
         }
 
-        public void ResetGroup(Segment? previousSegment, Segment currentSegment)
+        public void ResetGroup(Segment previousSegment, Segment currentSegment)
         {
             IsActive = true;
             Segments = new List<Segment>();
@@ -254,16 +255,11 @@ namespace MuseMapalyzr
 
         public double CalculatePatternDifficulty()
         {
-            // Console.WriteLine($"{PatternName,25} {"Difficulty",-25}");
+
             double variationMultiplier = CalcVariationScore();
             double patternMultiplier = CalcPatternMultiplier();
 
             double final = (VariationWeighting * variationMultiplier) + (PatternWeighting * patternMultiplier);
-
-
-            // Console.WriteLine($"{"Variation Multiplier:",25} {variationMultiplier}");
-            // Console.WriteLine($"{"Pattern Multiplier:",25} {patternMultiplier}");
-            // Console.WriteLine($"{"After Weighting:",25} {final}");
 
             return final;
         }
