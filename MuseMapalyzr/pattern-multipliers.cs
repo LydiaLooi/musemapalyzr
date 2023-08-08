@@ -120,6 +120,23 @@ namespace MuseMapalyzr
             return 1;
         }
 
+        public static double NothingButTheoryLengthMultiplier(double numNotes, double multiplier)
+        {
+            double lowerBound = 0;
+            double upperBound = 1;
+            double lowerClamp = 6;
+            double upperClamp = 10;
+
+            double additional = multiplier - 1;
+            double t = (numNotes - lowerClamp) / (upperClamp - lowerClamp);
+            t = Math.Max(Math.Min(t, 1), 0);
+
+            double lengthMultiplier = lowerBound + (upperBound - lowerBound) * SmoothStep(t);
+            double newAddtional = lengthMultiplier * additional;
+            return 1 + newAddtional;
+        }
+
+
         public static double FourStackMultiplier(double nps)
         {
             double lowerBound = double.Parse(conf["four_stack_low_bound"]);

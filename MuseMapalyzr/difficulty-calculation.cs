@@ -149,13 +149,16 @@ namespace MuseMapalyzr
 
             List<double> scores = CalculateScoresFromPatterns(patterns);
 
+            // Console.WriteLine("Before Weighting: " + scores.Average());
+
             double difficulty = DifficultyCalculation.WeightedAverageOfValues(
                 scores,
                 double.Parse(ConfigReader.GetConfig()["get_pattern_weighting_top_percentage"]),
                 double.Parse(ConfigReader.GetConfig()["get_pattern_weighting_top_weight"]),
                 double.Parse(ConfigReader.GetConfig()["get_pattern_weighting_bottom_weight"])
                 );
-
+            // Console.WriteLine("After Weighting: " + difficulty);
+            // Console.WriteLine(string.Join(", ", scores));
             return difficulty;
         }
 
@@ -179,7 +182,7 @@ namespace MuseMapalyzr
                 }
             }
 
-            double difficulty = WeightedAverageOfValues(movingAvg);
+            double difficulty = WeightedAverageOfValues(movingAvg, 0.3, 0.9, 0.1);
 
             double weighting = GetPatternWeighting(notes, sampleRate);
 
@@ -187,7 +190,7 @@ namespace MuseMapalyzr
 
             WeightingResults weightResults = new(weighting, difficulty, weightedDifficulty);
 
-            Console.WriteLine($"difficulty: {difficulty} weighting: {weighting} weightedDifficulty: {weightedDifficulty}");
+            Console.WriteLine($"difficulty: {difficulty:F2} weighting: {weighting:F2} weightedDifficulty: {weightedDifficulty:F2}");
 
             return weightResults;
         }
@@ -220,23 +223,24 @@ namespace MuseMapalyzr
 
             foreach (PatternScore patternScore in patternScores)
             {
-                if (patternScore.HasInterval && chunk.Count > 0)
-                {
-                    List<double> multiplied = ApplyMultiplierToPatternChunk(chunk);
-                    scores.AddRange(multiplied);
-                    chunk.Clear();
-                }
-                else
-                {
-                    chunk.Add(patternScore);
-                }
+                scores.Add(patternScore.Score);
+                // if (patternScore.HasInterval && chunk.Count > 0)
+                // {
+                //     List<double> multiplied = ApplyMultiplierToPatternChunk(chunk);
+                //     scores.AddRange(multiplied);
+                //     chunk.Clear();
+                // }
+                // else
+                // {
+                //     chunk.Add(patternScore);
+                // }
             }
 
-            if (chunk.Count > 0)
-            {
-                List<double> multiplied = ApplyMultiplierToPatternChunk(chunk);
-                scores.AddRange(multiplied);
-            }
+            // if (chunk.Count > 0)
+            // {
+            //     List<double> multiplied = ApplyMultiplierToPatternChunk(chunk);
+            //     scores.AddRange(multiplied);
+            // }
 
             return scores;
         }
@@ -254,11 +258,16 @@ namespace MuseMapalyzr
             List<double> multiplied = new List<double>();
             foreach (PatternScore c_ps in chunk)
             {
+                Console.WriteLine($"Chunk time: {c_ps.PatternName} {c_ps.TotalNotes} ... {multiplier} ... {c_ps.Score}");
                 double score = c_ps.PatternName != Constants.ZigZag ? c_ps.Score * multiplier : c_ps.Score;
                 multiplied.Add(score);
+                if (multiplier > 1)
+                {
+                    Console.WriteLine($"Before: {c_ps.Score} AFter: {score}");
+
+                }
             }
 
-            // Console.WriteLine($"Applying multiplier ({multiplier}x) - Chunk ({totalNotes} notes): {string.Join(", ", chunk)}");
 
             return multiplied;
         }

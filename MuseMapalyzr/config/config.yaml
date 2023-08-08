@@ -61,8 +61,8 @@ skewed_circle_up_bound: 1.75
 # stream_multiplier
 stream_low_bound: 1
 stream_up_bound: 1.3
-stream_low_clamp: 6.5
-stream_up_clamp: 12
+stream_low_clamp: 5
+stream_up_clamp: 14
 
 # pattern_stream_length_multiplier
 pattern_stream_length_low_bound: 1.025
@@ -79,21 +79,21 @@ zig_zag_length_nps_threshold: 17 # Slightly faster than EWF
 
 # four_stack_multiplier
 four_stack_low_bound: 1.0
-four_stack_up_bound: 1.4
-four_stack_low_clamp: 6
-four_stack_up_clamp: 12
+four_stack_up_bound: 1.3
+four_stack_low_clamp: 5
+four_stack_up_clamp: 14
 
 # three_stack_multiplier
 three_stack_low_bound: 1.0
-three_stack_up_bound: 1.25
-three_stack_low_clamp: 6
-three_stack_up_clamp: 12
+three_stack_up_bound: 1.2
+three_stack_low_clamp: 5
+three_stack_up_clamp: 14
 
 # two_stack_multiplier
 two_stack_low_bound: 1.0
-two_stack_up_bound: 1.20
-two_stack_low_clamp: 6
-two_stack_up_clamp: 12
+two_stack_up_bound: 1.15
+two_stack_low_clamp: 5
+two_stack_up_clamp: 14
 
 # varying_stacks_multiplier
 varying_stacks_low_bound: 1.0

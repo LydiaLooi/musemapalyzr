@@ -1,3 +1,4 @@
+
 namespace MuseMapalyzr
 {
     public class Pattern
@@ -131,7 +132,7 @@ namespace MuseMapalyzr
         }
         public double CalcSwitchDebuff(Dictionary<string, int> segmentCounts, double entropy)
         {
-            double? switchProportion = null;
+            double? switchProportion;
             var switchCount = segmentCounts[Constants.Switch];
             var totalPatterns = segmentCounts.Values.Sum();
             if (entropy > 1 && switchCount > 0)

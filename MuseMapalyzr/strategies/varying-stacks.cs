@@ -74,7 +74,7 @@ namespace MuseMapalyzr
         {
             double nps = Pattern.Segments[0].NotesPerSecond;
             double multiplier = PatternMultiplier.VaryingStacksMultiplier(nps); // assuming you have a method for this
-            Console.WriteLine($"VaryingStacksCalcPatternMultiplier: {multiplier}");
+            // Console.WriteLine($"VaryingStacksCalcPatternMultiplier: {multiplier}");
             return multiplier;
         }
     }

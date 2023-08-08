@@ -98,7 +98,7 @@ namespace MuseMapalyzr
         {
             double nps = Pattern.Segments.First().NotesPerSecond;
             double multiplier = PatternMultiplier.SkewedCircleMultiplier(nps); // replace with actual C# equivalent
-            Console.WriteLine($"SkewedCirclesCalcPatternMultiplier: {multiplier}");
+            // Console.WriteLine($"SkewedCirclesCalcPatternMultiplier: {multiplier}");
             return multiplier;
         }
     }

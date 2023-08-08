@@ -71,7 +71,7 @@ namespace MuseMapalyzr
             if (TimeDifference == null && Notes.Count > 1)
             {
                 TimeDifference = Math.Abs(Notes[1].SampleTime - Notes[0].SampleTime);
-                Console.WriteLine($"Auto setting time difference to: {TimeDifference}");
+                // Console.WriteLine($"Auto setting time difference to: {TimeDifference}");
             }
 
         }

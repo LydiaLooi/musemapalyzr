@@ -101,8 +101,24 @@ namespace MuseMapalyzr
             }
 
             // Console.WriteLine($"Other Pattern Multipliers: [{string.Join(", ", multipliers)}]");
-            double weightedAverage = DifficultyCalculation.WeightedAverageOfValues(multipliers); // assuming you have a method for this
-            Console.WriteLine($"Other Pattern Multiplier Weighted Average: {weightedAverage}");
+
+            // If other has quite a few patterns and notes, then higher weighting to the harder patterns
+            double weightedAverage;
+            if (multipliers.Count > 5 || Pattern.TotalNotes > 20)
+            {
+                weightedAverage = DifficultyCalculation.WeightedAverageOfValues(multipliers, 0.3, 0.9, 0.1); // assuming you have a method for this
+            }
+            else
+            {
+                weightedAverage = DifficultyCalculation.WeightedAverageOfValues(multipliers, 0.3, 0.6, 0.4); // assuming you have a method for this
+            }
+            // Console.WriteLine("Other Multiplier Count: " + multipliers.Count);
+            // Console.WriteLine($"Other Pattern Multiplier Weighted Average: {weightedAverage}");
+            // if (multipliers.Count > 10)
+            // {
+            //     Console.WriteLine($"Other Pattern Multipliers: [{string.Join(", ", multipliers)}]");
+            // }
+
             return weightedAverage;
         }
     }
