@@ -325,35 +325,47 @@ namespace MuseMapalyzr
 
             PatternWeightingResults patternWeightingResults = GetPatternWeighting(notes, sampleRate);
 
-            // foreach (Segment segment in patternWeightingResults.StreamSegments)
-            // {
-            //     Console.WriteLine(segment.ToString());
-            // }
-
             int sampleWindowSecs = ConfigReader.GetConfig().SampleWindowSecs;
 
-            List<List<Note>> sections = CreateSections(notes, sampleWindowSecs, sampleRate, patternWeightingResults.StreamSegments, 13);
+            // TODO: This could be optimised - instead of running CreateSections twice, just do both ranked and 
+            // unranked in it.
+            List<List<Note>> rankedSections = CreateSections(
+                notes,
+                sampleWindowSecs,
+                sampleRate,
+                patternWeightingResults.StreamSegments,
+                ConfigReader.GetConfig().DensitySingleStreamNPSCap
+                );
+
+            List<List<Note>> unrankedSections = CreateSections(
+                notes,
+                sampleWindowSecs,
+                sampleRate,
+                patternWeightingResults.StreamSegments,
+                ConfigReader.GetUnrankedConfig().DensitySingleStreamNPSCap
+                );
 
             int movingAverageWindow = ConfigReader.GetConfig().MovingAvgWindow;
 
-            List<double> movingAvg = MovingAverageNoteDensity(sections, movingAverageWindow);
+            List<double> rankedMovingAvg = MovingAverageNoteDensity(rankedSections, movingAverageWindow);
+            List<double> unrankedMovingAvg = MovingAverageNoteDensity(unrankedSections, movingAverageWindow);
 
             if (outfile != null)
             {
-                foreach (var s in movingAvg)
+                foreach (var s in rankedMovingAvg)
                 {
                     outfile.WriteLine($"{s}");
                 }
             }
 
             double rankedDifficulty = WeightedAverageOfValues(
-                movingAvg,
+                rankedMovingAvg,
                 ConfigReader.GetConfig().DensityTopProportion,
                 ConfigReader.GetConfig().DensityTopWeighting,
                 ConfigReader.GetConfig().DensityBottomWeighting
                 );
             double unrankedDifficulty = WeightedAverageOfValues(
-                movingAvg,
+                unrankedMovingAvg,
                 ConfigReader.GetUnrankedConfig().DensityTopProportion,
                 ConfigReader.GetUnrankedConfig().DensityTopWeighting,
                 ConfigReader.GetUnrankedConfig().DensityBottomWeighting
