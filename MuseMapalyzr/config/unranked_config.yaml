@@ -27,7 +27,7 @@ GetPatternWeightingTopWeight: 0.9
 GetPatternWeightingBottomWeight: 0.1
 
 # Density Average
-SampleWindowSecs: 1 # Default 1
+SampleWindowSecs: 1 # Default 1 DO NOT CHANGE THIS LOL Since NPS calculations will be messed up
 MovingAvgWindow: 5 # Default 5
 
 # Interval NPS Thresholds

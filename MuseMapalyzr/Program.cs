@@ -50,7 +50,7 @@ namespace MuseMapalyzr
                     MuseSwiprMap mMap = MuseSwiprMap.FromKoreographAsset(filename);
                     string name = filename.Split(new string[] { charSeparator }, StringSplitOptions.None)[^1].Split(".asset")[0];
 
-                    Console.WriteLine($"Analysing : {name}");
+                    Console.WriteLine($"Analysing : {name} Samplerate: {mMap.SampleRate}");
 
                     using (StreamWriter outfile = new StreamWriter($"{Constants.AnalysisDir}/{name}", false, Encoding.UTF8))
                     {

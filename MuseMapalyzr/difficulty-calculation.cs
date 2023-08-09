@@ -121,6 +121,8 @@ namespace MuseMapalyzr
             {
                 sections.Add(new List<Note>());
             }
+
+            int skipped = 0;
             Note lastAddedNote = new Note(0, -1);
             // Fill sections with notes
             foreach (Note note in notes)
@@ -137,14 +139,28 @@ namespace MuseMapalyzr
                             Console.WriteLine("OOF adding anyways");
                             sections[sectionIndex].Add(note);
                             lastAddedNote = note;
+
+                            if (skipped > 0) Console.WriteLine($"Skipped {skipped}");
+                            skipped = 0;
                         }
                         else
                         {
+
+                            List<Note> segmentNotes = foundSegment.Notes.OrderBy(note => note.SampleTime).ToList();
+
+                            if (skipped > 0) Console.WriteLine($"Skipped {skipped}");
+                            skipped = 0;
                             // Check if Segment NPS is above the threshold or not
                             if (foundSegment.NotesPerSecond > npsCap)
                             {
-                                // Console.WriteLine("Found Segment. NPS threshold breached.");
+                                Console.WriteLine($"Found Segment. Count: ({foundSegment.Notes.Count}) NPS: {foundSegment.NotesPerSecond}");
+                                Console.WriteLine($"{segmentNotes.First().SampleTime} -> {segmentNotes.Last().SampleTime}");
+
+                                int notesAdded = 0;
+
                                 sections[sectionIndex].Add(note);
+                                notesAdded++;
+
 
                                 Note tempNote = note;
                                 // Get the next note it should add:
@@ -153,24 +169,26 @@ namespace MuseMapalyzr
                                 {
                                     double nextNoteTime = tempNote.SampleTime + GetTimeDifferenceWithNPS(npsCap, sampleRate);
                                     tempNote = new Note(note.Lane, nextNoteTime);
-                                    if (nextNoteTime <= foundSegment.Notes.Last().SampleTime)
+                                    if (nextNoteTime <= segmentNotes.Last().SampleTime)
                                     {
                                         sections[sectionIndex].Add(tempNote);
                                         lastAddedNote = tempNote;
-                                        // Console.WriteLine("Adding note");
+                                        notesAdded++;
+                                        // Console.WriteLine($"Adding note: {tempNote.SampleTime}");
                                     }
                                     else
                                     {
                                         // Always Try to add a note at the the last note sample time in the segment
-                                        if (lastAddedNote.SampleTime != foundSegment.Notes.Last().SampleTime)
+                                        if (lastAddedNote.SampleTime != segmentNotes.Last().SampleTime)
                                         {
-                                            Note finalNote = new Note(tempNote.Lane, foundSegment.Notes.Last().SampleTime);
+                                            Note finalNote = new Note(tempNote.Lane, segmentNotes.Last().SampleTime);
                                             sections[sectionIndex].Add(finalNote);
                                             lastAddedNote = finalNote;
-                                            // Console.WriteLine("Added final note");
+                                            notesAdded++;
+                                            // Console.WriteLine($"Added final note: {finalNote.SampleTime}");
                                         }
                                         done = true;
-                                        // Console.WriteLine("Done");
+                                        Console.WriteLine($"Done: {notesAdded} added");
                                     }
                                 }
                             }
@@ -187,6 +205,13 @@ namespace MuseMapalyzr
                     {
                         sections[sectionIndex].Add(note);
                         lastAddedNote = note;
+                        if (skipped > 0) Console.WriteLine($"Skipped {skipped}");
+                        skipped = 0;
+
+                    }
+                    else
+                    {
+                        skipped++;
                     }
 
                 }
