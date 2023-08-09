@@ -63,10 +63,27 @@ namespace MuseMapalyzr
         {
             public double RankedPatternWeighting;
             public double UnrankedPatternWeighting;
-            public PatternWeightingResults(double ranked, double unranked)
+            public List<Pattern> IdentifiedPatterns = new List<Pattern>();
+            public List<Segment> IdentifiedSegments = new List<Segment>();
+            public List<Segment>? _StreamSegments;
+            public List<Segment> StreamSegments
             {
-                RankedPatternWeighting = ranked;
-                UnrankedPatternWeighting = unranked;
+                get
+                {
+                    if (_StreamSegments == null)
+                    {
+                        List<Segment> temp = new List<Segment>();
+                        foreach (Segment segment in IdentifiedSegments)
+                        {
+                            if (segment.SegmentName == Constants.SingleStreams)
+                            {
+                                temp.Add(segment);
+                            }
+                        }
+                        _StreamSegments = temp;
+                    }
+                    return _StreamSegments;
+                }
             }
         }
 
@@ -74,14 +91,23 @@ namespace MuseMapalyzr
         /// Creates sections of section_threshold_seconds length to help with calculating
         /// density over the course of a map.
         public List<List<Note>> CreateSections(
-            List<Note> notes, int sectionThresholdSeconds = 1, int? sampleRate = null
+            List<Note> notes,
+            int sectionThresholdSeconds,
+            int sampleRate,
+            List<Segment> streamSegments, // Is ordered 
+            double npsCap // E.g., cap is 13 NPS, then if there is a stream thats 42 NPS, we treat it like its 13 NPS.
         )
         {
-            if (sampleRate == null) { sampleRate = Constants.DefaultSampleRate; }
 
-            int sectionThreshold = sectionThresholdSeconds * (int)sampleRate;
+            int sectionThreshold = sectionThresholdSeconds * sampleRate;
             double songStartSamples = notes.Min(note => note.SampleTime);
             double songDurationSamples = notes.Max(note => note.SampleTime);
+
+            HashSet<double> streamSegmentStartSampleTimes = new HashSet<double>();
+            foreach (Segment segment in streamSegments)
+            {
+                streamSegmentStartSampleTimes.Add(segment.Notes.First().SampleTime);
+            }
 
             // Sorting the 'notes' list based on the 'SampleTime' property
             notes = notes.OrderBy(note => note.SampleTime).ToList();
@@ -95,19 +121,95 @@ namespace MuseMapalyzr
             {
                 sections.Add(new List<Note>());
             }
-
+            Note lastAddedNote = new Note(0, -1);
             // Fill sections with notes
             foreach (Note note in notes)
             {
                 int sectionIndex = (int)(note.SampleTime - songStartSamples) / sectionThreshold;
                 if (0 <= sectionIndex && sectionIndex < sections.Count)
                 {
-                    sections[sectionIndex].Add(note);
+                    if (streamSegmentStartSampleTimes.Contains(note.SampleTime))
+                    {
+
+                        Segment? foundSegment = FindSegmentFromStartNote(note, streamSegments);
+                        if (foundSegment == null)
+                        {
+                            Console.WriteLine("OOF adding anyways");
+                            sections[sectionIndex].Add(note);
+                            lastAddedNote = note;
+                        }
+                        else
+                        {
+                            // Check if Segment NPS is above the threshold or not
+                            if (foundSegment.NotesPerSecond > npsCap)
+                            {
+                                // Console.WriteLine("Found Segment. NPS threshold breached.");
+                                sections[sectionIndex].Add(note);
+
+                                Note tempNote = note;
+                                // Get the next note it should add:
+                                bool done = false;
+                                while (!done)
+                                {
+                                    double nextNoteTime = tempNote.SampleTime + GetTimeDifferenceWithNPS(npsCap, sampleRate);
+                                    tempNote = new Note(note.Lane, nextNoteTime);
+                                    if (nextNoteTime <= foundSegment.Notes.Last().SampleTime)
+                                    {
+                                        sections[sectionIndex].Add(tempNote);
+                                        lastAddedNote = tempNote;
+                                        // Console.WriteLine("Adding note");
+                                    }
+                                    else
+                                    {
+                                        // Always Try to add a note at the the last note sample time in the segment
+                                        if (lastAddedNote.SampleTime != foundSegment.Notes.Last().SampleTime)
+                                        {
+                                            Note finalNote = new Note(tempNote.Lane, foundSegment.Notes.Last().SampleTime);
+                                            sections[sectionIndex].Add(finalNote);
+                                            lastAddedNote = finalNote;
+                                            // Console.WriteLine("Added final note");
+                                        }
+                                        done = true;
+                                        // Console.WriteLine("Done");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                sections[sectionIndex].Add(note);
+                                lastAddedNote = note;
+                            }
+                        }
+
+
+                    }
+                    else if (note.SampleTime > lastAddedNote.SampleTime)
+                    {
+                        sections[sectionIndex].Add(note);
+                        lastAddedNote = note;
+                    }
+
                 }
             }
 
             return sections;
+        }
 
+        private double GetTimeDifferenceWithNPS(double NPS, double sampleRate)
+        {
+            return sampleRate / NPS;
+        }
+
+        private Segment? FindSegmentFromStartNote(Note note, List<Segment> segments)
+        {
+            foreach (Segment seg in segments)
+            {
+                if (seg.Notes.First().SampleTime == note.SampleTime)
+                {
+                    return seg;
+                }
+            }
+            return null;
         }
 
         public static List<double> MovingAverageNoteDensity(List<List<Note>> sections, int windowSize)
@@ -193,29 +295,44 @@ namespace MuseMapalyzr
 
             ScoreResults scoreResults = CalculateScoresFromPatterns(patterns);
 
-            double rankedDifficulty = WeightedAverageOfValues(
+            double rankedPatternWeighting = WeightedAverageOfValues(
                 scoreResults.RankedScores,
                 ConfigReader.GetConfig().GetPatternWeightingTopPercentage,
                 ConfigReader.GetConfig().GetPatternWeightingTopWeight,
                 ConfigReader.GetConfig().GetPatternWeightingBottomWeight
                 );
 
-            double unrankedDifficulty = WeightedAverageOfValues(
+            double unrankedPatternWeighting = WeightedAverageOfValues(
                 scoreResults.UnrankedScores,
                 ConfigReader.GetUnrankedConfig().GetPatternWeightingTopPercentage,
                 ConfigReader.GetUnrankedConfig().GetPatternWeightingTopWeight,
                 ConfigReader.GetUnrankedConfig().GetPatternWeightingBottomWeight
                 );
+            PatternWeightingResults results = new PatternWeightingResults
+            {
+                RankedPatternWeighting = rankedPatternWeighting,
+                UnrankedPatternWeighting = unrankedPatternWeighting,
+                IdentifiedPatterns = patterns,
+                IdentifiedSegments = segments
+            };
 
-            return new PatternWeightingResults(rankedDifficulty, unrankedDifficulty);
+            return results;
         }
 
 
         public WeightingResults CalculateDifficulty(List<Note> notes, StreamWriter outfile, int sampleRate)
         {
+
+            PatternWeightingResults patternWeightingResults = GetPatternWeighting(notes, sampleRate);
+
+            // foreach (Segment segment in patternWeightingResults.StreamSegments)
+            // {
+            //     Console.WriteLine(segment.ToString());
+            // }
+
             int sampleWindowSecs = ConfigReader.GetConfig().SampleWindowSecs;
 
-            List<List<Note>> sections = CreateSections(notes, sampleWindowSecs, sampleRate);
+            List<List<Note>> sections = CreateSections(notes, sampleWindowSecs, sampleRate, patternWeightingResults.StreamSegments, 13);
 
             int movingAverageWindow = ConfigReader.GetConfig().MovingAvgWindow;
 
@@ -242,7 +359,6 @@ namespace MuseMapalyzr
                 ConfigReader.GetUnrankedConfig().DensityBottomWeighting
                 );
 
-            PatternWeightingResults patternWeightingResults = GetPatternWeighting(notes, sampleRate);
 
             double rankedWeightedDifficulty = patternWeightingResults.RankedPatternWeighting * rankedDifficulty;
             double unrankedWeightedDifficulty = patternWeightingResults.UnrankedPatternWeighting * unrankedDifficulty;

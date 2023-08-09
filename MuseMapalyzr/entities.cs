@@ -78,7 +78,7 @@ namespace MuseMapalyzr
 
         public override string ToString()
         {
-            return $"{SegmentName} {Notes.Count} {TimeDifference}";
+            return $"{SegmentName} NC: {Notes.Count} TD: {TimeDifference} NPS: {NotesPerSecond} {Notes.First().SampleTime} -> {Notes.Last().SampleTime}";
         }
 
     }
