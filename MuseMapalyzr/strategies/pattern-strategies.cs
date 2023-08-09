@@ -46,7 +46,7 @@ namespace MuseMapalyzr
             Pattern = pattern;
         }
 
-        public abstract double CalcPatternMultiplier();
+        public abstract double CalcPatternMultiplier(bool ranked);
     }
 
     public abstract class CalcPatternLengthMultiplierStrategy

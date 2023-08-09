@@ -4,15 +4,31 @@ namespace MuseMapalyzr
     {
         public class WeightingResults // Named Tuple "Weighting" in python code
         {
-            public double Weighting;
-            public double Difficulty;
-            public double WeightedDifficulty;
+            public double RankedWeighting;
+            public double RankedDifficulty;
+            public double RankedWeightedDifficulty;
 
-            public WeightingResults(double weighting, double difficulty, double weightedDifficulty)
+            public double UnrankedWeighting;
+            public double UnrankedDifficulty;
+            public double UnrankedWeightedDifficulty;
+
+            public WeightingResults(
+                double rankedWeighting,
+                double rankedDifficulty,
+                double rankedWeightedDifficulty,
+                double unrankedWeighting,
+                double unrankedDifficulty,
+                double unrankedWeightedDifficulty
+                )
             {
-                Weighting = weighting;
-                Difficulty = difficulty;
-                WeightedDifficulty = weightedDifficulty;
+                RankedWeighting = rankedWeighting;
+                RankedDifficulty = rankedDifficulty;
+                RankedWeightedDifficulty = rankedWeightedDifficulty;
+
+                UnrankedWeighting = unrankedWeighting;
+                UnrankedDifficulty = unrankedDifficulty;
+                UnrankedWeightedDifficulty = unrankedWeightedDifficulty;
+
             }
         }
 
@@ -28,6 +44,29 @@ namespace MuseMapalyzr
                 Score = score;
                 HasInterval = hasInterval;
                 TotalNotes = totalNotes;
+            }
+        }
+
+
+        public class ScoreResults
+        {
+            public List<double> UnrankedScores;
+            public List<double> RankedScores;
+            public ScoreResults()
+            {
+                UnrankedScores = new List<double>();
+                RankedScores = new List<double>();
+            }
+        }
+
+        public class PatternWeightingResults
+        {
+            public double RankedPatternWeighting;
+            public double UnrankedPatternWeighting;
+            public PatternWeightingResults(double ranked, double unranked)
+            {
+                RankedPatternWeighting = ranked;
+                UnrankedPatternWeighting = unranked;
             }
         }
 
@@ -107,21 +146,26 @@ namespace MuseMapalyzr
             movingAveragesSorted.Sort();
             movingAveragesSorted.Reverse();
 
-            int thresholdIndex = (int)(values.Count * (1 - topPercentage));
+            // Console.WriteLine(string.Join(",", movingAveragesSorted));
+
+            int thresholdIndex = (int)(values.Count * topPercentage);
             if (thresholdIndex >= movingAveragesSorted.Count)
             {
                 thresholdIndex = movingAveragesSorted.Count - 1;
             }
-            double threshold = movingAveragesSorted[thresholdIndex];
+            // Console.WriteLine(thresholdIndex);
+            // double threshold = movingAveragesSorted[thresholdIndex];
+            // Console.WriteLine($"Top %{topPercentage} Index: {thresholdIndex} ... Threshold {threshold}");
 
             // Calculate the weighted average
             double totalWeight = 0;
             double weightedSum = 0;
 
-            foreach (double avg in values)
+            for (int i = 0; i < movingAveragesSorted.Count; i++)
             {
+                double value = movingAveragesSorted[i];
                 double weight;
-                if (avg >= threshold)
+                if (i <= thresholdIndex)
                 {
                     weight = topWeight;
                 }
@@ -130,15 +174,15 @@ namespace MuseMapalyzr
                     weight = bottomWeight;
                 }
 
-                weightedSum += avg * weight;
+                weightedSum += value * weight;
                 totalWeight += weight;
             }
-
+            // Console.WriteLine($"Weighted Sum: {weightedSum} (Actual: {values.Sum()}) Total Weight: {totalWeight}");
             double weightedAverage = weightedSum / totalWeight;
             return weightedAverage;
         }
 
-        public double GetPatternWeighting(List<Note> notes, int sampleRate)
+        public PatternWeightingResults GetPatternWeighting(List<Note> notes, int sampleRate)
         {
             // Need Mapalyzr Class that identifies patterns
             Mapalyzr mpg = new();
@@ -147,27 +191,33 @@ namespace MuseMapalyzr
 
             List<Pattern> patterns = mpg.IdentifyPatterns(segments);
 
-            List<double> scores = CalculateScoresFromPatterns(patterns);
+            ScoreResults scoreResults = CalculateScoresFromPatterns(patterns);
 
-            double difficulty = DifficultyCalculation.WeightedAverageOfValues(
-                scores,
+            double rankedDifficulty = WeightedAverageOfValues(
+                scoreResults.RankedScores,
                 ConfigReader.GetConfig().GetPatternWeightingTopPercentage,
                 ConfigReader.GetConfig().GetPatternWeightingTopWeight,
                 ConfigReader.GetConfig().GetPatternWeightingBottomWeight
                 );
 
-            return difficulty;
+            double unrankedDifficulty = WeightedAverageOfValues(
+                scoreResults.UnrankedScores,
+                ConfigReader.GetUnrankedConfig().GetPatternWeightingTopPercentage,
+                ConfigReader.GetUnrankedConfig().GetPatternWeightingTopWeight,
+                ConfigReader.GetUnrankedConfig().GetPatternWeightingBottomWeight
+                );
+
+            return new PatternWeightingResults(rankedDifficulty, unrankedDifficulty);
         }
 
 
         public WeightingResults CalculateDifficulty(List<Note> notes, StreamWriter outfile, int sampleRate)
         {
-            dynamic config = ConfigReader.GetConfig();
-            int sampleWindowSecs = config.SampleWindowSecs;
+            int sampleWindowSecs = ConfigReader.GetConfig().SampleWindowSecs;
 
             List<List<Note>> sections = CreateSections(notes, sampleWindowSecs, sampleRate);
 
-            int movingAverageWindow = config.MovingAvgWindow;
+            int movingAverageWindow = ConfigReader.GetConfig().MovingAvgWindow;
 
             List<double> movingAvg = MovingAverageNoteDensity(sections, movingAverageWindow);
 
@@ -179,22 +229,42 @@ namespace MuseMapalyzr
                 }
             }
 
-            double difficulty = WeightedAverageOfValues(movingAvg, 0.3, 0.9, 0.1);
+            double rankedDifficulty = WeightedAverageOfValues(
+                movingAvg,
+                ConfigReader.GetConfig().DensityTopProportion,
+                ConfigReader.GetConfig().DensityTopWeighting,
+                ConfigReader.GetConfig().DensityBottomWeighting
+                );
+            double unrankedDifficulty = WeightedAverageOfValues(
+                movingAvg,
+                ConfigReader.GetUnrankedConfig().DensityTopProportion,
+                ConfigReader.GetUnrankedConfig().DensityTopWeighting,
+                ConfigReader.GetUnrankedConfig().DensityBottomWeighting
+                );
 
-            double weighting = GetPatternWeighting(notes, sampleRate);
+            PatternWeightingResults patternWeightingResults = GetPatternWeighting(notes, sampleRate);
 
-            double weightedDifficulty = weighting * difficulty;
+            double rankedWeightedDifficulty = patternWeightingResults.RankedPatternWeighting * rankedDifficulty;
+            double unrankedWeightedDifficulty = patternWeightingResults.UnrankedPatternWeighting * unrankedDifficulty;
 
-            WeightingResults weightResults = new(weighting, difficulty, weightedDifficulty);
+            WeightingResults weightResults = new(
+                patternWeightingResults.RankedPatternWeighting,
+                rankedDifficulty,
+                rankedWeightedDifficulty,
 
-            Console.WriteLine($"difficulty: {difficulty:F2} weighting: {weighting:F2} weightedDifficulty: {weightedDifficulty:F2}");
+                patternWeightingResults.UnrankedPatternWeighting,
+                unrankedDifficulty,
+                unrankedWeightedDifficulty
+                );
+
 
             return weightResults;
         }
 
-        public static List<double> CalculateScoresFromPatterns(List<Pattern> patterns)
+        public static ScoreResults CalculateScoresFromPatterns(List<Pattern> patterns)
         {
-            List<PatternScore> patternScores = new List<PatternScore>();
+            List<PatternScore> rankedPatternScores = new List<PatternScore>();
+            List<PatternScore> unrankedPatternScores = new List<PatternScore>();
             // Console.WriteLine($"Checking {patterns.Count} Patterns");
 
             foreach (Pattern pattern in patterns)
@@ -202,12 +272,21 @@ namespace MuseMapalyzr
                 // Console.WriteLine($"----------{pattern.PatternName} {pattern.Segments.Count}----------");
                 if (pattern.Segments != null && pattern.Segments.Count > 0) // check if pattern has segments
                 {
-                    double score = pattern.CalculatePatternDifficulty();
+                    double rankedScore = pattern.CalculatePatternDifficulty(true);
+                    double unrankedScore = pattern.CalculatePatternDifficulty(false);
                     // Console.WriteLine($"Pattern Difficulty Score: {score}");
-                    patternScores.Add(
+                    rankedPatternScores.Add(
                         new PatternScore(
                             pattern.PatternName,
-                            score,
+                            rankedScore,
+                            pattern.HasIntervalSegment,
+                            pattern.TotalNotes
+                        )
+                    );
+                    unrankedPatternScores.Add(
+                        new PatternScore(
+                            pattern.PatternName,
+                            unrankedScore,
                             pattern.HasIntervalSegment,
                             pattern.TotalNotes
                         )
@@ -215,41 +294,50 @@ namespace MuseMapalyzr
                 }
             }
 
-            List<double> scores = new List<double>();
+            // Before, this was where pattern length multipliers were applied. 
+            // That wasn't working as intended so now it's just straight up the scores
+            // This is still here incase we want to look into that again.
+            ScoreResults scoreResults = new ScoreResults();
 
-            foreach (PatternScore patternScore in patternScores)
+            foreach (PatternScore rps in rankedPatternScores)
             {
-                scores.Add(patternScore.Score);
+                scoreResults.RankedScores.Add(rps.Score);
             }
-            return scores;
+
+            foreach (PatternScore urps in unrankedPatternScores)
+            {
+                scoreResults.UnrankedScores.Add(urps.Score);
+            }
+            return scoreResults;
         }
 
-        public static List<double> ApplyMultiplierToPatternChunk(List<PatternScore> chunk)
-        {
-            int totalNotes = chunk.Sum(ps => ps.TotalNotes);
+        // Commented out as it wasn't working as intended and buffing/nerfing maps unintentionally
+        // public static List<double> ApplyMultiplierToPatternChunk(List<PatternScore> chunk)
+        // {
+        //     int totalNotes = chunk.Sum(ps => ps.TotalNotes);
 
-            double multiplier = 1;
-            if (chunk.Count > 2)
-            {
-                multiplier = PatternMultiplier.PatternStreamLengthMultiplier(totalNotes);
-            }
+        //     double multiplier = 1;
+        //     if (chunk.Count > 2)
+        //     {
+        //         multiplier = PatternMultiplier.PatternStreamLengthMultiplier(totalNotes);
+        //     }
 
-            List<double> multiplied = new List<double>();
-            foreach (PatternScore c_ps in chunk)
-            {
-                Console.WriteLine($"Chunk time: {c_ps.PatternName} {c_ps.TotalNotes} ... {multiplier} ... {c_ps.Score}");
-                double score = c_ps.PatternName != Constants.ZigZag ? c_ps.Score * multiplier : c_ps.Score;
-                multiplied.Add(score);
-                if (multiplier > 1)
-                {
-                    Console.WriteLine($"Before: {c_ps.Score} AFter: {score}");
+        //     List<double> multiplied = new List<double>();
+        //     foreach (PatternScore c_ps in chunk)
+        //     {
+        //         Console.WriteLine($"Chunk time: {c_ps.PatternName} {c_ps.TotalNotes} ... {multiplier} ... {c_ps.Score}");
+        //         double score = c_ps.PatternName != Constants.ZigZag ? c_ps.Score * multiplier : c_ps.Score;
+        //         multiplied.Add(score);
+        //         if (multiplier > 1)
+        //         {
+        //             Console.WriteLine($"Before: {c_ps.Score} AFter: {score}");
 
-                }
-            }
+        //         }
+        //     }
 
 
-            return multiplied;
-        }
+        //     return multiplied;
+        // }
     }
 
 

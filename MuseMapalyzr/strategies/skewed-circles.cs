@@ -94,10 +94,10 @@ namespace MuseMapalyzr
     {
         public SkewedCirclesCalcPatternMultiplier(Pattern pattern) : base(pattern) { }
 
-        public override double CalcPatternMultiplier()
+        public override double CalcPatternMultiplier(bool ranked)
         {
             double nps = Pattern.Segments.First().NotesPerSecond;
-            double multiplier = PatternMultiplier.SkewedCircleMultiplier(nps); // replace with actual C# equivalent
+            double multiplier = PatternMultiplier.SkewedCircleMultiplier(nps, ranked); // replace with actual C# equivalent
             // Console.WriteLine($"SkewedCirclesCalcPatternMultiplier: {multiplier}");
             return multiplier;
         }

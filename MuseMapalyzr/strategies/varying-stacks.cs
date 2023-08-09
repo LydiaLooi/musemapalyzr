@@ -70,10 +70,10 @@ namespace MuseMapalyzr
     {
         public VaryingStacksCalcPatternMultiplier(Pattern pattern) : base(pattern) { }
 
-        public override double CalcPatternMultiplier()
+        public override double CalcPatternMultiplier(bool ranked)
         {
             double nps = Pattern.Segments[0].NotesPerSecond;
-            double multiplier = PatternMultiplier.VaryingStacksMultiplier(nps); // assuming you have a method for this
+            double multiplier = PatternMultiplier.VaryingStacksMultiplier(nps, ranked); // assuming you have a method for this
             // Console.WriteLine($"VaryingStacksCalcPatternMultiplier: {multiplier}");
             return multiplier;
         }

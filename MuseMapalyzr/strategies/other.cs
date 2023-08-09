@@ -37,45 +37,53 @@ namespace MuseMapalyzr
     {
         public OtherCalcPatternMultiplier(Pattern pattern) : base(pattern) { }
 
-        public override double CalcPatternMultiplier()
+        public override double CalcPatternMultiplier(bool ranked)
         {
             // Other Patterns are calculated based on the weighted average
             // of the segment difficulties within the Other pattern.
             List<double> multipliers = new List<double>();
+
+            var conf = ConfigReader.GetConfig();
+            if (!ranked)
+            {
+                conf = ConfigReader.GetUnrankedConfig();
+            }
+
 
             foreach (var segment in Pattern.Segments)
             {
                 switch (segment.SegmentName)
                 {
                     case Constants.Switch:
-                        multipliers.Add(ConfigReader.GetConfig().OtherSwitchMultiplier);
+                        multipliers.Add(conf.OtherSwitchMultiplier);
                         break;
                     case Constants.ZigZag:
                         // Zig zags are special as they can have many notes in them.
-                        double zigZagMultiplier = PatternMultiplier.ZigZagMultiplier(segment.NotesPerSecond);
-                        double zigZagLengthMultiplier = PatternMultiplier.ZigZagLengthMultiplier(segment.Notes.Count, segment.NotesPerSecond);
+                        double zigZagMultiplier = PatternMultiplier.ZigZagMultiplier(segment.NotesPerSecond, ranked);
+                        double zigZagLengthMultiplier = PatternMultiplier.ZigZagLengthMultiplier(segment.Notes.Count, segment.NotesPerSecond, ranked);
                         multipliers.Add(zigZagMultiplier * zigZagLengthMultiplier);
                         break;
                     case Constants.TwoStack:
-                        multipliers.Add(PatternMultiplier.TwoStackMultiplier(segment.NotesPerSecond));
+                        multipliers.Add(PatternMultiplier.TwoStackMultiplier(segment.NotesPerSecond, ranked));
                         break;
                     case Constants.ThreeStack:
-                        multipliers.Add(PatternMultiplier.ThreeStackMultiplier(segment.NotesPerSecond));
+                        multipliers.Add(PatternMultiplier.ThreeStackMultiplier(segment.NotesPerSecond, ranked));
                         break;
                     case Constants.FourStack:
-                        multipliers.Add(PatternMultiplier.FourStackMultiplier(segment.NotesPerSecond));
+                        multipliers.Add(PatternMultiplier.FourStackMultiplier(segment.NotesPerSecond, ranked));
                         break;
                     case Constants.SingleStreams:
-                        multipliers.Add(PatternMultiplier.StreamMultiplier(segment.NotesPerSecond));
+                        multipliers.Add(PatternMultiplier.StreamMultiplier(segment.NotesPerSecond, ranked));
                         break;
                     case Constants.ShortInterval:
-                        multipliers.Add(ConfigReader.GetConfig().OtherShortIntMultiplier);
+
+                        multipliers.Add(conf.OtherShortIntMultiplier);
                         break;
                     case Constants.MedInterval:
-                        multipliers.Add(ConfigReader.GetConfig().OtherMedIntMultiplier);
+                        multipliers.Add(conf.OtherMedIntMultiplier);
                         break;
                     case Constants.LongInterval:
-                        multipliers.Add(ConfigReader.GetConfig().OtherLongIntMultiplier);
+                        multipliers.Add(conf.OtherLongIntMultiplier);
                         break;
                     default:
                         multipliers.Add(1);

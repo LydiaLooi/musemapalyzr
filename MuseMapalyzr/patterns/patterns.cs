@@ -253,11 +253,12 @@ namespace MuseMapalyzr
             }
         }
 
-        public double CalculatePatternDifficulty()
+        public double CalculatePatternDifficulty(bool ranked)
         {
 
             double variationMultiplier = CalcVariationScore();
-            double patternMultiplier = CalcPatternMultiplier();
+            double patternMultiplier = CalcPatternMultiplier(ranked);
+            // Console.WriteLine($"Ranked {ranked} {patternMultiplier}");
 
             double final = (VariationWeighting * variationMultiplier) + (PatternWeighting * patternMultiplier);
 
@@ -306,9 +307,9 @@ namespace MuseMapalyzr
             return CalcVariationScoreStrategy.CalcVariationScore();
         }
 
-        public double CalcPatternMultiplier()
+        public double CalcPatternMultiplier(bool ranked)
         {
-            return CalcPatternMultiplierStrategy.CalcPatternMultiplier();
+            return CalcPatternMultiplierStrategy.CalcPatternMultiplier(ranked);
         }
 
         public double CalcPatternLengthMultiplier()

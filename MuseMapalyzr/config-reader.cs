@@ -3,23 +3,50 @@ namespace MuseMapalyzr
 {
     public class ConfigReader
     {
-        public static string GetConfigPath()
+        private static MuseMapalyzrConfig? _rankedConfig;
+        private static MuseMapalyzrConfig? _unrankedConfig;
+        public static string GetConfigPath(bool ranked = true)
         {
             string currentDirectory = Directory.GetCurrentDirectory();
-            string configFilePath = Path.Combine(currentDirectory, "config", "config.yaml");
+            string configFilePath;
+            if (ranked)
+            {
+                configFilePath = Path.Combine(currentDirectory, "config", "config.yaml");
+            }
+            else
+            {
+                configFilePath = Path.Combine(currentDirectory, "config", "unranked_config.yaml");
+            }
+
             return configFilePath;
         }
 
-        public static MuseMapalyzrConfig GetConfig()
+        private static MuseMapalyzrConfig DeserializeConfig(bool ranked)
         {
-            string yamlContent = File.ReadAllText(GetConfigPath());
+            string yamlContent = File.ReadAllText(GetConfigPath(ranked));
             var deserializer = new DeserializerBuilder().Build();
             MuseMapalyzrConfig config = deserializer.Deserialize<MuseMapalyzrConfig>(yamlContent);
             return config;
         }
 
+        public static MuseMapalyzrConfig GetConfig()
+        {
+            _rankedConfig ??= DeserializeConfig(true);
+            return _rankedConfig;
+        }
+
+        public static MuseMapalyzrConfig GetUnrankedConfig()
+        {
+            _unrankedConfig ??= DeserializeConfig(false);
+            return _unrankedConfig;
+        }
+
         public class MuseMapalyzrConfig
         {
+            public int NormalSizedMapThreshold { get; set; }
+            public double DensityTopProportion { get; set; }
+            public double DensityTopWeighting { get; set; }
+            public double DensityBottomWeighting { get; set; }
             public int PatternToleranceMs { get; set; }
             public int SegmentToleranceMs { get; set; }
             public double GetPatternWeightingTopPercentage { get; set; }

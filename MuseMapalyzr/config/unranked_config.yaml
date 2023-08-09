@@ -1,18 +1,19 @@
-###### RANKED ### RANKED ### RANKED ### RANKED ### RANKED ### RANKED ### RANKED #####
+###### UNRANKED ### UNRANKED ### UNRANKED ### UNRANKED ### UNRANKED ### UNRANKED ####
 #                                                                                   #
-#   This is the config file for RANKED difficulty calculation                       #
-#   This means that certain patterns though are difficult (extremely fast zigzags)  # 
-#   don't boost the difficulty as we want to discourage those types of maps         #                          
+#   This is the config file for UNRANKED difficulty calculation                     #
+#   This means that there is a less harsh cap on ZIG ZAGS and SINGLE LANE STREAMS   # 
 #                                                                                   #
 #####################################################################################
 
+# Note that some of these aren't used and the ranked config is used (e.g., sample window threshold etc.)
+
 # Normal Sized Map Threshold
-NormalSizedMapThreshold: 91 # Screw you TV-sized maps :)
+NormalSizedMapThreshold: 0
 
 # Density 
-DensityTopProportion: 0.3
-DensityTopWeighting: 1
-DensityBottomWeighting: 0.3
+DensityTopProportion: 0.2
+DensityTopWeighting: 1.2
+DensityBottomWeighting: 0.1
 
 # Tolerances
 PatternToleranceMs: 20
@@ -24,7 +25,7 @@ GetPatternWeightingTopWeight: 0.9
 GetPatternWeightingBottomWeight: 0.1
 
 # Density Average
-SampleWindowSecs: 1 # Default 1 DO NOT CHANGE THIS LOL Since NPS calculations will be messed up
+SampleWindowSecs: 1 # Default 1
 MovingAvgWindow: 5 # Default 5
 
 # Interval NPS Thresholds

@@ -76,9 +76,9 @@ namespace MuseMapalyzr
     {
         public SlowStretchPatternMultiplier(Pattern pattern) : base(pattern) { }
 
-        public override double CalcPatternMultiplier()
+        public override double CalcPatternMultiplier(bool ranked)
         {
-            return base.CalcPatternMultiplier();
+            return base.CalcPatternMultiplier(ranked);
         }
     }
 }

@@ -150,13 +150,13 @@ namespace MuseMapalyzr
     public class NothingButTheoryCalcPatternMultiplier : CalcPatternMultiplierStrategy
     {
         public NothingButTheoryCalcPatternMultiplier(Pattern pattern) : base(pattern) { }
-        public override double CalcPatternMultiplier()
+        public override double CalcPatternMultiplier(bool ranked)
         {
             double nps = Pattern.Segments[0].NotesPerSecond;
-            double multiplier = PatternMultiplier.NothingButTheoryMultiplier(nps);
+            double multiplier = PatternMultiplier.NothingButTheoryMultiplier(nps, ranked);
             // NBT can spike difficulties when it is a relatively fast but short as it maxes out the weighting
             // So, apply a weighting based on how many notes.
-            double newMultiplier = PatternMultiplier.NothingButTheoryLengthMultiplier(Pattern.TotalNotes, multiplier);
+            double newMultiplier = PatternMultiplier.NothingButTheoryLengthMultiplier(Pattern.TotalNotes, multiplier, ranked);
             // Console.WriteLine($"NothingButTheoryCalcPatternMultiplier: {multiplier} (NEW: {newMultiplier})| NPS: {nps} | Notes: {Pattern.TotalNotes}");
             return newMultiplier;
         }

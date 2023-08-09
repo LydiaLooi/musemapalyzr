@@ -8,7 +8,7 @@ namespace MuseMapalyzr
 {
     public class MultiplierGraphing
     {
-        public static PlotModel GraphMethods()
+        public static PlotModel GraphMethods(bool ranked)
         {
             PlotModel plotModel = new PlotModel
             {
@@ -26,15 +26,15 @@ namespace MuseMapalyzr
                 npsValues[i] = 1 + i * step;
             }
 
-            AddLineSeries(plotModel, npsValues, PatternMultiplier.EvenCircleMultiplier, "Even Circle");
-            AddLineSeries(plotModel, npsValues, PatternMultiplier.SkewedCircleMultiplier, "Skewed Circle");
-            AddLineSeries(plotModel, npsValues, PatternMultiplier.ZigZagMultiplier, "Zig Zag");
-            AddLineSeries(plotModel, npsValues, PatternMultiplier.NothingButTheoryMultiplier, "Nothing But Theory");
-            AddLineSeries(plotModel, npsValues, PatternMultiplier.StreamMultiplier, "Stream");
-            AddLineSeries(plotModel, npsValues, PatternMultiplier.FourStackMultiplier, "4-Stacks");
-            AddLineSeries(plotModel, npsValues, PatternMultiplier.ThreeStackMultiplier, "3-Stacks");
-            AddLineSeries(plotModel, npsValues, PatternMultiplier.TwoStackMultiplier, "2-Stacks");
-            AddLineSeries(plotModel, npsValues, PatternMultiplier.VaryingStacksMultiplier, "Varying Stacks");
+            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.EvenCircleMultiplier(nps, ranked), "Even Circle");
+            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.SkewedCircleMultiplier(nps, ranked), "Skewed Circle");
+            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.ZigZagMultiplier(nps, ranked), "Zig Zag");
+            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.NothingButTheoryMultiplier(nps, ranked), "Nothing But Theory");
+            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.StreamMultiplier(nps, ranked), "Stream");
+            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.FourStackMultiplier(nps, ranked), "4-Stacks");
+            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.ThreeStackMultiplier(nps, ranked), "3-Stacks");
+            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.TwoStackMultiplier(nps, ranked), "2-Stacks");
+            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.VaryingStacksMultiplier(nps, ranked), "Varying Stacks");
 
 
             return plotModel;
@@ -52,22 +52,22 @@ namespace MuseMapalyzr
             model.Series.Add(lineSeries);
         }
 
-        public static void Graph()
+        public static void Graph(bool ranked)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var form = new MyForm();
+            var form = new MyForm(ranked);
             Application.Run(form); // This line actually shows the form
         }
 
         public partial class MyForm : Form
         {
-            public MyForm()
+            public MyForm(bool ranked)
             {
 
                 var plot = new PlotView
                 {
-                    Model = GraphMethods(),
+                    Model = GraphMethods(ranked),
                     Dock = DockStyle.Fill
                 };
 
