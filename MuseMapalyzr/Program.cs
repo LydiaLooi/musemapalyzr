@@ -81,6 +81,10 @@ namespace MuseMapalyzr
                 // If no arguments are provided, run export all difficulties
                 inputData.CalculateAndExportAllDifficulties(Constants.DataDir);
             }
+            else if (args[0] == "graph")
+            {
+                MultiplierGraphing.Graph();
+            }
             else
             {
                 // If any argument is provided, run filtered difficulties
