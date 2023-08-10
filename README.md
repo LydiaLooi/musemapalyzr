@@ -1,24 +1,26 @@
 
 # Usage
 
+Make sure in `MuseMapalyzr` there are the following directories:
+- `analysis`
+- `difficulty_exports`
+- `logs`
+
 `cd MuseMapalyzr`
 
 - Process all difficulties in `data`: `dotnet run`
 - Process filtered difficulties: `dotnet run search string` e.g., `dotnet run speculation`
 - See the multiplier graph: `dotnet run graph`
 
+# Logging
+- You can configure the logging level by changing it in `Logger.cs`
+- `private static LogLevel DebugLevel = LogLevel.Debug;` <- Change to whatever you want.
+- It will output to `logs.log` in `MuseMapalyzr/logs`
+
 
 # TODO:
-## To be continued
-- Dark omen 7 NPS cap is like ~16 but then 7000 (which means it's not doing any cutting of notes) is like ~15?????
-- Is something wrong with the single stream density nerfing thing???
-- We set ranked NPS cap to 8 and unranked to 13 and that's when we discovered that dark omen was just being weird. 
-- Could it be a weird interaction with the density stuff? can't be though??? riught??
-
-
-## Still to do:
 - Ranked incorporates the "normal length" song threshold when determining the density.
-
+- Look at the pattern multipliers again.
 
 # Packages and stuff:
 
