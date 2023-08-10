@@ -4,3 +4,4 @@ data/
 difficulty_exports/
 map_outputs/
 obj/
+*.log

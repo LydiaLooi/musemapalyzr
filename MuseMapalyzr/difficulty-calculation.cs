@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace MuseMapalyzr
 {
     public class DifficultyCalculation
@@ -99,6 +101,11 @@ namespace MuseMapalyzr
         )
         {
 
+            using (StreamWriter writer = new StreamWriter("test.log", false, Encoding.UTF8))
+            {
+                writer.WriteLine("Hello");
+            }
+
             int sectionThreshold = sectionThresholdSeconds * sampleRate;
             double songStartSamples = notes.Min(note => note.SampleTime);
             double songDurationSamples = notes.Max(note => note.SampleTime);
@@ -136,11 +143,11 @@ namespace MuseMapalyzr
                         Segment? foundSegment = FindSegmentFromStartNote(note, streamSegments);
                         if (foundSegment == null)
                         {
-                            Console.WriteLine("OOF adding anyways");
+                            CustomLogger.Instance.Warning($"Didn't actually find a segment.. Adding the note anyways SampleTime{note.SampleTime}");
                             sections[sectionIndex].Add(note);
                             lastAddedNote = note;
 
-                            if (skipped > 0) Console.WriteLine($"Skipped {skipped}");
+                            if (skipped > 0) CustomLogger.Instance.Debug($"Found segment == null: Skipped {skipped}");
                             skipped = 0;
                         }
                         else
@@ -153,8 +160,8 @@ namespace MuseMapalyzr
                             // Check if Segment NPS is above the threshold or not
                             if (foundSegment.NotesPerSecond > npsCap)
                             {
-                                Console.WriteLine($"Found Segment. Count: ({foundSegment.Notes.Count}) NPS: {foundSegment.NotesPerSecond}");
-                                Console.WriteLine($"{segmentNotes.First().SampleTime} -> {segmentNotes.Last().SampleTime}");
+                                CustomLogger.Instance.Debug($"Found Segment. Count: ({foundSegment.Notes.Count}) NPS: {foundSegment.NotesPerSecond}");
+                                CustomLogger.Instance.Debug($"{segmentNotes.First().SampleTime} -> {segmentNotes.Last().SampleTime}");
 
                                 int notesAdded = 0;
 
@@ -174,7 +181,7 @@ namespace MuseMapalyzr
                                         sections[sectionIndex].Add(tempNote);
                                         lastAddedNote = tempNote;
                                         notesAdded++;
-                                        // Console.WriteLine($"Adding note: {tempNote.SampleTime}");
+                                        // CustomLogger.Instance.Debug($"Adding note: {tempNote.SampleTime}");
                                     }
                                     else
                                     {
@@ -185,10 +192,10 @@ namespace MuseMapalyzr
                                             sections[sectionIndex].Add(finalNote);
                                             lastAddedNote = finalNote;
                                             notesAdded++;
-                                            // Console.WriteLine($"Added final note: {finalNote.SampleTime}");
+                                            // CustomLogger.Instance.Debug($"Added final note: {finalNote.SampleTime}");
                                         }
                                         done = true;
-                                        Console.WriteLine($"Done: {notesAdded} added");
+                                        CustomLogger.Instance.Debug($"Done: {notesAdded} added");
                                     }
                                 }
                             }
@@ -205,7 +212,7 @@ namespace MuseMapalyzr
                     {
                         sections[sectionIndex].Add(note);
                         lastAddedNote = note;
-                        if (skipped > 0) Console.WriteLine($"Skipped {skipped}");
+                        if (skipped > 0) CustomLogger.Instance.Debug($"note.SampleTime > lastAddedNote.SampleTime: Skipped {skipped}");
                         skipped = 0;
 
                     }

@@ -51,7 +51,7 @@ namespace MuseMapalyzr
                     string name = filename.Split(new string[] { charSeparator }, StringSplitOptions.None)[^1].Split(".asset")[0];
 
                     Console.WriteLine($"Analysing : {name} Samplerate: {mMap.SampleRate}");
-
+                    CustomLogger.Instance.Info($"Analysing : {name} Samplerate: {mMap.SampleRate}");
                     using (StreamWriter outfile = new StreamWriter($"{Constants.AnalysisDir}/{name}", false, Encoding.UTF8))
                     {
                         DifficultyCalculation.WeightingResults weightResults = difficultyCalculation.CalculateDifficulty(mMap.Notes, outfile, mMap.SampleRate);
@@ -76,6 +76,8 @@ namespace MuseMapalyzr
         {
             InputData inputData = new();
 
+            CustomLogger.Instance.Info("Starting Application");
+
             if (args.Length == 0)
             {
                 // If no arguments are provided, run export all difficulties
@@ -85,7 +87,6 @@ namespace MuseMapalyzr
             {
                 if (args.Length > 1 && args[1] == "unranked")
                 {
-                    Console.WriteLine("Graphing UNRANKED");
                     MultiplierGraphing.Graph(false);
                 }
                 else
@@ -109,6 +110,7 @@ namespace MuseMapalyzr
                 string filterBy = string.Join(" ", args);
                 inputData.CalculateAndExportFilteredDifficulties(filterBy, Constants.DataDir);
             }
+            CustomLogger.Instance.Close(); // Close the logger at the end
         }
     }
 }

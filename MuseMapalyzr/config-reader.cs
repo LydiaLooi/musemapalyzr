@@ -5,6 +5,9 @@ namespace MuseMapalyzr
     {
         private static MuseMapalyzrConfig? _rankedConfig;
         private static MuseMapalyzrConfig? _unrankedConfig;
+
+        public static bool Debug = true;
+
         public static string GetConfigPath(bool ranked = true)
         {
             string currentDirectory = Directory.GetCurrentDirectory();
