@@ -52,6 +52,8 @@ namespace MuseMapalyzr
 
                     Console.WriteLine($"Analysing : {name} Samplerate: {mMap.SampleRate}");
                     CustomLogger.Instance.Info($"Analysing : {name} Samplerate: {mMap.SampleRate}");
+                    CustomLogger.Instance.PatternLog($"Analysing : {name} Samplerate: {mMap.SampleRate}");
+
                     using (StreamWriter outfile = new StreamWriter($"{Constants.AnalysisDir}/{name}", false, Encoding.UTF8))
                     {
                         DifficultyCalculation.WeightingResults weightResults = difficultyCalculation.CalculateDifficulty(mMap.Notes, outfile, mMap.SampleRate);

@@ -427,7 +427,7 @@ namespace MuseMapalyzr
             List<PatternScore> rankedPatternScores = new List<PatternScore>();
             List<PatternScore> unrankedPatternScores = new List<PatternScore>();
             // Console.WriteLine($"Checking {patterns.Count} Patterns");
-
+            CustomLogger.Instance.PatternLog(String.Format("\n{0,20} {1,10} {2,10} {3,10} {4,18} {5,18}", "Pattern Name", "Ranked", "Unranked", "# Segments", "Start SampleTime", "End SampleTime"));
             foreach (Pattern pattern in patterns)
             {
                 // Console.WriteLine($"----------{pattern.PatternName} {pattern.Segments.Count}----------");
@@ -435,6 +435,21 @@ namespace MuseMapalyzr
                 {
                     double rankedScore = pattern.CalculatePatternDifficulty(true);
                     double unrankedScore = pattern.CalculatePatternDifficulty(false);
+
+
+                    CustomLogger.Instance.PatternLog($"{pattern.PatternName,20} {rankedScore,10:F3} {unrankedScore,10:F3} {pattern.Segments.Count,10} {pattern.StartSample,18} {pattern.EndSample,18}");
+                    if (pattern.PatternName == Constants.Other)
+                    {
+                        CustomLogger.Instance.PatternLog(String.Format("\n{0,30} {1,10} {2,10}", "Segment Name", "# Notes", "NPS"));
+
+                        foreach (Segment seg in pattern.Segments)
+                        {
+                            CustomLogger.Instance.PatternLog($"{seg.SegmentName,30} {seg.Notes.Count,10} {seg.NotesPerSecond,10:F3}");
+
+                        }
+                        CustomLogger.Instance.PatternLog("");
+
+                    }
                     // Console.WriteLine($"Pattern Difficulty Score: {score}");
                     rankedPatternScores.Add(
                         new PatternScore(

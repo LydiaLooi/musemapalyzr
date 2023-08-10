@@ -8,8 +8,20 @@ namespace MuseMapalyzr
     {
         public string PatternName { get; set; }
         public List<Segment> Segments { get; set; }
-        public int StartSample { get; set; }
-        public int EndSample { get; set; }
+        public double StartSample
+        {
+            get
+            {
+                return Segments.First().Notes.First().SampleTime;
+            }
+        }
+        public double EndSample
+        {
+            get
+            {
+                return Segments.Last().Notes.Last().SampleTime;
+            }
+        }
         public bool IsActive { get; set; }
         public int SampleRate { get; set; }
         public int Tolerance { get; set; }
@@ -70,12 +82,11 @@ namespace MuseMapalyzr
             }
         }
 
-        public Pattern(string patternName, List<Segment> segments, int startSample = 0, int endSample = 0, int sampleRate = 0)
+        public Pattern(string patternName, List<Segment> segments, int sampleRate)
         {
             PatternName = patternName;
             Segments = segments;
-            StartSample = startSample;
-            EndSample = endSample;
+
             IsActive = true;
             if (sampleRate == 0)
             {
@@ -104,7 +115,7 @@ namespace MuseMapalyzr
 
         public virtual Pattern CreateCopy()
         {
-            return new Pattern(PatternName, Segments, StartSample, EndSample);
+            return new Pattern(PatternName, Segments, SampleRate);
         }
 
         public Dictionary<string, int> GetSegmentTypeCounts(List<string> segmentNames)

@@ -21,11 +21,15 @@ namespace MuseMapalyzr
         private static string Outfile = "logs/logs.log";
         private static StreamWriter LogWriter;
 
+        private static string PatternOutfile = "logs/patterns.log";
+        private static StreamWriter PatternLogWriter;
+
 
         // Private constructor to prevent outside instantiation
         private CustomLogger()
         {
             LogWriter = new StreamWriter(Outfile, false, Encoding.UTF8);
+            PatternLogWriter = new StreamWriter(PatternOutfile, false, Encoding.UTF8);
         }
 
         public static CustomLogger Instance
@@ -49,6 +53,12 @@ namespace MuseMapalyzr
             LogWriter.Flush();
         }
 
+        private void WriteToPatternFile(string message)
+        {
+            PatternLogWriter.WriteLine(message);
+            PatternLogWriter.Flush();
+        }
+
         public void Debug(string message)
         {
             if (DebugLevel <= LogLevel.Debug) WriteToFile(message);
@@ -69,10 +79,17 @@ namespace MuseMapalyzr
             if (DebugLevel <= LogLevel.Error) WriteToFile(message);
         }
 
+        public void PatternLog(string message)
+        {
+            WriteToPatternFile(message);
+        }
+
+
         // Don't forget to provide a method to properly close the StreamWriter
         public void Close()
         {
             LogWriter.Close();
+            PatternLogWriter.Close();
         }
 
     }
