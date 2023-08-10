@@ -52,43 +52,46 @@ namespace MuseMapalyzr
 
             foreach (var segment in Pattern.Segments)
             {
+                double multiplier = 1;
                 switch (segment.SegmentName)
                 {
                     case Constants.Switch:
-                        multipliers.Add(conf.OtherSwitchMultiplier);
+                        multiplier = conf.OtherSwitchMultiplier;
                         break;
                     case Constants.ZigZag:
                         // Zig zags are special as they can have many notes in them.
                         double zigZagMultiplier = PatternMultiplier.ZigZagMultiplier(segment.NotesPerSecond, ranked);
                         double zigZagLengthMultiplier = PatternMultiplier.ZigZagLengthMultiplier(segment.Notes.Count, segment.NotesPerSecond, ranked);
-                        multipliers.Add(zigZagMultiplier * zigZagLengthMultiplier);
+                        multiplier = zigZagMultiplier * zigZagLengthMultiplier;
                         break;
                     case Constants.TwoStack:
-                        multipliers.Add(PatternMultiplier.TwoStackMultiplier(segment.NotesPerSecond, ranked));
+                        multiplier = PatternMultiplier.TwoStackMultiplier(segment.NotesPerSecond, ranked);
                         break;
                     case Constants.ThreeStack:
-                        multipliers.Add(PatternMultiplier.ThreeStackMultiplier(segment.NotesPerSecond, ranked));
+                        multiplier = PatternMultiplier.ThreeStackMultiplier(segment.NotesPerSecond, ranked);
                         break;
                     case Constants.FourStack:
-                        multipliers.Add(PatternMultiplier.FourStackMultiplier(segment.NotesPerSecond, ranked));
+                        multiplier = PatternMultiplier.FourStackMultiplier(segment.NotesPerSecond, ranked);
                         break;
                     case Constants.SingleStreams:
-                        multipliers.Add(PatternMultiplier.StreamMultiplier(segment.NotesPerSecond, ranked));
+                        multiplier = PatternMultiplier.StreamMultiplier(segment.NotesPerSecond, ranked);
                         break;
                     case Constants.ShortInterval:
-
-                        multipliers.Add(conf.OtherShortIntMultiplier);
+                        multiplier = conf.OtherShortIntMultiplier;
                         break;
                     case Constants.MedInterval:
-                        multipliers.Add(conf.OtherMedIntMultiplier);
+                        multiplier = conf.OtherMedIntMultiplier;
                         break;
                     case Constants.LongInterval:
-                        multipliers.Add(conf.OtherLongIntMultiplier);
+                        multiplier = conf.OtherLongIntMultiplier;
                         break;
                     default:
-                        multipliers.Add(1);
+                        multipliers.Add(multiplier);
                         break;
                 }
+                multipliers.Add(multiplier);
+                segment.Multiplier = multiplier;
+
             }
 
             // If other has quite a few patterns and notes, then higher weighting to the harder patterns

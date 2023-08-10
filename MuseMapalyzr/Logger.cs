@@ -14,6 +14,7 @@ namespace MuseMapalyzr
     {
 
         private static LogLevel DebugLevel = LogLevel.Debug;
+        private static bool LogPatternMultipliers = false;
 
         private static readonly object locker = new object();
         private static CustomLogger instance = null;
@@ -81,7 +82,7 @@ namespace MuseMapalyzr
 
         public void PatternLog(string message)
         {
-            WriteToPatternFile(message);
+            if (LogPatternMultipliers) WriteToPatternFile(message);
         }
 
 

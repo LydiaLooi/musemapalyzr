@@ -21,7 +21,7 @@ Make sure in `MuseMapalyzr` there are the following directories:
 # TODO:
 - Ranked incorporates the "normal length" song threshold when determining the density.
 - Look at the pattern multipliers again.
-- With pattern multipliers for each map, actually log somewhere about what multipliers are affecting it etc.
+    - Patterns being grouped and then the multiplier being averaged after affects maps with patterns that fall under "Other".
 
 # Packages and stuff:
 
