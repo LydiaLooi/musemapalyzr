@@ -101,11 +101,6 @@ namespace MuseMapalyzr
         )
         {
 
-            using (StreamWriter writer = new StreamWriter("test.log", false, Encoding.UTF8))
-            {
-                writer.WriteLine("Hello");
-            }
-
             int sectionThreshold = sectionThresholdSeconds * sampleRate;
             double songStartSamples = notes.Min(note => note.SampleTime);
             double songDurationSamples = notes.Max(note => note.SampleTime);
@@ -155,7 +150,7 @@ namespace MuseMapalyzr
 
                             List<Note> segmentNotes = foundSegment.Notes.OrderBy(note => note.SampleTime).ToList();
 
-                            if (skipped > 0) Console.WriteLine($"Skipped {skipped}");
+                            if (skipped > 0) CustomLogger.Instance.Debug($"Found a stream. Skipped {skipped}");
                             skipped = 0;
                             // Check if Segment NPS is above the threshold or not
                             if (foundSegment.NotesPerSecond > npsCap)
@@ -175,10 +170,11 @@ namespace MuseMapalyzr
                                 while (!done)
                                 {
                                     double nextNoteTime = tempNote.SampleTime + GetTimeDifferenceWithNPS(npsCap, sampleRate);
+                                    int nextSectionIndex = (int)(nextNoteTime - songStartSamples) / sectionThreshold;
                                     tempNote = new Note(note.Lane, nextNoteTime);
                                     if (nextNoteTime <= segmentNotes.Last().SampleTime)
                                     {
-                                        sections[sectionIndex].Add(tempNote);
+                                        sections[nextSectionIndex].Add(tempNote);
                                         lastAddedNote = tempNote;
                                         notesAdded++;
                                         // CustomLogger.Instance.Debug($"Adding note: {tempNote.SampleTime}");
@@ -189,7 +185,8 @@ namespace MuseMapalyzr
                                         if (lastAddedNote.SampleTime != segmentNotes.Last().SampleTime)
                                         {
                                             Note finalNote = new Note(tempNote.Lane, segmentNotes.Last().SampleTime);
-                                            sections[sectionIndex].Add(finalNote);
+                                            int finalSectionIndex = (int)(finalNote.SampleTime - songStartSamples) / sectionThreshold;
+                                            sections[finalSectionIndex].Add(finalNote);
                                             lastAddedNote = finalNote;
                                             notesAdded++;
                                             // CustomLogger.Instance.Debug($"Added final note: {finalNote.SampleTime}");
@@ -247,10 +244,14 @@ namespace MuseMapalyzr
         public static List<double> MovingAverageNoteDensity(List<List<Note>> sections, int windowSize)
         {
             int numSections = sections.Count;
+
+            CustomLogger.Instance.Debug($"MovingAverageNoteDensity Num Sections: {numSections} WindowSize: {windowSize}");
+
             List<int> noteDensities = new List<int>();
             foreach (var section in sections)
             {
                 noteDensities.Add(section.Count);
+                CustomLogger.Instance.Debug($"Adding {section.Count} to noteDensities");
             }
 
             List<double> movingAverages = new List<double>();
