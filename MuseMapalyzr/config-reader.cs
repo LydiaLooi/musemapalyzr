@@ -51,6 +51,9 @@ namespace MuseMapalyzr
             public double DensityTopWeighting { get; set; }
             public double DensityBottomWeighting { get; set; }
             public double DensitySingleStreamNPSCap { get; set; }
+            public double DensityFourStackNPSCap { get; set; }
+            public double DensityThreeStackNPSCap { get; set; }
+            public double DensityTwoStackNPSCap { get; set; }
             public int PatternToleranceMs { get; set; }
             public int SegmentToleranceMs { get; set; }
             public double GetPatternWeightingTopPercentage { get; set; }

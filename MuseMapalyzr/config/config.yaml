@@ -15,7 +15,9 @@ DensityTopWeighting: 1
 DensityBottomWeighting: 0.3
 
 DensitySingleStreamNPSCap: 8
-
+DensityFourStackNPSCap: 9
+DensityThreeStackNPSCap: 10
+DensityTwoStackNPSCap: 11
 
 # Tolerances
 PatternToleranceMs: 20

@@ -13,8 +13,8 @@ namespace MuseMapalyzr
     public class CustomLogger
     {
 
-        private static LogLevel DebugLevel = LogLevel.Debug;
-        private static bool LogPatternMultipliers = false;
+        private static LogLevel DebugLevel = LogLevel.Info;
+        private static bool LogPatternMultipliers = true;
 
         private static readonly object locker = new object();
         private static CustomLogger instance = null;

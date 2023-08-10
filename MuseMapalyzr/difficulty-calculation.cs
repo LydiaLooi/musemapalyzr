@@ -77,7 +77,12 @@ namespace MuseMapalyzr
                         List<Segment> temp = new List<Segment>();
                         foreach (Segment segment in IdentifiedSegments)
                         {
-                            if (segment.SegmentName == Constants.SingleStreams)
+                            if (
+                                segment.SegmentName == Constants.SingleStreams
+                                || segment.SegmentName == Constants.FourStack
+                                || segment.SegmentName == Constants.ThreeStack
+                                || segment.SegmentName == Constants.TwoStack
+                                )
                             {
                                 temp.Add(segment);
                             }
@@ -97,9 +102,29 @@ namespace MuseMapalyzr
             int sectionThresholdSeconds,
             int sampleRate,
             List<Segment> streamSegments, // Is ordered 
-            double npsCap // E.g., cap is 13 NPS, then if there is a stream thats 42 NPS, we treat it like its 13 NPS.
+            bool ranked
+        // double streamNpsCap, // E.g., cap is 13 NPS, then if there is a stream thats 42 NPS, we treat it like its 13 NPS.
         )
         {
+            double streamNpsCap;
+            double fourStackNpsCap;
+            double threeStackNpsCap;
+            double twoStackNpsCap;
+            if (ranked)
+            {
+                streamNpsCap = ConfigReader.GetConfig().DensitySingleStreamNPSCap;
+                fourStackNpsCap = ConfigReader.GetConfig().DensityFourStackNPSCap;
+                threeStackNpsCap = ConfigReader.GetConfig().DensityThreeStackNPSCap;
+                twoStackNpsCap = ConfigReader.GetConfig().DensityTwoStackNPSCap;
+
+            }
+            else
+            {
+                streamNpsCap = ConfigReader.GetUnrankedConfig().DensitySingleStreamNPSCap;
+                fourStackNpsCap = ConfigReader.GetUnrankedConfig().DensityFourStackNPSCap;
+                threeStackNpsCap = ConfigReader.GetUnrankedConfig().DensityThreeStackNPSCap;
+                twoStackNpsCap = ConfigReader.GetUnrankedConfig().DensityTwoStackNPSCap;
+            }
 
             int sectionThreshold = sectionThresholdSeconds * sampleRate;
             double songStartSamples = notes.Min(note => note.SampleTime);
@@ -125,8 +150,11 @@ namespace MuseMapalyzr
             }
 
             int skipped = 0;
-            Note lastAddedNote = new Note(0, -1);
+            // Note lastAddedNote = new Note(0, -1);
+            double skipIfBeforeOrEqualToThisTime = 0;
             // Fill sections with notes
+
+
             foreach (Note note in notes)
             {
                 int sectionIndex = (int)(note.SampleTime - songStartSamples) / sectionThreshold;
@@ -140,7 +168,6 @@ namespace MuseMapalyzr
                         {
                             CustomLogger.Instance.Warning($"Didn't actually find a segment.. Adding the note anyways SampleTime{note.SampleTime}");
                             sections[sectionIndex].Add(note);
-                            lastAddedNote = note;
 
                             if (skipped > 0) CustomLogger.Instance.Debug($"Found segment == null: Skipped {skipped}");
                             skipped = 0;
@@ -149,14 +176,45 @@ namespace MuseMapalyzr
                         {
 
                             List<Note> segmentNotes = foundSegment.Notes.OrderBy(note => note.SampleTime).ToList();
+                            double npsCap;
+
+                            switch (foundSegment.SegmentName)
+                            {
+                                case Constants.SingleStreams:
+                                    npsCap = streamNpsCap;
+                                    CustomLogger.Instance.Debug($"NPS Cap: stream cap: {streamNpsCap}");
+                                    break;
+                                case Constants.FourStack:
+                                    npsCap = fourStackNpsCap;
+                                    CustomLogger.Instance.Debug($"NPS Cap: 4-stack cap: {fourStackNpsCap}");
+                                    break;
+                                case Constants.ThreeStack:
+                                    npsCap = threeStackNpsCap;
+                                    CustomLogger.Instance.Debug($"NPS Cap: 3-stack cap: {threeStackNpsCap}");
+                                    break;
+                                case Constants.TwoStack:
+                                    npsCap = twoStackNpsCap;
+                                    CustomLogger.Instance.Debug($"NPS Cap: 2-stack cap: {twoStackNpsCap}");
+                                    break;
+                                default:
+                                    CustomLogger.Instance.Error($"Create sections stream segments found a non stream or N-stack segment? {foundSegment.SegmentName}");
+                                    npsCap = streamNpsCap;
+                                    break;
+                            }
+
 
                             if (skipped > 0) CustomLogger.Instance.Debug($"Found a stream. Skipped {skipped}");
                             skipped = 0;
                             // Check if Segment NPS is above the threshold or not
                             if (foundSegment.NotesPerSecond > npsCap)
                             {
-                                CustomLogger.Instance.Debug($"Found Segment. Count: ({foundSegment.Notes.Count}) NPS: {foundSegment.NotesPerSecond}");
+                                CustomLogger.Instance.Debug($"Found a {foundSegment.SegmentName} with {foundSegment.Notes.Count} notes and {foundSegment.NotesPerSecond:F3} NPS");
                                 CustomLogger.Instance.Debug($"{segmentNotes.First().SampleTime} -> {segmentNotes.Last().SampleTime}");
+
+                                skipIfBeforeOrEqualToThisTime = foundSegment.Notes.Last().SampleTime;
+
+
+
 
                                 int notesAdded = 0;
 
@@ -169,46 +227,35 @@ namespace MuseMapalyzr
                                 bool done = false;
                                 while (!done)
                                 {
+
+
+
                                     double nextNoteTime = tempNote.SampleTime + GetTimeDifferenceWithNPS(npsCap, sampleRate);
                                     int nextSectionIndex = (int)(nextNoteTime - songStartSamples) / sectionThreshold;
                                     tempNote = new Note(note.Lane, nextNoteTime);
                                     if (nextNoteTime <= segmentNotes.Last().SampleTime)
                                     {
                                         sections[nextSectionIndex].Add(tempNote);
-                                        lastAddedNote = tempNote;
                                         notesAdded++;
-                                        // CustomLogger.Instance.Debug($"Adding note: {tempNote.SampleTime}");
                                     }
                                     else
                                     {
-                                        // Always Try to add a note at the the last note sample time in the segment
-                                        if (lastAddedNote.SampleTime != segmentNotes.Last().SampleTime)
-                                        {
-                                            Note finalNote = new Note(tempNote.Lane, segmentNotes.Last().SampleTime);
-                                            int finalSectionIndex = (int)(finalNote.SampleTime - songStartSamples) / sectionThreshold;
-                                            sections[finalSectionIndex].Add(finalNote);
-                                            lastAddedNote = finalNote;
-                                            notesAdded++;
-                                            // CustomLogger.Instance.Debug($"Added final note: {finalNote.SampleTime}");
-                                        }
                                         done = true;
                                         CustomLogger.Instance.Debug($"Done: {notesAdded} added");
                                     }
                                 }
                             }
-                            else
+                            else // The Segment NPS was not above the threshold so we just add it as normal
                             {
                                 sections[sectionIndex].Add(note);
-                                lastAddedNote = note;
                             }
                         }
 
 
                     }
-                    else if (note.SampleTime > lastAddedNote.SampleTime)
+                    else if (note.SampleTime > skipIfBeforeOrEqualToThisTime)
                     {
                         sections[sectionIndex].Add(note);
-                        lastAddedNote = note;
                         if (skipped > 0) CustomLogger.Instance.Debug($"note.SampleTime > lastAddedNote.SampleTime: Skipped {skipped}");
                         skipped = 0;
 
@@ -367,7 +414,7 @@ namespace MuseMapalyzr
                 sampleWindowSecs,
                 sampleRate,
                 patternWeightingResults.StreamSegments,
-                ConfigReader.GetConfig().DensitySingleStreamNPSCap
+                true
                 );
 
             List<List<Note>> unrankedSections = CreateSections(
@@ -375,7 +422,7 @@ namespace MuseMapalyzr
                 sampleWindowSecs,
                 sampleRate,
                 patternWeightingResults.StreamSegments,
-                ConfigReader.GetUnrankedConfig().DensitySingleStreamNPSCap
+                false
                 );
 
             int movingAverageWindow = ConfigReader.GetConfig().MovingAvgWindow;
