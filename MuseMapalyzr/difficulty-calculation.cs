@@ -110,12 +110,14 @@ namespace MuseMapalyzr
             double fourStackNpsCap;
             double threeStackNpsCap;
             double twoStackNpsCap;
+            double normalSizedMapThreshold;
             if (ranked)
             {
                 streamNpsCap = ConfigReader.GetConfig().DensitySingleStreamNPSCap;
                 fourStackNpsCap = ConfigReader.GetConfig().DensityFourStackNPSCap;
                 threeStackNpsCap = ConfigReader.GetConfig().DensityThreeStackNPSCap;
                 twoStackNpsCap = ConfigReader.GetConfig().DensityTwoStackNPSCap;
+                normalSizedMapThreshold = ConfigReader.GetConfig().NormalSizedMapThreshold;
 
             }
             else
@@ -124,11 +126,22 @@ namespace MuseMapalyzr
                 fourStackNpsCap = ConfigReader.GetUnrankedConfig().DensityFourStackNPSCap;
                 threeStackNpsCap = ConfigReader.GetUnrankedConfig().DensityThreeStackNPSCap;
                 twoStackNpsCap = ConfigReader.GetUnrankedConfig().DensityTwoStackNPSCap;
+                normalSizedMapThreshold = ConfigReader.GetUnrankedConfig().NormalSizedMapThreshold;
             }
+
+            double songLength = (notes.Last().SampleTime - notes.First().SampleTime) / sampleRate;
+            if (songLength < normalSizedMapThreshold)
+            {
+                // If the song length is less than the threshold, then add a note at the threshold time
+                // so that when calculating density, it looks at that whole time.
+                notes.Add(new Note(0, normalSizedMapThreshold * sampleRate));
+            }
+
 
             int sectionThreshold = sectionThresholdSeconds * sampleRate;
             double songStartSamples = notes.Min(note => note.SampleTime);
             double songDurationSamples = notes.Max(note => note.SampleTime);
+
 
             HashSet<double> streamSegmentStartSampleTimes = new HashSet<double>();
             foreach (Segment segment in streamSegments)
@@ -409,8 +422,9 @@ namespace MuseMapalyzr
 
             // TODO: This could be optimised - instead of running CreateSections twice, just do both ranked and 
             // unranked in it.
+
             List<List<Note>> rankedSections = CreateSections(
-                notes,
+                notes.ToList(),
                 sampleWindowSecs,
                 sampleRate,
                 patternWeightingResults.StreamSegments,
@@ -418,7 +432,7 @@ namespace MuseMapalyzr
                 );
 
             List<List<Note>> unrankedSections = CreateSections(
-                notes,
+                notes.ToList(),
                 sampleWindowSecs,
                 sampleRate,
                 patternWeightingResults.StreamSegments,

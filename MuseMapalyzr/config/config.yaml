@@ -75,7 +75,7 @@ SkewedCircleUpBound: 1.25
 
 # StreamMultiplier
 StreamLowBound: 1
-StreamUpBound: 1.4
+StreamUpBound: 1.35
 StreamLowClamp: 5
 StreamUpClamp: 14
 
@@ -88,7 +88,7 @@ ZigZagLengthNpsThreshold: 17 # Slightly faster than EWF
 
 # FourStackMultiplier
 FourStackLowBound: 1.0
-FourStackUpBound: 1.45
+FourStackUpBound: 1.4
 FourStackLowClamp: 5
 FourStackUpClamp: 14
 
