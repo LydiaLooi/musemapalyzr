@@ -17,7 +17,9 @@ Make sure in `MuseMapalyzr` there are the following directories:
 - `private static LogLevel DebugLevel = LogLevel.Debug;` <- Change to whatever you want.
 - It will output to `logs.log` in `MuseMapalyzr/logs`
 
-
+# To Do
+- Make Zig Zags their own pattern
+- Currently (v3.2) Other patterns do not take into account variation. When I make it so it does, some maps are buffed a lot and some debuffed a lot. Particularly those where high difficulty zig zags are their source of difficulty.
 # Theory crafting:
 - Ranked incorporates the "normal length" song threshold when determining the density.
 - Segment multipliers instead of pattern multipliers.

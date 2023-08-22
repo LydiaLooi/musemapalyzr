@@ -274,6 +274,15 @@ namespace MuseMapalyzr
             double final = (VariationWeighting * variationMultiplier) + (PatternWeighting * patternMultiplier);
 
             if (PatternName != Constants.Other) SetSegmentsMultiplier(final, ranked);
+            if (PatternName == Constants.Other)
+            {
+                // Console.WriteLine($"Other... Variation: {variationMultiplier}");
+                foreach (Segment segment in Segments)
+                {
+                    segment.RankedMultiplier = (VariationWeighting * variationMultiplier) + (PatternWeighting * segment.RankedMultiplier);
+                    segment.UnrankedMultiplier = (VariationWeighting * variationMultiplier) + (PatternWeighting * segment.UnrankedMultiplier);
+                }
+            }
         }
 
 
