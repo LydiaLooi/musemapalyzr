@@ -34,6 +34,9 @@ namespace MuseMapalyzr
 
         public double? TimeDifference { get; set; }
 
+        public double RankedMultiplier { get; set; }
+        public double UnrankedMultiplier { get; set; }
+
         public int SampleRate { get; set; } = Constants.DefaultSampleRate;
 
         public double NotesPerSecond
@@ -78,7 +81,7 @@ namespace MuseMapalyzr
 
         public override string ToString()
         {
-            return $"{SegmentName} {Notes.Count} {TimeDifference}";
+            return $"{SegmentName} NC: {Notes.Count} TD: {TimeDifference} NPS: {NotesPerSecond} {Notes.First().SampleTime} -> {Notes.Last().SampleTime}";
         }
 
     }

@@ -3,23 +3,57 @@ namespace MuseMapalyzr
 {
     public class ConfigReader
     {
-        public static string GetConfigPath()
+        private static MuseMapalyzrConfig? _rankedConfig;
+        private static MuseMapalyzrConfig? _unrankedConfig;
+
+        public static bool Debug = true;
+
+        public static string GetConfigPath(bool ranked = true)
         {
             string currentDirectory = Directory.GetCurrentDirectory();
-            string configFilePath = Path.Combine(currentDirectory, "config", "config.yaml");
+            string configFilePath;
+            if (ranked)
+            {
+                configFilePath = Path.Combine(currentDirectory, "config", "config.yaml");
+            }
+            else
+            {
+                configFilePath = Path.Combine(currentDirectory, "config", "unranked_config.yaml");
+            }
+
             return configFilePath;
         }
 
-        public static MuseMapalyzrConfig GetConfig()
+        private static MuseMapalyzrConfig DeserializeConfig(bool ranked)
         {
-            string yamlContent = File.ReadAllText(GetConfigPath());
+            string yamlContent = File.ReadAllText(GetConfigPath(ranked));
             var deserializer = new DeserializerBuilder().Build();
             MuseMapalyzrConfig config = deserializer.Deserialize<MuseMapalyzrConfig>(yamlContent);
             return config;
         }
 
+        public static MuseMapalyzrConfig GetConfig()
+        {
+            _rankedConfig ??= DeserializeConfig(true);
+            return _rankedConfig;
+        }
+
+        public static MuseMapalyzrConfig GetUnrankedConfig()
+        {
+            _unrankedConfig ??= DeserializeConfig(false);
+            return _unrankedConfig;
+        }
+
         public class MuseMapalyzrConfig
         {
+            public int NormalSizedMapThreshold { get; set; }
+            public double DensityTopProportion { get; set; }
+            public double DensityTopWeighting { get; set; }
+            public double DensityBottomWeighting { get; set; }
+            public double DensitySingleStreamNPSCap { get; set; }
+            public double DensityFourStackNPSCap { get; set; }
+            public double DensityThreeStackNPSCap { get; set; }
+            public double DensityTwoStackNPSCap { get; set; }
             public int PatternToleranceMs { get; set; }
             public int SegmentToleranceMs { get; set; }
             public double GetPatternWeightingTopPercentage { get; set; }
@@ -44,10 +78,6 @@ namespace MuseMapalyzr
             public double NothingButTheoryUpBound { get; set; }
             public double NothingButTheoryLowClamp { get; set; }
             public double NothingButTheoryUpClamp { get; set; }
-            public double VaryingStreamsLowBound { get; set; }
-            public double VaryingStreamsUpBound { get; set; }
-            public double VaryingStreamsLowClamp { get; set; }
-            public double VaryingStreamsUpClamp { get; set; }
             public double ZigZagLowBound { get; set; }
             public double ZigZagUpBound { get; set; }
             public double ZigZagLowClamp { get; set; }
@@ -60,10 +90,6 @@ namespace MuseMapalyzr
             public double StreamUpBound { get; set; }
             public double StreamLowClamp { get; set; }
             public double StreamUpClamp { get; set; }
-            public double PatternStreamLengthLowBound { get; set; }
-            public double PatternStreamLengthUpBound { get; set; }
-            public double PatternStreamLengthLowClamp { get; set; }
-            public double PatternStreamLengthUpClamp { get; set; }
             public double ZigZagLengthLowBound { get; set; }
             public double ZigZagLengthUpBound { get; set; }
             public double ZigZagLengthLowClamp { get; set; }

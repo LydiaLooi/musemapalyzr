@@ -46,7 +46,22 @@ namespace MuseMapalyzr
             Pattern = pattern;
         }
 
-        public abstract double CalcPatternMultiplier();
+        public abstract double CalcPatternMultiplier(bool ranked);
+
+        public void SetSegmentsMultiplier(double multiplier, bool ranked)
+        {
+            foreach (Segment segment in Pattern.Segments)
+            {
+                if (ranked)
+                {
+                    segment.RankedMultiplier = multiplier;
+                }
+                else
+                {
+                    segment.UnrankedMultiplier = multiplier;
+                }
+            }
+        }
     }
 
     public abstract class CalcPatternLengthMultiplierStrategy

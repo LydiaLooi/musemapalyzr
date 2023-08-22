@@ -76,7 +76,7 @@ namespace MuseMapalyzr
                     // Append OtherGroup if no other groups were appendable
                     if (OtherPattern.Segments.Count > 0)
                     {
-                        Patterns.Add(new OtherPattern(Constants.Other, OtherPattern.Segments, OtherPattern.StartSample, OtherPattern.EndSample));
+                        Patterns.Add(new OtherPattern(Constants.Other, OtherPattern.Segments, OtherPattern.SampleRate));
                     }
                     OtherPattern.ResetGroup(previousSegment, currentSegment);  // reset OtherGroup
 
@@ -148,8 +148,7 @@ namespace MuseMapalyzr
                     Pattern lastPatternCopy = new OtherPattern(
                         Constants.Other,
                         new List<Segment>(OtherPattern.Segments),
-                        OtherPattern.StartSample,
-                        OtherPattern.EndSample
+                        OtherPattern.SampleRate
                     );
                     Patterns.Add(lastPatternCopy);
                 }

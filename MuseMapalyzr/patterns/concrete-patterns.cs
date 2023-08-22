@@ -3,7 +3,7 @@ namespace MuseMapalyzr
     public class EvenCirclesGroup : Pattern
     {
         public EvenCirclesGroup(string patternName, List<Segment> segments, int startSample = 0, int endSample = 0, int sampleRate = 0)
-            : base(patternName, segments, startSample, endSample, sampleRate)
+            : base(patternName, segments, sampleRate)
         {
             SetCheckSegmentStrategy(new EvenCirclesCheckSegment(this));
             SetIsAppendableStrategy(new EvenCirclesIsAppendable(this));
@@ -13,7 +13,7 @@ namespace MuseMapalyzr
         }
         public override Pattern CreateCopy()
         {
-            return new EvenCirclesGroup(PatternName, Segments, StartSample, EndSample, SampleRate);
+            return new EvenCirclesGroup(PatternName, Segments, SampleRate);
         }
 
     }
@@ -22,7 +22,7 @@ namespace MuseMapalyzr
     public class SkewedCirclesGroup : Pattern
     {
         public SkewedCirclesGroup(string patternName, List<Segment> segments, int startSample = 0, int endSample = 0, int sampleRate = 0)
-            : base(patternName, segments, startSample, endSample, sampleRate)
+            : base(patternName, segments, sampleRate)
         {
             SetCheckSegmentStrategy(new SkewedCirclesCheckSegment(this));
             SetIsAppendableStrategy(new SkewedCirclesIsAppendable(this));
@@ -32,14 +32,14 @@ namespace MuseMapalyzr
         }
         public override Pattern CreateCopy()
         {
-            return new SkewedCirclesGroup(PatternName, Segments, StartSample, EndSample, SampleRate);
+            return new SkewedCirclesGroup(PatternName, Segments, SampleRate);
         }
     }
 
     public class NothingButTheoryGroup : Pattern
     {
         public NothingButTheoryGroup(string patternName, List<Segment> segments, int startSample = 0, int endSample = 0, int sampleRate = 0)
-            : base(patternName, segments, startSample, endSample, sampleRate)
+            : base(patternName, segments, sampleRate)
         {
             SetCheckSegmentStrategy(new NothingButTheoryCheckSegment(this));
             SetIsAppendableStrategy(new NothingButTheoryIsAppendable(this));
@@ -49,14 +49,14 @@ namespace MuseMapalyzr
         }
         public override Pattern CreateCopy()
         {
-            return new NothingButTheoryGroup(PatternName, Segments, StartSample, EndSample, SampleRate);
+            return new NothingButTheoryGroup(PatternName, Segments, SampleRate);
         }
     }
 
     public class SlowStretchPattern : Pattern
     {
         public SlowStretchPattern(string patternName, List<Segment> segments, int startSample = 0, int endSample = 0, int sampleRate = 0)
-            : base(patternName, segments, startSample, endSample, sampleRate)
+            : base(patternName, segments, sampleRate)
         {
             SetCheckSegmentStrategy(new SlowStretchCheckSegment(this));
             SetIsAppendableStrategy(new SlowStretchIsAppendable(this));
@@ -66,14 +66,14 @@ namespace MuseMapalyzr
         }
         public override Pattern CreateCopy()
         {
-            return new SlowStretchPattern(PatternName, Segments, StartSample, EndSample, SampleRate);
+            return new SlowStretchPattern(PatternName, Segments, SampleRate);
         }
     }
 
     public class VaryingStacksPattern : Pattern
     {
         public VaryingStacksPattern(string patternName, List<Segment> segments, int startSample = 0, int endSample = 0, int sampleRate = 0)
-            : base(patternName, segments, startSample, endSample, sampleRate)
+            : base(patternName, segments, sampleRate)
         {
             SetCheckSegmentStrategy(new VaryingStacksCheckSegment(this));
             SetIsAppendableStrategy(new VaryingStacksIsAppendable(this));
@@ -83,14 +83,14 @@ namespace MuseMapalyzr
         }
         public override Pattern CreateCopy()
         {
-            return new VaryingStacksPattern(PatternName, Segments, StartSample, EndSample, SampleRate);
+            return new VaryingStacksPattern(PatternName, Segments, SampleRate);
         }
     }
 
     public class OtherPattern : Pattern
     {
         public OtherPattern(string patternName, List<Segment> segments, int startSample = 0, int endSample = 0, int sampleRate = 0)
-            : base(patternName, segments, startSample, endSample, sampleRate)
+            : base(patternName, segments, sampleRate)
         {
             SetCheckSegmentStrategy(new OtherCheckSegment(this));
             SetIsAppendableStrategy(new OtherIsAppendable(this));
@@ -100,7 +100,7 @@ namespace MuseMapalyzr
         }
         public override Pattern CreateCopy()
         {
-            return new OtherPattern(PatternName, Segments, StartSample, EndSample, SampleRate);
+            return new OtherPattern(PatternName, Segments, SampleRate);
         }
     }
 

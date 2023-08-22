@@ -72,7 +72,7 @@ namespace MuseMapalyzr
     {
         public DefaultCalcPatternMultiplier(Pattern pattern) : base(pattern) { }
 
-        public override double CalcPatternMultiplier()
+        public override double CalcPatternMultiplier(bool ranked)
         {
             return 1;
         }

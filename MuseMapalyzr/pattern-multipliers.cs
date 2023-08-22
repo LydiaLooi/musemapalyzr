@@ -5,7 +5,14 @@ namespace MuseMapalyzr
 {
     public class PatternMultiplier
     {
-        private static MuseMapalyzrConfig conf = ConfigReader.GetConfig();
+        private static MuseMapalyzrConfig Conf = ConfigReader.GetConfig();
+        private static MuseMapalyzrConfig UnrankedConf = ConfigReader.GetUnrankedConfig();
+
+        private static MuseMapalyzrConfig GetRightConfig(bool ranked)
+        {
+            if (ranked) return Conf;
+            return UnrankedConf;
+        }
 
         private static double SmoothStep(double x)
         {
@@ -27,91 +34,68 @@ namespace MuseMapalyzr
             return Math.Max(min, Math.Min(max, value));
         }
 
-        public static double NothingButTheoryMultiplier(double nps)
+        public static double NothingButTheoryMultiplier(double nps, bool ranked)
         {
-            double lowerBound = conf.NothingButTheoryLowBound;
-            double upperBound = conf.NothingButTheoryUpBound;
-            double lowerClamp = conf.NothingButTheoryLowClamp;
-            double upperClamp = conf.NothingButTheoryUpClamp;
+            double lowerBound = GetRightConfig(ranked).NothingButTheoryLowBound;
+            double upperBound = GetRightConfig(ranked).NothingButTheoryUpBound;
+            double lowerClamp = GetRightConfig(ranked).NothingButTheoryLowClamp;
+            double upperClamp = GetRightConfig(ranked).NothingButTheoryUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Clamp(t, 0, 1);
             return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
         }
 
-        public static double VaryingStreams(double nps)
-        {
-            double lowerBound = conf.VaryingStreamsLowBound;
-            double upperBound = conf.VaryingStreamsUpBound;
-            double lowerClamp = conf.VaryingStreamsLowClamp;
-            double upperClamp = conf.VaryingStreamsUpClamp;
 
-            double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
-            t = Clamp(t, 0, 1);
-            return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
-        }
-
-        public static double ZigZagMultiplier(double nps)
+        public static double ZigZagMultiplier(double nps, bool ranked)
         {
-            double lowerBound = conf.ZigZagLowBound;
-            double upperBound = conf.ZigZagUpBound;
-            double lowerClamp = conf.ZigZagLowClamp;
-            double upperClamp = conf.ZigZagUpClamp;
+            double lowerBound = GetRightConfig(ranked).ZigZagLowBound;
+            double upperBound = GetRightConfig(ranked).ZigZagUpBound;
+            double lowerClamp = GetRightConfig(ranked).ZigZagLowClamp;
+            double upperClamp = GetRightConfig(ranked).ZigZagUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Clamp(t, 0, 1);
             return lowerBound + (upperBound - lowerBound) * EaseInCubic(t);
         }
 
-        public static double EvenCircleMultiplier(double nps)
+        public static double EvenCircleMultiplier(double nps, bool ranked)
         {
-            double lowerBound = conf.EvenCircleLowBound;
-            double upperBound = conf.EvenCircleUpBound;
+            double lowerBound = GetRightConfig(ranked).EvenCircleLowBound;
+            double upperBound = GetRightConfig(ranked).EvenCircleUpBound;
 
             double t = Clamp(nps / 30, 0, 1);
             return lowerBound + (upperBound - lowerBound) * EaseInOut(t);
         }
 
-        public static double SkewedCircleMultiplier(double nps)
+        public static double SkewedCircleMultiplier(double nps, bool ranked)
         {
-            double lowerBound = conf.SkewedCircleLowBound;
-            double upperBound = conf.SkewedCircleUpBound;
+            double lowerBound = GetRightConfig(ranked).SkewedCircleLowBound;
+            double upperBound = GetRightConfig(ranked).SkewedCircleUpBound;
 
             double t = Clamp(nps / 30, 0, 1);
             return lowerBound + (upperBound - lowerBound) * EaseInOut(t);
         }
 
-        public static double StreamMultiplier(double nps)
+        public static double StreamMultiplier(double nps, bool ranked)
         {
-            double lowerBound = conf.StreamLowBound;
-            double upperBound = conf.StreamUpBound;
-            double lowerClamp = conf.StreamLowClamp;
-            double upperClamp = conf.StreamUpClamp;
+            double lowerBound = GetRightConfig(ranked).StreamLowBound;
+            double upperBound = GetRightConfig(ranked).StreamUpBound;
+            double lowerClamp = GetRightConfig(ranked).StreamLowClamp;
+            double upperClamp = GetRightConfig(ranked).StreamUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Clamp(t, 0, 1);
             return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
         }
 
-        public static double PatternStreamLengthMultiplier(double numNotes)
+        public static double ZigZagLengthMultiplier(double numNotes, double nps, bool ranked)
         {
-            double lowerBound = conf.PatternStreamLengthLowBound;
-            double upperBound = conf.PatternStreamLengthUpBound;
-            double lowerClamp = conf.PatternStreamLengthLowClamp;
-            double upperClamp = conf.PatternStreamLengthUpClamp;
-
-            double t = (numNotes - lowerClamp) / (upperClamp - lowerClamp);
-            t = Clamp(t, 0, 1);
-            return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
-        }
-
-        public static double ZigZagLengthMultiplier(double numNotes, double nps)
-        {
-            double lowerBound = conf.ZigZagLengthLowBound;
-            double upperBound = conf.ZigZagLengthUpBound;
-            double lowerClamp = conf.ZigZagLengthLowClamp;
-            double upperClamp = conf.ZigZagLengthUpClamp;
-            double npsThreshold = conf.ZigZagLengthNpsThreshold;
+            double lowerBound = GetRightConfig(ranked).ZigZagLengthLowBound;
+            double upperBound = GetRightConfig(ranked).ZigZagLengthUpBound;
+            double lowerClamp = GetRightConfig(ranked).ZigZagLengthLowClamp;
+            double upperClamp = GetRightConfig(ranked).ZigZagLengthUpClamp;
+            double npsThreshold = GetRightConfig(ranked).ZigZagLengthNpsThreshold;
 
             if (nps > npsThreshold)
             {
@@ -122,7 +106,7 @@ namespace MuseMapalyzr
             return 1;
         }
 
-        public static double NothingButTheoryLengthMultiplier(double numNotes, double multiplier)
+        public static double NothingButTheoryLengthMultiplier(double numNotes, double multiplier, bool ranked)
         {
             double lowerBound = 0;
             double upperBound = 1;
@@ -138,12 +122,12 @@ namespace MuseMapalyzr
             return 1 + newAddtional;
         }
 
-        public static double FourStackMultiplier(double nps)
+        public static double FourStackMultiplier(double nps, bool ranked)
         {
-            double lowerBound = conf.FourStackLowBound;
-            double upperBound = conf.FourStackUpBound;
-            double lowerClamp = conf.FourStackLowClamp;
-            double upperClamp = conf.FourStackUpClamp;
+            double lowerBound = GetRightConfig(ranked).FourStackLowBound;
+            double upperBound = GetRightConfig(ranked).FourStackUpBound;
+            double lowerClamp = GetRightConfig(ranked).FourStackLowClamp;
+            double upperClamp = GetRightConfig(ranked).FourStackUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Math.Max(Math.Min(t, 1), 0);
@@ -151,36 +135,36 @@ namespace MuseMapalyzr
         }
 
 
-        public static double ThreeStackMultiplier(double nps)
+        public static double ThreeStackMultiplier(double nps, bool ranked)
         {
-            double lowerBound = conf.ThreeStackLowBound;
-            double upperBound = conf.ThreeStackUpBound;
-            double lowerClamp = conf.ThreeStackLowClamp;
-            double upperClamp = conf.ThreeStackUpClamp;
+            double lowerBound = GetRightConfig(ranked).ThreeStackLowBound;
+            double upperBound = GetRightConfig(ranked).ThreeStackUpBound;
+            double lowerClamp = GetRightConfig(ranked).ThreeStackLowClamp;
+            double upperClamp = GetRightConfig(ranked).ThreeStackUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Math.Max(Math.Min(t, 1), 0);
             return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
         }
 
-        public static double TwoStackMultiplier(double nps)
+        public static double TwoStackMultiplier(double nps, bool ranked)
         {
-            double lowerBound = conf.TwoStackLowBound;
-            double upperBound = conf.TwoStackUpBound;
-            double lowerClamp = conf.TwoStackLowClamp;
-            double upperClamp = conf.TwoStackUpClamp;
+            double lowerBound = GetRightConfig(ranked).TwoStackLowBound;
+            double upperBound = GetRightConfig(ranked).TwoStackUpBound;
+            double lowerClamp = GetRightConfig(ranked).TwoStackLowClamp;
+            double upperClamp = GetRightConfig(ranked).TwoStackUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Math.Max(Math.Min(t, 1), 0);
             return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
         }
 
-        public static double VaryingStacksMultiplier(double nps)
+        public static double VaryingStacksMultiplier(double nps, bool ranked)
         {
-            double lowerBound = conf.VaryingStacksLowBound;
-            double upperBound = conf.VaryingStacksUpBound;
-            double lowerClamp = conf.VaryingStacksLowClamp;
-            double upperClamp = conf.VaryingStacksUpClamp;
+            double lowerBound = GetRightConfig(ranked).VaryingStacksLowBound;
+            double upperBound = GetRightConfig(ranked).VaryingStacksUpBound;
+            double lowerClamp = GetRightConfig(ranked).VaryingStacksLowClamp;
+            double upperClamp = GetRightConfig(ranked).VaryingStacksUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
             t = Math.Max(Math.Min(t, 1), 0);

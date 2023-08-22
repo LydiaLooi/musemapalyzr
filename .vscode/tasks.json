@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/MuseMapalyzr/musemapalyzr-csharp.csproj",
+                "${workspaceFolder}/musemapalyzr-csharp.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/MuseMapalyzr/musemapalyzr-csharp.csproj",
+                "${workspaceFolder}/musemapalyzr-csharp.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,18 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/MuseMapalyzr/musemapalyzr-csharp.csproj"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        
-        {
-            "label": "test",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "test",
-                "${workspaceFolder}/MuseMapalyzr.Tests/MuseMapalyzr.Tests.csproj"
+                "${workspaceFolder}/musemapalyzr-csharp.sln"
             ],
             "problemMatcher": "$msCompile"
         }

@@ -9,20 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/MuseMapalyzr/bin/Debug/net7.0/musemapalyzr-csharp.dll",
+            "program": "${workspaceFolder}/MuseMapalyzr/bin/Debug/netcoreapp7.0-windows/musemapalyzr-csharp.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/MuseMapalyzr/",
-            "console": "internalConsole",
-            "stopAtEntry": false
-        },
-        {
-            "name": ".NET Core Launch (console) w/ Args",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/MuseMapalyzr/bin/Debug/net7.0/musemapalyzr-csharp.dll",
-            "args": ["loonboon"],
-            "cwd": "${workspaceFolder}/MuseMapalyzr/",
+            "cwd": "${workspaceFolder}/MuseMapalyzr",
             "console": "internalConsole",
             "stopAtEntry": false
         },
