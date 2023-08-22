@@ -60,12 +60,6 @@ NothingButTheoryUpBound: 1.5
 NothingButTheoryLowClamp: 2.5
 NothingButTheoryUpClamp: 21.5
 
-# VaryingStreams
-VaryingStreamsLowBound: 1
-VaryingStreamsUpBound: 2
-VaryingStreamsLowClamp: 2.5
-VaryingStreamsUpClamp: 20.5
-
 # ZigZagMultiplier
 ZigZagLowBound: 1
 ZigZagUpBound: 2
@@ -74,23 +68,17 @@ ZigZagUpClamp: 18
 
 # EvenCircleMultiplier
 EvenCircleLowBound: 1
-EvenCircleUpBound: 1.55
+EvenCircleUpBound: 1.15
 
 # SkewedCircleMultiplier
 SkewedCircleLowBound: 1
-SkewedCircleUpBound: 1.75
+SkewedCircleUpBound: 1.25
 
 # StreamMultiplier
 StreamLowBound: 1
-StreamUpBound: 1.3
+StreamUpBound: 1.5
 StreamLowClamp: 5
 StreamUpClamp: 14
-
-# PatternStreamLengthMultiplier
-PatternStreamLengthLowBound: 1.025
-PatternStreamLengthUpBound: 1.1
-PatternStreamLengthLowClamp: 6.5
-PatternStreamLengthUpClamp: 20
 
 # ZigZagLengthMultiplier
 ZigZagLengthLowBound: 1
@@ -101,19 +89,19 @@ ZigZagLengthNpsThreshold: 17 # Slightly faster than EWF
 
 # FourStackMultiplier
 FourStackLowBound: 1.0
-FourStackUpBound: 1.3
+FourStackUpBound: 1.45
 FourStackLowClamp: 5
 FourStackUpClamp: 14
 
 # ThreeStackMultiplier
 ThreeStackLowBound: 1.0
-ThreeStackUpBound: 1.2
+ThreeStackUpBound: 1.35
 ThreeStackLowClamp: 5
 ThreeStackUpClamp: 14
 
 # TwoStackMultiplier
 TwoStackLowBound: 1.0
-TwoStackUpBound: 1.15
+TwoStackUpBound: 1.3
 TwoStackLowClamp: 5
 TwoStackUpClamp: 14
 

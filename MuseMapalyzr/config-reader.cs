@@ -78,10 +78,6 @@ namespace MuseMapalyzr
             public double NothingButTheoryUpBound { get; set; }
             public double NothingButTheoryLowClamp { get; set; }
             public double NothingButTheoryUpClamp { get; set; }
-            public double VaryingStreamsLowBound { get; set; }
-            public double VaryingStreamsUpBound { get; set; }
-            public double VaryingStreamsLowClamp { get; set; }
-            public double VaryingStreamsUpClamp { get; set; }
             public double ZigZagLowBound { get; set; }
             public double ZigZagUpBound { get; set; }
             public double ZigZagLowClamp { get; set; }
@@ -94,10 +90,6 @@ namespace MuseMapalyzr
             public double StreamUpBound { get; set; }
             public double StreamLowClamp { get; set; }
             public double StreamUpClamp { get; set; }
-            public double PatternStreamLengthLowBound { get; set; }
-            public double PatternStreamLengthUpBound { get; set; }
-            public double PatternStreamLengthLowClamp { get; set; }
-            public double PatternStreamLengthUpClamp { get; set; }
             public double ZigZagLengthLowBound { get; set; }
             public double ZigZagLengthUpBound { get; set; }
             public double ZigZagLengthLowClamp { get; set; }

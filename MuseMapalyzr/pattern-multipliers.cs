@@ -46,17 +46,6 @@ namespace MuseMapalyzr
             return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
         }
 
-        public static double VaryingStreams(double nps, bool ranked)
-        {
-            double lowerBound = GetRightConfig(ranked).VaryingStreamsLowBound;
-            double upperBound = GetRightConfig(ranked).VaryingStreamsUpBound;
-            double lowerClamp = GetRightConfig(ranked).VaryingStreamsLowClamp;
-            double upperClamp = GetRightConfig(ranked).VaryingStreamsUpClamp;
-
-            double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
-            t = Clamp(t, 0, 1);
-            return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
-        }
 
         public static double ZigZagMultiplier(double nps, bool ranked)
         {
@@ -96,18 +85,6 @@ namespace MuseMapalyzr
             double upperClamp = GetRightConfig(ranked).StreamUpClamp;
 
             double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
-            t = Clamp(t, 0, 1);
-            return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
-        }
-
-        public static double PatternStreamLengthMultiplier(double numNotes, bool ranked)
-        {
-            double lowerBound = GetRightConfig(ranked).PatternStreamLengthLowBound;
-            double upperBound = GetRightConfig(ranked).PatternStreamLengthUpBound;
-            double lowerClamp = GetRightConfig(ranked).PatternStreamLengthLowClamp;
-            double upperClamp = GetRightConfig(ranked).PatternStreamLengthUpClamp;
-
-            double t = (numNotes - lowerClamp) / (upperClamp - lowerClamp);
             t = Clamp(t, 0, 1);
             return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
         }
