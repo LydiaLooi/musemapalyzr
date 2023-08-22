@@ -273,7 +273,7 @@ namespace MuseMapalyzr
 
             double final = (VariationWeighting * variationMultiplier) + (PatternWeighting * patternMultiplier);
 
-            if (PatternName != Constants.Other) SetSegmentsMultiplier(final);
+            if (PatternName != Constants.Other) SetSegmentsMultiplier(final, ranked);
 
             return final;
         }
@@ -330,9 +330,9 @@ namespace MuseMapalyzr
             return CalcPatternLengthMultiplierStrategy.CalcPatternLengthMultiplier();
         }
 
-        public void SetSegmentsMultiplier(double multiplier)
+        public void SetSegmentsMultiplier(double multiplier, bool ranked)
         {
-            CalcPatternMultiplierStrategy.SetSegmentsMultiplier(multiplier);
+            CalcPatternMultiplierStrategy.SetSegmentsMultiplier(multiplier, ranked);
         }
 
         public override string ToString()

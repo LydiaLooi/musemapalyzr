@@ -34,7 +34,8 @@ namespace MuseMapalyzr
 
         public double? TimeDifference { get; set; }
 
-        public double Multiplier { get; set; }
+        public double RankedMultiplier { get; set; }
+        public double UnrankedMultiplier { get; set; }
 
         public int SampleRate { get; set; } = Constants.DefaultSampleRate;
 

@@ -487,11 +487,11 @@ namespace MuseMapalyzr
                     CustomLogger.Instance.PatternLog($"{pattern.PatternName,20} {rankedScore,10:F3} {unrankedScore,10:F3} {pattern.Segments.Count,10} {pattern.StartSample,18} {pattern.EndSample,18}");
                     if (true)
                     {
-                        CustomLogger.Instance.PatternLog(String.Format("\n{0,30} {1,10} {2,10} {3,10}", "Segment Name", "# Notes", "NPS", "Multiplier"));
+                        CustomLogger.Instance.PatternLog(String.Format("\n{0,30} {1,10} {2,10} {3,10} {4,10}", "Segment Name", "# Notes", "NPS", "R Multi", "UR Multi"));
 
                         foreach (Segment seg in pattern.Segments)
                         {
-                            CustomLogger.Instance.PatternLog($"{seg.SegmentName,30} {seg.Notes.Count,10} {seg.NotesPerSecond,10:F3} {seg.Multiplier,10:F3}");
+                            CustomLogger.Instance.PatternLog($"{seg.SegmentName,30} {seg.Notes.Count,10} {seg.NotesPerSecond,10:F3} {seg.RankedMultiplier,10:F3} {seg.UnrankedMultiplier,10:F3}");
 
                         }
                         CustomLogger.Instance.PatternLog("");

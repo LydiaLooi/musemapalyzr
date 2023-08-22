@@ -90,7 +90,15 @@ namespace MuseMapalyzr
                         break;
                 }
                 multipliers.Add(multiplier);
-                segment.Multiplier = multiplier;
+                if (ranked)
+                {
+                    segment.RankedMultiplier = multiplier;
+
+                }
+                else
+                {
+                    segment.UnrankedMultiplier = multiplier;
+                }
 
             }
 
