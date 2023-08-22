@@ -89,6 +89,7 @@ namespace MuseMapalyzr
             {
                 if (args.Length > 1 && args[1] == "unranked")
                 {
+                    Console.WriteLine("Graphing unranked");
                     MultiplierGraphing.Graph(false);
                 }
                 else

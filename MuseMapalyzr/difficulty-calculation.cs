@@ -474,17 +474,18 @@ namespace MuseMapalyzr
             List<PatternScore> rankedPatternScores = new List<PatternScore>();
             List<PatternScore> unrankedPatternScores = new List<PatternScore>();
             // Console.WriteLine($"Checking {patterns.Count} Patterns");
-            CustomLogger.Instance.PatternLog(String.Format("\n{0,20} {1,10} {2,10} {3,10} {4,18} {5,18}", "Pattern Name", "Ranked", "Unranked", "# Segments", "Start SampleTime", "End SampleTime"));
+            CustomLogger.Instance.PatternLog(String.Format("\n{0,20} {1,10} {2,18} {3,18}", "Pattern Name", "# Segments", "Start SampleTime", "End SampleTime"));
             foreach (Pattern pattern in patterns)
             {
                 // Console.WriteLine($"----------{pattern.PatternName} {pattern.Segments.Count}----------");
                 if (pattern.Segments != null && pattern.Segments.Count > 0) // check if pattern has segments
                 {
-                    double rankedScore = pattern.CalculatePatternDifficulty(true);
-                    double unrankedScore = pattern.CalculatePatternDifficulty(false);
+
+                    pattern.CalculatePatternDifficulty(true);
+                    pattern.CalculatePatternDifficulty(false);
 
 
-                    CustomLogger.Instance.PatternLog($"{pattern.PatternName,20} {rankedScore,10:F3} {unrankedScore,10:F3} {pattern.Segments.Count,10} {pattern.StartSample,18} {pattern.EndSample,18}");
+                    CustomLogger.Instance.PatternLog($"{pattern.PatternName,20} {pattern.Segments.Count,10} {pattern.StartSample,18} {pattern.EndSample,18}");
                     if (true)
                     {
                         CustomLogger.Instance.PatternLog(String.Format("\n{0,30} {1,10} {2,10} {3,10} {4,10}", "Segment Name", "# Notes", "NPS", "R Multi", "UR Multi"));
@@ -497,70 +498,21 @@ namespace MuseMapalyzr
                         CustomLogger.Instance.PatternLog("");
 
                     }
-                    // Console.WriteLine($"Pattern Difficulty Score: {score}");
-                    rankedPatternScores.Add(
-                        new PatternScore(
-                            pattern.PatternName,
-                            rankedScore,
-                            pattern.HasIntervalSegment,
-                            pattern.TotalNotes
-                        )
-                    );
-                    unrankedPatternScores.Add(
-                        new PatternScore(
-                            pattern.PatternName,
-                            unrankedScore,
-                            pattern.HasIntervalSegment,
-                            pattern.TotalNotes
-                        )
-                    );
                 }
             }
 
-            // Before, this was where pattern length multipliers were applied. 
-            // That wasn't working as intended so now it's just straight up the scores
-            // This is still here incase we want to look into that again.
             ScoreResults scoreResults = new ScoreResults();
 
-            foreach (PatternScore rps in rankedPatternScores)
+            foreach (Pattern pattern in patterns)
             {
-                scoreResults.RankedScores.Add(rps.Score);
-            }
-
-            foreach (PatternScore urps in unrankedPatternScores)
-            {
-                scoreResults.UnrankedScores.Add(urps.Score);
+                foreach (Segment segment in pattern.Segments)
+                {
+                    scoreResults.RankedScores.Add(segment.RankedMultiplier);
+                    scoreResults.UnrankedScores.Add(segment.UnrankedMultiplier);
+                }
             }
             return scoreResults;
         }
-
-        // Commented out as it wasn't working as intended and buffing/nerfing maps unintentionally
-        // public static List<double> ApplyMultiplierToPatternChunk(List<PatternScore> chunk)
-        // {
-        //     int totalNotes = chunk.Sum(ps => ps.TotalNotes);
-
-        //     double multiplier = 1;
-        //     if (chunk.Count > 2)
-        //     {
-        //         multiplier = PatternMultiplier.PatternStreamLengthMultiplier(totalNotes);
-        //     }
-
-        //     List<double> multiplied = new List<double>();
-        //     foreach (PatternScore c_ps in chunk)
-        //     {
-        //         Console.WriteLine($"Chunk time: {c_ps.PatternName} {c_ps.TotalNotes} ... {multiplier} ... {c_ps.Score}");
-        //         double score = c_ps.PatternName != Constants.ZigZag ? c_ps.Score * multiplier : c_ps.Score;
-        //         multiplied.Add(score);
-        //         if (multiplier > 1)
-        //         {
-        //             Console.WriteLine($"Before: {c_ps.Score} AFter: {score}");
-
-        //         }
-        //     }
-
-
-        //     return multiplied;
-        // }
     }
 
 

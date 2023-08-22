@@ -264,7 +264,7 @@ namespace MuseMapalyzr
             }
         }
 
-        public double CalculatePatternDifficulty(bool ranked)
+        public void CalculatePatternDifficulty(bool ranked)
         {
 
             double variationMultiplier = CalcVariationScore();
@@ -274,8 +274,6 @@ namespace MuseMapalyzr
             double final = (VariationWeighting * variationMultiplier) + (PatternWeighting * patternMultiplier);
 
             if (PatternName != Constants.Other) SetSegmentsMultiplier(final, ranked);
-
-            return final;
         }
 
 
