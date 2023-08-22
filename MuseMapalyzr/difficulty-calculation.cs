@@ -485,7 +485,7 @@ namespace MuseMapalyzr
 
 
                     CustomLogger.Instance.PatternLog($"{pattern.PatternName,20} {rankedScore,10:F3} {unrankedScore,10:F3} {pattern.Segments.Count,10} {pattern.StartSample,18} {pattern.EndSample,18}");
-                    if (pattern.PatternName == Constants.Other)
+                    if (true)
                     {
                         CustomLogger.Instance.PatternLog(String.Format("\n{0,30} {1,10} {2,10} {3,10}", "Segment Name", "# Notes", "NPS", "Multiplier"));
 
