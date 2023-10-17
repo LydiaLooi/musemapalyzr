@@ -5,6 +5,16 @@ namespace MuseMapalyzr
 {
     public class SegmentAnalyser
     {
+        private static int MaxNumberNotesInSegment = 25; // So that long zig zags are taken into account more.
+
+        private static bool IfZigZagItIsValid(Segment currentSegment)
+        {
+            if (currentSegment.SegmentName != Constants.ZigZag) return true;
+
+            if (currentSegment.Notes.Count < MaxNumberNotesInSegment) return true;
+
+            return false;
+        }
 
         public static List<Segment> AnalyseSegments(List<Note> notes, int sampleRate)
         {
@@ -28,7 +38,7 @@ namespace MuseMapalyzr
                     double baseTimeDifference = currentSegment.Notes[1].SampleTime - currentSegment.Notes[0].SampleTime;
 
                     // If the time difference between the current pair of notes is within the tolerance of the base time difference of the current segment
-                    if (Math.Abs(timeDifference - baseTimeDifference) <= tolerance)
+                    if (Math.Abs(timeDifference - baseTimeDifference) <= tolerance && IfZigZagItIsValid(currentSegment))
                     {
                         currentSegment.Notes.Add(note);
                     }

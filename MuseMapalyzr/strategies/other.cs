@@ -50,9 +50,30 @@ namespace MuseMapalyzr
             }
 
 
-            foreach (var segment in Pattern.Segments)
+            int zigZagChainNoteCount = 0;
+            double prevNPS = -1;
+            foreach (Segment segment in Pattern.Segments)
             {
                 double multiplier = 1;
+
+                // This is to keep track of how many zig zag segments we have seen so we can properly
+                // use the zig zag length multiplier
+                if (segment.SegmentName == Constants.ZigZag &&
+                    (prevNPS == -1 || prevNPS == segment.NotesPerSecond))
+                {
+
+                    zigZagChainNoteCount += segment.Notes.Count - 1; // Due to the overlap of segments
+                    prevNPS = (double)segment.NotesPerSecond;
+
+                }
+                else
+                {
+                    prevNPS = -1;
+                    zigZagChainNoteCount = 0;
+                }
+
+
+
                 switch (segment.SegmentName)
                 {
                     case Constants.Switch:
@@ -61,7 +82,7 @@ namespace MuseMapalyzr
                     case Constants.ZigZag:
                         // Zig zags are special as they can have many notes in them.
                         double zigZagMultiplier = PatternMultiplier.ZigZagMultiplier(segment.NotesPerSecond, ranked);
-                        double zigZagLengthMultiplier = PatternMultiplier.ZigZagLengthMultiplier(segment.Notes.Count, segment.NotesPerSecond, ranked);
+                        double zigZagLengthMultiplier = PatternMultiplier.ZigZagLengthMultiplier(zigZagChainNoteCount, segment.NotesPerSecond, ranked);
                         multiplier = zigZagMultiplier * zigZagLengthMultiplier;
                         break;
                     case Constants.TwoStack:
@@ -89,6 +110,7 @@ namespace MuseMapalyzr
                         multipliers.Add(multiplier);
                         break;
                 }
+
                 multipliers.Add(multiplier);
                 if (ranked)
                 {
