@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 
 namespace MuseMapalyzr
@@ -375,10 +376,94 @@ namespace MuseMapalyzr
             return weightedAverage;
         }
 
+
+        public static double WeightedAverageOfDensities(List<double> values, double topPercentage, double topWeight, double bottomWeight, int? numMax = null)
+        {
+            // Check if the list is empty
+            if (values.Count == 0 || values == null)
+            {
+                throw new ArgumentException("Input list is empty.");
+            }
+
+            int numTopValues;
+            if (numMax != null)
+            {
+                // Calculate the number of top values to consider based on the percentage
+                numTopValues = Math.Min((int)(values.Count * topPercentage), (int)numMax);
+            }
+            else
+            {
+                numTopValues = (int)(values.Count * topPercentage);
+            }
+
+
+            Console.WriteLine($"DENSITY LENGTH: {values.Count}");
+
+            numTopValues = Math.Max(numTopValues, 1);
+
+            // Sort the list in descending order
+            values.Sort((a, b) => -a.CompareTo(b));
+
+            // Console.WriteLine(string.Join(",", values));
+
+
+            //Calculate the sum of top values
+            double topSum = values.Take(numTopValues).Sum();
+
+            // Calculate the sum of the remaining values
+            // IEnumerable<double> bottomNums = values.Skip(numTopValues);
+
+            double highest = topSum / numTopValues; // top average
+
+
+            double additionalStars = 1;// arbitrary number to get the "max" diff
+            double maxDiff = highest + additionalStars;
+
+
+
+            double bottomSum = CalculateWeightedSum(values, highest);
+
+
+            double X = additionalStars; // The number to approach
+            double N = 1000;  // The point where the function should be 90% of X
+            double bottomAverage = LogarithmicGrowth(bottomSum, X, N);
+
+
+            double finalWeight = highest + bottomAverage;
+
+            // Console.WriteLine($"{finalWeight} | valueslength: {values.Count} ... numTopValues {numTopValues} Highest: {highest} Bottom avg {bottomAverage} |Top {topPercentage * 100}% Index: {numTopValues} ... Threshold {values[numTopValues]}\n");
+
+
+            return finalWeight;
+
+
+
+        }
+
+
+        private static double LogarithmicGrowth(double x, double X, double N)
+        {
+            double b = (Math.Exp(0.9) - 1) / N;
+            return X * Math.Log(b * x + 1);
+        }
+
+        private static double CalculateWeightedSum(IEnumerable<double> bottomNums, double highest)
+        {
+            double weightedSum = 0;
+
+            foreach (double num in bottomNums)
+            {
+                double weight = 1 / Math.Max(Math.Abs(highest - num), 1); // Math.Max 1 to avoid div by 0
+                weightedSum += num * weight;
+            }
+
+            return weightedSum;
+        }
+
         public PatternWeightingResults GetPatternWeighting(List<Note> notes, int sampleRate)
         {
             // Need Mapalyzr Class that identifies patterns
-            Mapalyzr mpg = new();
+            Mapalyzr mpg = new Mapalyzr();
 
             List<Segment> segments = SegmentAnalyser.AnalyseSegments(notes, sampleRate);
 
@@ -411,6 +496,7 @@ namespace MuseMapalyzr
         }
 
 
+        // When copying over to museswipr, we just get rid of the outfile param.
         public WeightingResults CalculateDifficulty(List<Note> notes, StreamWriter outfile, int sampleRate)
         {
 
@@ -442,6 +528,7 @@ namespace MuseMapalyzr
             List<double> rankedMovingAvg = MovingAverageNoteDensity(rankedSections, movingAverageWindow);
             List<double> unrankedMovingAvg = MovingAverageNoteDensity(unrankedSections, movingAverageWindow);
 
+            // When copying over to museswipr, we just get rid of the if below.
             if (outfile != null)
             {
                 foreach (var s in rankedMovingAvg)
@@ -450,13 +537,13 @@ namespace MuseMapalyzr
                 }
             }
 
-            double rankedDifficulty = WeightedAverageOfValues(
+            double rankedDifficulty = WeightedAverageOfDensities(
                 rankedMovingAvg,
                 ConfigReader.GetConfig().DensityTopProportion,
                 ConfigReader.GetConfig().DensityTopWeighting,
                 ConfigReader.GetConfig().DensityBottomWeighting
                 ) * BaseDifficultyMultiplier;
-            double unrankedDifficulty = WeightedAverageOfValues(
+            double unrankedDifficulty = WeightedAverageOfDensities(
                 unrankedMovingAvg,
                 ConfigReader.GetUnrankedConfig().DensityTopProportion,
                 ConfigReader.GetUnrankedConfig().DensityTopWeighting,
@@ -471,9 +558,9 @@ namespace MuseMapalyzr
             double rankedWeightedDifficulty = patternWeightingResults.RankedPatternWeighting * rankedDifficulty;
             double unrankedWeightedDifficulty = patternWeightingResults.UnrankedPatternWeighting * unrankedDifficulty;
 
-            WeightingResults weightResults = new(
+            WeightingResults weightResults = new WeightingResults(
                 patternWeightingResults.RankedPatternWeighting,
-                rankedDifficulty,
+            rankedDifficulty,
                 rankedWeightedDifficulty,
 
                 patternWeightingResults.UnrankedPatternWeighting,

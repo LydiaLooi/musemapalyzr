@@ -101,11 +101,42 @@ namespace MuseMapalyzr
             else if (args[0] == "test")
             {
                 List<double> values = new List<double> {
-                    1,1,1,1,1,1,1,9,9,9
+                    9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
                     };
-                double results = DifficultyCalculation.WeightedAverageOfValues(values, 0.3, 1, 0.1);
-                double results2 = DifficultyCalculation.WeightedAverageOfValues(values, 0.2, 1, 0.1);
-                Console.WriteLine($"Weighted: {results} Weighted: {results2} Mean: {values.Average()}");
+
+                List<double> values2 = new List<double> {
+                    9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9
+                    };
+
+                ConfigReader.MuseMapalyzrConfig rankedConfig = ConfigReader.GetConfig();
+                ConfigReader.MuseMapalyzrConfig unrankedConfig = ConfigReader.GetUnrankedConfig();
+
+                double resultsRanked = DifficultyCalculation.WeightedAverageOfDensities(
+                    values,
+                    rankedConfig.DensityTopProportion,
+                    rankedConfig.DensityTopWeighting,
+                    rankedConfig.DensityBottomWeighting);
+                double resultsUnranked = DifficultyCalculation.WeightedAverageOfDensities(
+                    values,
+                    unrankedConfig.DensityTopProportion,
+                    unrankedConfig.DensityTopWeighting,
+                    unrankedConfig.DensityBottomWeighting, 15);
+
+                double resultsRanked2 = DifficultyCalculation.WeightedAverageOfDensities(
+                    values2,
+                    rankedConfig.DensityTopProportion,
+                    rankedConfig.DensityTopWeighting,
+                    rankedConfig.DensityBottomWeighting);
+
+                double resultsUnranked2 = DifficultyCalculation.WeightedAverageOfDensities(
+                    values2,
+                    unrankedConfig.DensityTopProportion,
+                    unrankedConfig.DensityTopWeighting,
+                    unrankedConfig.DensityBottomWeighting, 15);
+
+
+                Console.WriteLine($"1 Ranked: {resultsRanked} Unranked: {resultsUnranked} Mean: {values.Average()}");
+                Console.WriteLine($"2 Ranked: {resultsRanked2} Unranked: {resultsUnranked2} Mean: {values.Average()}");
             }
             else
             {

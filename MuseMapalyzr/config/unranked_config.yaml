@@ -12,7 +12,7 @@ NormalSizedMapThreshold: 0
 
 # Density 
 DensityTopProportion: 0.2
-DensityTopWeighting: 1.5
+DensityTopWeighting: 0.9
 DensityBottomWeighting: 0.1
 
 DensitySingleStreamNPSCap: 13
