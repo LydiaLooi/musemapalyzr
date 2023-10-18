@@ -4,6 +4,10 @@ namespace MuseMapalyzr
 {
     public class DifficultyCalculation
     {
+
+
+        private static float BaseDifficultyMultiplier = 0.75f; // So that the difficulty range is somewhat more palettable
+
         public class WeightingResults // Named Tuple "Weighting" in python code
         {
             public double RankedWeighting;
@@ -329,51 +333,45 @@ namespace MuseMapalyzr
         }
 
 
-        public static double WeightedAverageOfValues(List<double> values, double topPercentage = 0.3, double topWeight = 0.7, double bottomWeight = 0.3)
+        public static double WeightedAverageOfValues(List<double> values, double topPercentage, double topWeight, double bottomWeight, int? numMax = null)
         {
-            if (values == null || values.Count == 0)
+            // Check if the list is empty
+            if (values.Count == 0 || values == null)
             {
-                throw new ArgumentException("The input list 'values' cannot be empty.");
+                throw new ArgumentException("Input list is empty.");
             }
 
-            // Find the threshold that separates the top 30% highest densities from the rest
-            List<double> movingAveragesSorted = new List<double>(values);
-            movingAveragesSorted.Sort();
-            movingAveragesSorted.Reverse();
-
-            // Console.WriteLine(string.Join(",", movingAveragesSorted));
-
-            int thresholdIndex = (int)(values.Count * topPercentage);
-            if (thresholdIndex >= movingAveragesSorted.Count)
+            int numTopValues;
+            if (numMax != null)
             {
-                thresholdIndex = movingAveragesSorted.Count - 1;
+                // Calculate the number of top values to consider based on the percentage
+                numTopValues = Math.Min((int)(values.Count * topPercentage), (int)numMax);
             }
-            // Console.WriteLine(thresholdIndex);
-            // double threshold = movingAveragesSorted[thresholdIndex];
-            // Console.WriteLine($"Top %{topPercentage} Index: {thresholdIndex} ... Threshold {threshold}");
-
-            // Calculate the weighted average
-            double totalWeight = 0;
-            double weightedSum = 0;
-
-            for (int i = 0; i < movingAveragesSorted.Count; i++)
+            else
             {
-                double value = movingAveragesSorted[i];
-                double weight;
-                if (i <= thresholdIndex)
-                {
-                    weight = topWeight;
-                }
-                else
-                {
-                    weight = bottomWeight;
-                }
-
-                weightedSum += value * weight;
-                totalWeight += weight;
+                numTopValues = (int)(values.Count * topPercentage);
             }
-            // Console.WriteLine($"Weighted Sum: {weightedSum} (Actual: {values.Sum()}) Total Weight: {totalWeight}");
-            double weightedAverage = weightedSum / totalWeight;
+
+
+            // Sort the list in descending order
+            values.Sort((a, b) => -a.CompareTo(b));
+
+            //Console.WriteLine(string.Join(",", values));
+
+
+            // Calculate the sum of top values with the topWeight
+            double topSum = values.Take(numTopValues).Sum() * topWeight;
+
+            // Calculate the sum of the remaining values with the bottomWeight
+            double bottomSum = values.Skip(numTopValues).Sum() * bottomWeight;
+
+            // Calculate the final weighted average
+            double totalWeight = (numTopValues * topWeight) + ((values.Count - numTopValues) * bottomWeight);
+            double weightedAverage = (topSum + bottomSum) / totalWeight;
+
+            //Console.WriteLine($"{weightedAverage} | Top {topPercentage * 100}% Index: {numTopValues} ... Threshold {values[numTopValues]}\n");
+
+
             return weightedAverage;
         }
 
@@ -457,14 +455,18 @@ namespace MuseMapalyzr
                 ConfigReader.GetConfig().DensityTopProportion,
                 ConfigReader.GetConfig().DensityTopWeighting,
                 ConfigReader.GetConfig().DensityBottomWeighting
-                );
+                ) * BaseDifficultyMultiplier;
             double unrankedDifficulty = WeightedAverageOfValues(
                 unrankedMovingAvg,
                 ConfigReader.GetUnrankedConfig().DensityTopProportion,
                 ConfigReader.GetUnrankedConfig().DensityTopWeighting,
-                ConfigReader.GetUnrankedConfig().DensityBottomWeighting
-                );
+                ConfigReader.GetUnrankedConfig().DensityBottomWeighting,
+                15 // seconds max - arbitrary number to prevent hard parts in long maps being watered out.
+                ) * BaseDifficultyMultiplier;
 
+
+            // The unranked difficulty should never be lower than the ranked difficulty
+            unrankedDifficulty = Math.Max(rankedDifficulty, unrankedDifficulty);
 
             double rankedWeightedDifficulty = patternWeightingResults.RankedPatternWeighting * rankedDifficulty;
             double unrankedWeightedDifficulty = patternWeightingResults.UnrankedPatternWeighting * unrankedDifficulty;

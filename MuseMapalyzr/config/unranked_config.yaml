@@ -12,7 +12,7 @@ NormalSizedMapThreshold: 0
 
 # Density 
 DensityTopProportion: 0.2
-DensityTopWeighting: 1.2
+DensityTopWeighting: 1.5
 DensityBottomWeighting: 0.1
 
 DensitySingleStreamNPSCap: 13
@@ -39,8 +39,8 @@ MedIntervalNps: 1 # Default 1
 LongIntervalNps: 0.5 # Default 0.5
 
 #### Pattern Class Attributes
-DefaultVariationWeighting: 0.5
-DefaultPatternWeighting: 0.5
+DefaultVariationWeighting: 0.2
+DefaultPatternWeighting: 0.8
 ShortIntDebuff: 0.7
 MedIntDebuff: 0.6
 LongIntDebuff: 0.4

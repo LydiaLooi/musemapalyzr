@@ -269,9 +269,11 @@ namespace MuseMapalyzr
 
             double variationMultiplier = CalcVariationScore();
             double patternMultiplier = CalcPatternMultiplier(ranked);
-            // Console.WriteLine($"Ranked {ranked} {patternMultiplier}");
 
             double final = (VariationWeighting * variationMultiplier) + (PatternWeighting * patternMultiplier);
+
+            //Console.WriteLine($"Ranked {ranked} | Final: {final} | Pattern Multiplier {patternMultiplier} | Pattern Weighting {PatternWeighting} | Variation Multiplier {variationMultiplier} | Variation Weighting {VariationWeighting}");
+
 
             if (PatternName != Constants.Other) SetSegmentsMultiplier(final, ranked);
         }
