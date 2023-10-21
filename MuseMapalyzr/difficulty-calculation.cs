@@ -490,7 +490,14 @@ namespace MuseMapalyzr
         }
 
 
-        public static double CalculateDensityAverage(List<double> values, int hardestSeconds, double arbitrary90PercentThreshold, double rankedPenaltyProportion, double ceilingProportion)
+        public static double CalculateDensityAverage(
+            List<double> values,
+            int hardestSeconds,
+            double arbitrary90PercentThreshold,
+            double rankedPenaltyProportion,
+            double ceilingProportion,
+            List<List<double>> patternMultiplierSections
+            )
         {
 
             // Values should be the densities * pattern multipliers in each 1 second windows
@@ -505,6 +512,23 @@ namespace MuseMapalyzr
 
 
             //Console.WriteLine($"DENSITY LENGTH: {values.Count}");
+
+            // Console.WriteLine(values.Count == patternMultiplierSections.Count);
+
+            int index = 0;
+            foreach (List<double> thing in patternMultiplierSections)
+            {
+                if (thing.Count == 0)
+                {
+                    thing.Add(1);
+                }
+                double averagePatternMultiplier = thing.Average();
+                values[index] *= averagePatternMultiplier;
+                // Console.WriteLine($"Index: {index} Count: {thing.Count} | {values[index]} {averagePatternMultiplier}");
+                index++;
+
+            }
+
 
 
 
@@ -543,7 +567,7 @@ namespace MuseMapalyzr
             double finalPenalisedBase = hardest - penalty; // Is just hardest if calculating peak difficulty
 
             double finalDifficulty = finalPenalisedBase + addedDifficulty;
-            Console.WriteLine($"Final diff: {finalDifficulty} | ... {rankedPenaltyProportion} Ceiling: {ceiling} | Hardest: {hardest} | final penalised: {finalPenalisedBase}");
+            //Console.WriteLine($"Final diff: {finalDifficulty} | ... {rankedPenaltyProportion} Ceiling: {ceiling} | Hardest: {hardest} | final penalised: {finalPenalisedBase}");
 
             // Console.WriteLine($"{finalWeight} | valueslength: {values.Count} ... numTopValues {numTopValues} Highest: {highest} Bottom avg {bottomAverage} |Top {topPercentage * 100}% Index: {numTopValues} ... Threshold {values[numTopValues]}\n");
 
@@ -558,13 +582,13 @@ namespace MuseMapalyzr
             return X * Math.Log(b * x + 1);
         }
 
-        private static double CalculateWeightedSum(IEnumerable<double> bottomNums, double highest)
+        private static double CalculateWeightedSum(IEnumerable<double> bottomNums, double hardest)
         {
             double weightedSum = 0;
 
             foreach (double num in bottomNums)
             {
-                double weight = 1 / Math.Max(Math.Abs(highest - num), 1); // Math.Max 1 to avoid div by 0
+                double weight = 1 / Math.Max(Math.Abs(hardest - num), 1); // Math.Max 1 to avoid div by 0
                 weightedSum += num * weight;
             }
 
@@ -645,7 +669,8 @@ namespace MuseMapalyzr
                 ConfigReader.GetConfig().HardestSeconds,
                 ConfigReader.GetConfig().Arbitrary90PercentThreshold,
                 ConfigReader.GetConfig().RankedPenaltyProportion,
-                ConfigReader.GetConfig().CeilingProportion
+                ConfigReader.GetConfig().CeilingProportion,
+                patternWeightingResults.RankedPatternWeightingSections
                 ) * BaseDifficultyMultiplier;
 
 
@@ -655,15 +680,16 @@ namespace MuseMapalyzr
                 ConfigReader.GetUnrankedConfig().HardestSeconds,
                 ConfigReader.GetUnrankedConfig().Arbitrary90PercentThreshold,
                 ConfigReader.GetUnrankedConfig().RankedPenaltyProportion,
-                ConfigReader.GetUnrankedConfig().CeilingProportion
+                ConfigReader.GetUnrankedConfig().CeilingProportion,
+                patternWeightingResults.UnrankedPatternWeightingSections
                 ) * BaseDifficultyMultiplier;
 
 
             // The unranked difficulty should never be lower than the ranked difficulty
             unrankedDifficulty = Math.Max(rankedDifficulty, unrankedDifficulty);
             Console.WriteLine($"Unranked: {unrankedDifficulty} Ranked: {rankedDifficulty}");
-            double rankedWeightedDifficulty = patternWeightingResults.RankedPatternWeighting * rankedDifficulty;
-            double unrankedWeightedDifficulty = patternWeightingResults.UnrankedPatternWeighting * unrankedDifficulty;
+            double rankedWeightedDifficulty = rankedDifficulty;
+            double unrankedWeightedDifficulty = unrankedDifficulty;
 
             WeightingResults weightResults = new WeightingResults(
                 patternWeightingResults.RankedPatternWeighting,

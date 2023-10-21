@@ -32,7 +32,7 @@ namespace MuseMapalyzr
 
             int count = 1000;
             double[] npsValues = new double[count];
-            double step = 50 / (double)count;
+            double step = 100 / (double)count;
 
             for (int i = 0; i < count; i++)
             {

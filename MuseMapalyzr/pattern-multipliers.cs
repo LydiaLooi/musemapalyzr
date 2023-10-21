@@ -54,9 +54,36 @@ namespace MuseMapalyzr
             double lowerClamp = GetRightConfig(ranked).ZigZagLowClamp;
             double upperClamp = GetRightConfig(ranked).ZigZagUpClamp;
 
-            double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
-            t = Clamp(t, 0, 1);
-            return lowerBound + (upperBound - lowerBound) * EaseInCubic(t);
+            // If nps is within the clamped range
+
+            if (ranked)
+            {
+                double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
+                t = Clamp(t, 0, 1);
+                return lowerBound + (upperBound - lowerBound) * EaseInCubic(t);
+            }
+            else
+            {
+
+                if (nps <= upperClamp)
+                {
+                    double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
+                    t = Clamp(t, 0, 1);
+                    return lowerBound + (upperBound - lowerBound) * EaseInCubic(t);
+                }
+                // If nps is greater than the upper clamp
+                else
+                {
+                    // Apply a logarithmic function here.
+                    // The constants 'a' and 'b' can be adjusted to control the curve.
+                    double a = 20; // Controls the steepness of the curve
+                    double b = upperBound - a * Math.Log(upperClamp); // Ensures the curve starts at (upperClamp, upperBound)
+                    double result = a * Math.Log(nps) + b;
+                    return result;
+                }
+            }
+
+
         }
 
         public static double EvenCircleMultiplier(double nps, bool ranked)

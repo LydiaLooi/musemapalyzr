@@ -83,7 +83,7 @@ StreamUpClamp: 14
 
 # ZigZagLengthMultiplier
 ZigZagLengthLowBound: 1
-ZigZagLengthUpBound: 15
+ZigZagLengthUpBound: 4
 ZigZagLengthLowClamp: 15
 ZigZagLengthUpClamp: 50
 ZigZagLengthNpsThreshold: 17 # Slightly faster than EWF

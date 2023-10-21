@@ -119,14 +119,16 @@ namespace MuseMapalyzr
                     ConfigReader.GetConfig().HardestSeconds,
                     ConfigReader.GetConfig().Arbitrary90PercentThreshold,
                     ConfigReader.GetConfig().RankedPenaltyProportion,
-                    ConfigReader.GetConfig().CeilingProportion
+                    ConfigReader.GetConfig().CeilingProportion,
+                    new List<List<double>>()
                     );
                 double resultsUnranked = DifficultyCalculation.CalculateDensityAverage(
                     values,
                     ConfigReader.GetUnrankedConfig().HardestSeconds,
                     ConfigReader.GetUnrankedConfig().Arbitrary90PercentThreshold,
                     ConfigReader.GetUnrankedConfig().RankedPenaltyProportion,
-                    ConfigReader.GetUnrankedConfig().CeilingProportion
+                    ConfigReader.GetUnrankedConfig().CeilingProportion,
+                    new List<List<double>>()
                     );
 
 
@@ -135,14 +137,16 @@ namespace MuseMapalyzr
                     ConfigReader.GetConfig().HardestSeconds,
                     ConfigReader.GetConfig().Arbitrary90PercentThreshold,
                     ConfigReader.GetConfig().RankedPenaltyProportion,
-                    ConfigReader.GetConfig().CeilingProportion
+                    ConfigReader.GetConfig().CeilingProportion,
+                    new List<List<double>>()
                     );
                 double resultsUnranked2 = DifficultyCalculation.CalculateDensityAverage(
                     values2,
                     ConfigReader.GetUnrankedConfig().HardestSeconds,
                     ConfigReader.GetUnrankedConfig().Arbitrary90PercentThreshold,
                     ConfigReader.GetUnrankedConfig().RankedPenaltyProportion,
-                    ConfigReader.GetUnrankedConfig().CeilingProportion
+                    ConfigReader.GetUnrankedConfig().CeilingProportion,
+                    new List<List<double>>()
                     );
 
 
