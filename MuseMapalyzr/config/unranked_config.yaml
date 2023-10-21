@@ -14,7 +14,7 @@ NormalSizedMapThreshold: 0
 HardestSeconds: 15
 Arbitrary90PercentThreshold: 1000
 RankedPenaltyProportion: 0
-CeilingProportion: 0.1
+CeilingProportion: 0.2
 
 DensitySingleStreamNPSCap: 13
 DensityFourStackNPSCap: 14

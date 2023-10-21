@@ -532,34 +532,28 @@ namespace MuseMapalyzr
             }
 
 
-
-
             // Sort the list in descending order
-            // values.Sort((a, b) => -a.CompareTo(b));
             values = values.OrderByDescending(d => d).ToList();
 
             // Console.WriteLine(string.Join(",", values));
 
 
-            //Calculate the sum of top values
-            // double topSum = values.Take(numTopValues).Sum();
 
-            // IEnumerable<double> something = values.Take(numTopValues);
-            // foreach (double s in something)
-            // {
-            //     Console.WriteLine(s);
-            // }
-            // Console.WriteLine("Emd");
+            IEnumerable<double> something = values.Take(numTopValues);
+            foreach (double s in something)
+            {
+                Console.WriteLine(s);
+            }
+            Console.WriteLine("END");
 
 
-            // double hardest = topSum / numTopValues; // the hardest x seconds of the map
             List<double> topValues = values.Take(numTopValues).ToList();
             double hardest = WeightedAverageOfValues(topValues, 0.2, 0.9, 0.1);
 
             double additionalStars = ceilingProportion * hardest;
+
             // Console.WriteLine(additionalStars + " Additional stars");
             double ceiling = hardest + additionalStars;
-            // Console.WriteLine(hardest + " highest " + numTopValues + " numTopValues");
 
 
 
@@ -571,13 +565,12 @@ namespace MuseMapalyzr
             double X = ceiling - finalPenalisedBase; // The number to approach
             double N = arbitrary90PercentThreshold;  // The point where the function should be 90% of X
             double addedDifficulty = LogarithmicGrowth(cumulativeSumOfDensities, X, N);
-            // double addedDifficulty = 0;
 
 
 
             double finalDifficulty = finalPenalisedBase + addedDifficulty;
-            // Console.WriteLine($"X: {X} | added diff: {addedDifficulty}");
-            // Console.WriteLine($"Final diff: {finalDifficulty} | ... {rankedPenaltyProportion} Ceiling: {ceiling} | Hardest: {hardest} | final penalised: {finalPenalisedBase} | Cumulative sum: {cumulativeSumOfDensities}");
+            Console.WriteLine($"X: {X} | added diff: {addedDifficulty}");
+            Console.WriteLine($"Final diff: {finalDifficulty} | ... {rankedPenaltyProportion} Ceiling: {ceiling} | Hardest: {hardest} | final penalised: {finalPenalisedBase} | Cumulative sum: {cumulativeSumOfDensities}");
 
 
 
@@ -595,9 +588,11 @@ namespace MuseMapalyzr
         {
             double weightedSum = 0;
 
+            double strength = 2.5; // yeah
+
             foreach (double num in bottomNums)
             {
-                double weight = 1 / Math.Max(Math.Abs(hardest - num) + 1, 1); // Math.Max 1 to avoid div by 0... 
+                double weight = strength / Math.Max(Math.Abs(hardest - num) + 1, 1); // Math.Max 1 to avoid div by 0... 
                 weightedSum += num * weight;
             }
 

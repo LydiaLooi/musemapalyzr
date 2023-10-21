@@ -14,7 +14,7 @@ NormalSizedMapThreshold: 91 # Screw you TV-sized maps :)
 HardestSeconds: 15
 Arbitrary90PercentThreshold: 2000
 RankedPenaltyProportion: 0.2
-CeilingProportion: 0.1
+CeilingProportion: 0.2
 
 
 DensitySingleStreamNPSCap: 8
@@ -84,7 +84,7 @@ StreamUpClamp: 14
 
 # ZigZagLengthMultiplier
 ZigZagLengthLowBound: 1
-ZigZagLengthUpBound: 2
+ZigZagLengthUpBound: 1.5
 ZigZagLengthLowClamp: 15
 ZigZagLengthUpClamp: 50
 ZigZagLengthNpsThreshold: 17 # Slightly faster than EWF
