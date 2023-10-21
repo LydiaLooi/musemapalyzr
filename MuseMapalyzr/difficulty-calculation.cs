@@ -20,7 +20,7 @@ namespace MuseMapalyzr
     {
 
 
-        private static float BaseDifficultyMultiplier = 0.5f; // So that the difficulty range is somewhat more palettable
+        private static float BaseDifficultyMultiplier = 0.5f; // So that the difficulty range is somewhat more palatable
 
         public class WeightingResults // Named Tuple "Weighting" in python code
         {
@@ -516,13 +516,15 @@ namespace MuseMapalyzr
             // Console.WriteLine(values.Count == patternMultiplierSections.Count);
 
             int index = 0;
-            foreach (List<double> thing in patternMultiplierSections)
+            foreach (List<double> patternMultipliers in patternMultiplierSections)
             {
-                if (thing.Count == 0)
+                if (patternMultipliers.Count == 0)
                 {
-                    thing.Add(1);
+                    patternMultipliers.Add(1);
                 }
-                double averagePatternMultiplier = thing.Average();
+                // double averagePatternMultiplier = patternMultipliers.Average();
+                double averagePatternMultiplier = WeightedAverageOfValues(patternMultipliers, 0.2, 0.9, 0.1);
+
                 values[index] *= averagePatternMultiplier;
                 // Console.WriteLine($"Index: {index} Count: {thing.Count} | {values[index]} {averagePatternMultiplier}");
                 index++;
@@ -533,20 +535,26 @@ namespace MuseMapalyzr
 
 
             // Sort the list in descending order
-            values.Sort((a, b) => -a.CompareTo(b));
+            // values.Sort((a, b) => -a.CompareTo(b));
+            values = values.OrderByDescending(d => d).ToList();
 
             // Console.WriteLine(string.Join(",", values));
 
 
             //Calculate the sum of top values
-            double topSum = values.Take(numTopValues).Sum();
+            // double topSum = values.Take(numTopValues).Sum();
+
+            // IEnumerable<double> something = values.Take(numTopValues);
+            // foreach (double s in something)
+            // {
+            //     Console.WriteLine(s);
+            // }
+            // Console.WriteLine("Emd");
 
 
-            // Calculate the sum of the remaining values
-            // IEnumerable<double> bottomNums = values.Skip(numTopValues);
-
-            double hardest = topSum / numTopValues; // the hardest x seconds of the map
-
+            // double hardest = topSum / numTopValues; // the hardest x seconds of the map
+            List<double> topValues = values.Take(numTopValues).ToList();
+            double hardest = WeightedAverageOfValues(topValues, 0.2, 0.9, 0.1);
 
             double additionalStars = ceilingProportion * hardest;
             // Console.WriteLine(additionalStars + " Additional stars");
@@ -558,16 +566,18 @@ namespace MuseMapalyzr
             double cumulativeSumOfDensities = CalculateWeightedSum(values, hardest);
 
             double penalty = hardest * rankedPenaltyProportion; // 0 if calculating peak difficulty
-
-            double X = additionalStars + hardest; // The number to approach
-            double N = arbitrary90PercentThreshold;  // The point where the function should be 90% of X
-            double addedDifficulty = LogarithmicGrowth(cumulativeSumOfDensities, X, N);
-
-
             double finalPenalisedBase = hardest - penalty; // Is just hardest if calculating peak difficulty
 
+            double X = ceiling - finalPenalisedBase; // The number to approach
+            double N = arbitrary90PercentThreshold;  // The point where the function should be 90% of X
+            double addedDifficulty = LogarithmicGrowth(cumulativeSumOfDensities, X, N);
+            // double addedDifficulty = 0;
+
+
+
             double finalDifficulty = finalPenalisedBase + addedDifficulty;
-            //Console.WriteLine($"Final diff: {finalDifficulty} | ... {rankedPenaltyProportion} Ceiling: {ceiling} | Hardest: {hardest} | final penalised: {finalPenalisedBase}");
+            // Console.WriteLine($"X: {X} | added diff: {addedDifficulty}");
+            // Console.WriteLine($"Final diff: {finalDifficulty} | ... {rankedPenaltyProportion} Ceiling: {ceiling} | Hardest: {hardest} | final penalised: {finalPenalisedBase} | Cumulative sum: {cumulativeSumOfDensities}");
 
             // Console.WriteLine($"{finalWeight} | valueslength: {values.Count} ... numTopValues {numTopValues} Highest: {highest} Bottom avg {bottomAverage} |Top {topPercentage * 100}% Index: {numTopValues} ... Threshold {values[numTopValues]}\n");
 

@@ -76,7 +76,7 @@ namespace MuseMapalyzr
                 {
                     // Apply a logarithmic function here.
                     // The constants 'a' and 'b' can be adjusted to control the curve.
-                    double a = 20; // Controls the steepness of the curve
+                    double a = 10; // Controls the steepness of the curve
                     double b = upperBound - a * Math.Log(upperClamp); // Ensures the curve starts at (upperClamp, upperBound)
                     double result = a * Math.Log(nps) + b;
                     return result;

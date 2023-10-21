@@ -47,9 +47,6 @@ namespace MuseMapalyzr
         public class MuseMapalyzrConfig
         {
             public int NormalSizedMapThreshold { get; set; }
-            // public double DensityTopProportion { get; set; }
-            // public double DensityTopWeighting { get; set; }
-            // public double DensityBottomWeighting { get; set; }
             public int HardestSeconds { get; set; }
             public double Arbitrary90PercentThreshold { get; set; }
             public double RankedPenaltyProportion { get; set; }
