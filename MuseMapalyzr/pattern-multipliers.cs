@@ -185,19 +185,5 @@ namespace MuseMapalyzr
             t = Math.Max(Math.Min(t, 1), 0);
             return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
         }
-
-        public static double VaryingStacksMultiplier(double nps, bool ranked)
-        {
-            double lowerBound = GetRightConfig(ranked).VaryingStacksLowBound;
-            double upperBound = GetRightConfig(ranked).VaryingStacksUpBound;
-            double lowerClamp = GetRightConfig(ranked).VaryingStacksLowClamp;
-            double upperClamp = GetRightConfig(ranked).VaryingStacksUpClamp;
-
-            double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
-            t = Math.Max(Math.Min(t, 1), 0);
-            return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
-        }
-
-
     }
 }

@@ -108,7 +108,4 @@ TwoStackLowClamp: 5
 TwoStackUpClamp: 14
 
 # VaryingStacksMultiplier
-VaryingStacksLowBound: 1.0
-VaryingStacksUpBound: 1.35
-VaryingStacksLowClamp: 4
-VaryingStacksUpClamp: 14
+VaryingStackMultiplier: 1.25

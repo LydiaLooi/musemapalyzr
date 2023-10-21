@@ -275,7 +275,7 @@ namespace MuseMapalyzr
             //Console.WriteLine($"Ranked {ranked} | Final: {final} | Pattern Multiplier {patternMultiplier} | Pattern Weighting {PatternWeighting} | Variation Multiplier {variationMultiplier} | Variation Weighting {VariationWeighting}");
 
 
-            if (PatternName != Constants.Other) SetSegmentsMultiplier(final, ranked);
+            if (PatternName != Constants.Other && PatternName != Constants.VaryingStacks) SetSegmentsMultiplier(final, ranked);
         }
 
 

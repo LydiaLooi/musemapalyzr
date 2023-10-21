@@ -579,7 +579,6 @@ namespace MuseMapalyzr
             // Console.WriteLine($"X: {X} | added diff: {addedDifficulty}");
             // Console.WriteLine($"Final diff: {finalDifficulty} | ... {rankedPenaltyProportion} Ceiling: {ceiling} | Hardest: {hardest} | final penalised: {finalPenalisedBase} | Cumulative sum: {cumulativeSumOfDensities}");
 
-            // Console.WriteLine($"{finalWeight} | valueslength: {values.Count} ... numTopValues {numTopValues} Highest: {highest} Bottom avg {bottomAverage} |Top {topPercentage * 100}% Index: {numTopValues} ... Threshold {values[numTopValues]}\n");
 
 
             return finalDifficulty;
@@ -598,7 +597,7 @@ namespace MuseMapalyzr
 
             foreach (double num in bottomNums)
             {
-                double weight = 1 / Math.Max(Math.Abs(hardest - num), 1); // Math.Max 1 to avoid div by 0
+                double weight = 1 / Math.Max(Math.Abs(hardest - num) + 1, 1); // Math.Max 1 to avoid div by 0... 
                 weightedSum += num * weight;
             }
 
@@ -703,7 +702,7 @@ namespace MuseMapalyzr
 
             WeightingResults weightResults = new WeightingResults(
                 patternWeightingResults.RankedPatternWeighting,
-            rankedDifficulty,
+                rankedDifficulty,
                 rankedWeightedDifficulty,
 
                 patternWeightingResults.UnrankedPatternWeighting,

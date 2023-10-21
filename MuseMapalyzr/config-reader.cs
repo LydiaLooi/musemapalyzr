@@ -109,10 +109,7 @@ namespace MuseMapalyzr
             public double TwoStackUpBound { get; set; }
             public double TwoStackLowClamp { get; set; }
             public double TwoStackUpClamp { get; set; }
-            public double VaryingStacksLowBound { get; set; }
-            public double VaryingStacksUpBound { get; set; }
-            public double VaryingStacksLowClamp { get; set; }
-            public double VaryingStacksUpClamp { get; set; }
+            public double VaryingStackMultiplier { get; set; }
         }
 
     }
