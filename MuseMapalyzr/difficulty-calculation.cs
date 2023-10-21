@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics;
 using System.Text;
 
@@ -389,7 +390,8 @@ namespace MuseMapalyzr
             if (numMax != null)
             {
                 // Calculate the number of top values to consider based on the percentage
-                numTopValues = Math.Min((int)(values.Count * topPercentage), (int)numMax);
+                //numTopValues = Math.Min((int)(values.Count * topPercentage), (int)numMax);
+                numTopValues = 15;
             }
             else
             {
@@ -397,7 +399,7 @@ namespace MuseMapalyzr
             }
 
 
-            Console.WriteLine($"DENSITY LENGTH: {values.Count}");
+            //Console.WriteLine($"DENSITY LENGTH: {values.Count}");
 
             numTopValues = Math.Max(numTopValues, 1);
 
@@ -409,6 +411,15 @@ namespace MuseMapalyzr
 
             //Calculate the sum of top values
             double topSum = values.Take(numTopValues).Sum();
+            IEnumerable<double> something = values.Take(numTopValues);
+            if (numMax != null)
+            {
+                foreach (double thing in something)
+                {
+                    Console.WriteLine(thing);
+                }
+
+            }
 
             // Calculate the sum of the remaining values
             // IEnumerable<double> bottomNums = values.Skip(numTopValues);
@@ -416,8 +427,10 @@ namespace MuseMapalyzr
             double highest = topSum / numTopValues; // top average
 
 
-            double additionalStars = 1;// arbitrary number to get the "max" diff
+            double additionalStars = 0.1 * highest;// arbitrary number to get the "max" diff
+            Console.WriteLine(additionalStars + " Additional stars");
             double maxDiff = highest + additionalStars;
+            Console.WriteLine(highest + " highest " + numTopValues + " numTopValues");
 
 
 
@@ -430,7 +443,7 @@ namespace MuseMapalyzr
 
 
             double finalWeight = highest + bottomAverage;
-
+            Console.WriteLine(finalWeight + " final weight .. bottom sum: " + bottomSum);
             // Console.WriteLine($"{finalWeight} | valueslength: {values.Count} ... numTopValues {numTopValues} Highest: {highest} Bottom avg {bottomAverage} |Top {topPercentage * 100}% Index: {numTopValues} ... Threshold {values[numTopValues]}\n");
 
 
@@ -554,7 +567,7 @@ namespace MuseMapalyzr
 
             // The unranked difficulty should never be lower than the ranked difficulty
             unrankedDifficulty = Math.Max(rankedDifficulty, unrankedDifficulty);
-
+            Console.WriteLine($"Unranked: {unrankedDifficulty} Ranked: {rankedDifficulty}");
             double rankedWeightedDifficulty = patternWeightingResults.RankedPatternWeighting * rankedDifficulty;
             double unrankedWeightedDifficulty = patternWeightingResults.UnrankedPatternWeighting * unrankedDifficulty;
 

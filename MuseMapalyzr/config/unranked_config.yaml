@@ -12,8 +12,8 @@ NormalSizedMapThreshold: 0
 
 # Density 
 DensityTopProportion: 0.2
-DensityTopWeighting: 0.9
-DensityBottomWeighting: 0.1
+DensityTopWeighting: 1.0
+DensityBottomWeighting: 0 # We don't care about the low stuff for unranked
 
 DensitySingleStreamNPSCap: 13
 DensityFourStackNPSCap: 14

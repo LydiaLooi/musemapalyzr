@@ -50,8 +50,8 @@ namespace MuseMapalyzr
             AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.VaryingStacksMultiplier(nps, ranked), "Varying Stacks");
 
             // Uncomment to see the zig zag length multiplier
-            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.ZigZagLengthMultiplier(nps, GetRightConfig(true).ZigZagLengthNpsThreshold + 1, true), "Zig Zag Length Multiplier RANK");
-            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.ZigZagLengthMultiplier(nps, GetRightConfig(false).ZigZagLengthNpsThreshold + 1, false), "Zig Zag Length Multiplier UNRANK");
+            // AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.ZigZagLengthMultiplier(nps, GetRightConfig(true).ZigZagLengthNpsThreshold + 1, true), "Zig Zag Length Multiplier RANK");
+            // AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.ZigZagLengthMultiplier(nps, GetRightConfig(false).ZigZagLengthNpsThreshold + 1, false), "Zig Zag Length Multiplier UNRANK");
 
 
             return plotModel;
