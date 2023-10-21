@@ -10,9 +10,12 @@
 NormalSizedMapThreshold: 91 # Screw you TV-sized maps :)
 
 # Density 
-DensityTopProportion: 0.3
-DensityTopWeighting: 0.9
-DensityBottomWeighting: 0.1
+# Density Calculation
+HardestSeconds: 15
+Arbitrary90PercentThreshold: 2000
+RankedPenaltyProportion: 0.2
+CeilingProportion: 0.1
+
 
 DensitySingleStreamNPSCap: 8
 DensityFourStackNPSCap: 9

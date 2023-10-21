@@ -11,9 +11,10 @@
 NormalSizedMapThreshold: 0
 
 # Density 
-DensityTopProportion: 0.2
-DensityTopWeighting: 1.0
-DensityBottomWeighting: 0 # We don't care about the low stuff for unranked
+HardestSeconds: 15
+Arbitrary90PercentThreshold: 1000
+RankedPenaltyProportion: 0
+CeilingProportion: 0.1
 
 DensitySingleStreamNPSCap: 13
 DensityFourStackNPSCap: 14

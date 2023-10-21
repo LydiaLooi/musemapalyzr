@@ -101,7 +101,7 @@ namespace MuseMapalyzr
             else if (args[0] == "test")
             {
                 List<double> values = new List<double> {
-                    9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+                    9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,8,8,8,8,2,1,3,2,2,1,2
                     };
 
                 List<double> values2 = new List<double> {
@@ -111,28 +111,39 @@ namespace MuseMapalyzr
                 ConfigReader.MuseMapalyzrConfig rankedConfig = ConfigReader.GetConfig();
                 ConfigReader.MuseMapalyzrConfig unrankedConfig = ConfigReader.GetUnrankedConfig();
 
-                double resultsRanked = DifficultyCalculation.WeightedAverageOfDensities(
-                    values,
-                    rankedConfig.DensityTopProportion,
-                    rankedConfig.DensityTopWeighting,
-                    rankedConfig.DensityBottomWeighting);
-                double resultsUnranked = DifficultyCalculation.WeightedAverageOfDensities(
-                    values,
-                    unrankedConfig.DensityTopProportion,
-                    unrankedConfig.DensityTopWeighting,
-                    unrankedConfig.DensityBottomWeighting, 15);
 
-                double resultsRanked2 = DifficultyCalculation.WeightedAverageOfDensities(
-                    values2,
-                    rankedConfig.DensityTopProportion,
-                    rankedConfig.DensityTopWeighting,
-                    rankedConfig.DensityBottomWeighting);
 
-                double resultsUnranked2 = DifficultyCalculation.WeightedAverageOfDensities(
+
+                double resultsRanked = DifficultyCalculation.CalculateDensityAverage(
+                    values,
+                    ConfigReader.GetConfig().HardestSeconds,
+                    ConfigReader.GetConfig().Arbitrary90PercentThreshold,
+                    ConfigReader.GetConfig().RankedPenaltyProportion,
+                    ConfigReader.GetConfig().CeilingProportion
+                    );
+                double resultsUnranked = DifficultyCalculation.CalculateDensityAverage(
+                    values,
+                    ConfigReader.GetUnrankedConfig().HardestSeconds,
+                    ConfigReader.GetUnrankedConfig().Arbitrary90PercentThreshold,
+                    ConfigReader.GetUnrankedConfig().RankedPenaltyProportion,
+                    ConfigReader.GetUnrankedConfig().CeilingProportion
+                    );
+
+
+                double resultsRanked2 = DifficultyCalculation.CalculateDensityAverage(
                     values2,
-                    unrankedConfig.DensityTopProportion,
-                    unrankedConfig.DensityTopWeighting,
-                    unrankedConfig.DensityBottomWeighting, 15);
+                    ConfigReader.GetConfig().HardestSeconds,
+                    ConfigReader.GetConfig().Arbitrary90PercentThreshold,
+                    ConfigReader.GetConfig().RankedPenaltyProportion,
+                    ConfigReader.GetConfig().CeilingProportion
+                    );
+                double resultsUnranked2 = DifficultyCalculation.CalculateDensityAverage(
+                    values2,
+                    ConfigReader.GetUnrankedConfig().HardestSeconds,
+                    ConfigReader.GetUnrankedConfig().Arbitrary90PercentThreshold,
+                    ConfigReader.GetUnrankedConfig().RankedPenaltyProportion,
+                    ConfigReader.GetUnrankedConfig().CeilingProportion
+                    );
 
 
                 Console.WriteLine($"1 Ranked: {resultsRanked} Unranked: {resultsUnranked} Mean: {values.Average()}");
