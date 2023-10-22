@@ -510,6 +510,19 @@ namespace MuseMapalyzr
 
             int numTopValues = hardestSeconds;
 
+            // int k = 0;
+            // foreach (var value in values)
+            // {
+
+
+            //     string multipliersString = string.Join(", ", patternMultiplierSections[k]);
+
+            //     Console.WriteLine($"{value} | {multipliersString}x");
+            //     k++;
+            // }
+
+            // Console.WriteLine("ENDDDDDDDDDDDDDDDDD");
+
 
             //Console.WriteLine($"DENSITY LENGTH: {values.Count}");
 
@@ -526,10 +539,29 @@ namespace MuseMapalyzr
                 double averagePatternMultiplier = WeightedAverageOfValues(patternMultipliers, 0.2, 0.9, 0.1);
                 double before = values[index];
                 values[index] *= averagePatternMultiplier;
-                // Console.WriteLine($"Index: {index} Count: {patternMultipliers.Count} | Before: {before} After: {values[index]} {averagePatternMultiplier}x");
+                string multipliersString = string.Join(", ", patternMultipliers);
+                // Console.WriteLine($"Index: {index} [{multipliersString}] | Before: {before} After: {values[index]} {averagePatternMultiplier}x");
                 index++;
 
             }
+
+            // 16.058333333333334
+            // 15.919939019571318
+            // 14.883333333333333
+            // 14.491666666666667
+            // 14.491666666666667
+            // 14.100000000000001
+            // 13.5
+            // 13.36328730297084
+            // 12.925
+            // 12.075617283950617
+            // 11.916666666666668
+            // 11.135118788341
+            // 11.135118788341
+            // 11.135118788341
+            // 11.033950617283953
+
+
 
 
             // Sort the list in descending order
@@ -569,8 +601,8 @@ namespace MuseMapalyzr
 
 
             double finalDifficulty = finalPenalisedBase + addedDifficulty;
-            Console.WriteLine($"X: {X} | added diff: {addedDifficulty}");
-            Console.WriteLine($"Final diff: {finalDifficulty} | ... {rankedPenaltyProportion} Ceiling: {ceiling} | Hardest: {hardest} | final penalised: {finalPenalisedBase} | Cumulative sum: {cumulativeSumOfDensities}");
+            // Console.WriteLine($"X: {X} | added diff: {addedDifficulty}");
+            // Console.WriteLine($"Final diff: {finalDifficulty} | ... {rankedPenaltyProportion} Ceiling: {ceiling} | Hardest: {hardest} | final penalised: {finalPenalisedBase} | Cumulative sum: {cumulativeSumOfDensities}");
 
 
 
