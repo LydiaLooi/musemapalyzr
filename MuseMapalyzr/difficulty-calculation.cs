@@ -545,23 +545,6 @@ namespace MuseMapalyzr
 
             }
 
-            // 16.058333333333334
-            // 15.919939019571318
-            // 14.883333333333333
-            // 14.491666666666667
-            // 14.491666666666667
-            // 14.100000000000001
-            // 13.5
-            // 13.36328730297084
-            // 12.925
-            // 12.075617283950617
-            // 11.916666666666668
-            // 11.135118788341
-            // 11.135118788341
-            // 11.135118788341
-            // 11.033950617283953
-
-
 
 
             // Sort the list in descending order
@@ -608,7 +591,25 @@ namespace MuseMapalyzr
 
             return finalDifficulty;
         }
+        public static double ScaleDifficulty(double originalDifficulty)
+        {
+            // Target value
+            double target = 6.0;
+            double scalingFactor = 1.5;
 
+            // If the original difficulty is less than or equal to the target, return it as is
+            if (originalDifficulty <= target)
+            {
+                return originalDifficulty;
+            }
+
+            // Apply a logarithmic transformation to compress values greater than the target
+            // The "+ 1" ensures that the value is always greater than the target
+            // The "Math.Log(originalDifficulty - target + 1)" compresses the values
+            double adjustedDifficulty = target + Math.Log(originalDifficulty - target + 1) * scalingFactor;
+
+            return adjustedDifficulty;
+        }
 
         private static double LogarithmicGrowth(double x, double X, double N)
         {
@@ -722,20 +723,18 @@ namespace MuseMapalyzr
                 ) * BaseDifficultyMultiplier;
 
 
-            // The unranked difficulty should never be lower than the ranked difficulty
-            unrankedDifficulty = Math.Max(rankedDifficulty, unrankedDifficulty);
-            Console.WriteLine($"Unranked: {unrankedDifficulty} Ranked: {rankedDifficulty}");
-            double rankedWeightedDifficulty = rankedDifficulty;
-            double unrankedWeightedDifficulty = unrankedDifficulty;
+            double scaledPeakDifficulty = ScaleDifficulty(unrankedDifficulty);
+
+            Console.WriteLine($"Peak: {unrankedDifficulty} (Scaled: {scaledPeakDifficulty}) Ranked: {rankedDifficulty}");
 
             WeightingResults weightResults = new WeightingResults(
                 patternWeightingResults.RankedPatternWeighting,
                 rankedDifficulty,
-                rankedWeightedDifficulty,
+                rankedDifficulty,
 
                 patternWeightingResults.UnrankedPatternWeighting,
-                unrankedDifficulty,
-                unrankedWeightedDifficulty
+                scaledPeakDifficulty,
+                scaledPeakDifficulty
                 );
 
 

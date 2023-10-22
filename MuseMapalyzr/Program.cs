@@ -100,58 +100,11 @@ namespace MuseMapalyzr
             }
             else if (args[0] == "test")
             {
-                List<double> values = new List<double> {
-                    9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,8,8,8,8,2,1,3,2,2,1,2
-                    };
-
-                List<double> values2 = new List<double> {
-                    9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9
-                    };
-
-                ConfigReader.MuseMapalyzrConfig rankedConfig = ConfigReader.GetConfig();
-                ConfigReader.MuseMapalyzrConfig unrankedConfig = ConfigReader.GetUnrankedConfig();
-
-
-
-
-                double resultsRanked = DifficultyCalculation.CalculateDensityAverage(
-                    values,
-                    ConfigReader.GetConfig().HardestSeconds,
-                    ConfigReader.GetConfig().Arbitrary90PercentThreshold,
-                    ConfigReader.GetConfig().RankedPenaltyProportion,
-                    ConfigReader.GetConfig().CeilingProportion,
-                    new List<List<double>>()
-                    );
-                double resultsUnranked = DifficultyCalculation.CalculateDensityAverage(
-                    values,
-                    ConfigReader.GetUnrankedConfig().HardestSeconds,
-                    ConfigReader.GetUnrankedConfig().Arbitrary90PercentThreshold,
-                    ConfigReader.GetUnrankedConfig().RankedPenaltyProportion,
-                    ConfigReader.GetUnrankedConfig().CeilingProportion,
-                    new List<List<double>>()
-                    );
-
-
-                double resultsRanked2 = DifficultyCalculation.CalculateDensityAverage(
-                    values2,
-                    ConfigReader.GetConfig().HardestSeconds,
-                    ConfigReader.GetConfig().Arbitrary90PercentThreshold,
-                    ConfigReader.GetConfig().RankedPenaltyProportion,
-                    ConfigReader.GetConfig().CeilingProportion,
-                    new List<List<double>>()
-                    );
-                double resultsUnranked2 = DifficultyCalculation.CalculateDensityAverage(
-                    values2,
-                    ConfigReader.GetUnrankedConfig().HardestSeconds,
-                    ConfigReader.GetUnrankedConfig().Arbitrary90PercentThreshold,
-                    ConfigReader.GetUnrankedConfig().RankedPenaltyProportion,
-                    ConfigReader.GetUnrankedConfig().CeilingProportion,
-                    new List<List<double>>()
-                    );
-
-
-                Console.WriteLine($"1 Ranked: {resultsRanked} Unranked: {resultsUnranked} Mean: {values.Average()}");
-                Console.WriteLine($"2 Ranked: {resultsRanked2} Unranked: {resultsUnranked2} Mean: {values.Average()}");
+                for (double i = 0; i < 50; i++)
+                {
+                    double result = DifficultyCalculation.ScaleDifficulty(i);
+                    Console.WriteLine($"{i} -> {result}");
+                }
             }
             else
             {
