@@ -524,9 +524,9 @@ namespace MuseMapalyzr
                 }
                 // double averagePatternMultiplier = patternMultipliers.Average();
                 double averagePatternMultiplier = WeightedAverageOfValues(patternMultipliers, 0.2, 0.9, 0.1);
-
+                double before = values[index];
                 values[index] *= averagePatternMultiplier;
-                // Console.WriteLine($"Index: {index} Count: {thing.Count} | {values[index]} {averagePatternMultiplier}");
+                // Console.WriteLine($"Index: {index} Count: {patternMultipliers.Count} | Before: {before} After: {values[index]} {averagePatternMultiplier}x");
                 index++;
 
             }
@@ -539,12 +539,12 @@ namespace MuseMapalyzr
 
 
 
-            IEnumerable<double> something = values.Take(numTopValues);
-            foreach (double s in something)
-            {
-                Console.WriteLine(s);
-            }
-            Console.WriteLine("END");
+            // IEnumerable<double> something = values.Take(numTopValues);
+            // foreach (double s in something)
+            // {
+            //     Console.WriteLine(s);
+            // }
+            // Console.WriteLine("END");
 
 
             List<double> topValues = values.Take(numTopValues).ToList();
@@ -655,9 +655,10 @@ namespace MuseMapalyzr
             List<List<Note>> rankedSections = sectionResults.RankedSections;
 
             int movingAverageWindow = ConfigReader.GetConfig().MovingAvgWindow;
+            int unrankedMovingAverageWindow = ConfigReader.GetUnrankedConfig().MovingAvgWindow;
 
             List<double> rankedMovingAvg = MovingAverageNoteDensity(rankedSections, movingAverageWindow);
-            List<double> unrankedMovingAvg = MovingAverageNoteDensity(unrankedSections, movingAverageWindow);
+            List<double> unrankedMovingAvg = MovingAverageNoteDensity(unrankedSections, unrankedMovingAverageWindow);
 
             // When copying over to museswipr, we just get rid of the if below.
             if (outfile != null)

@@ -80,8 +80,12 @@ namespace MuseMapalyzr
             public double NothingButTheoryUpBound { get; set; }
             public double NothingButTheoryLowClamp { get; set; }
             public double NothingButTheoryUpClamp { get; set; }
+            public double ZigZagBaseMultiplier { get; set; }
             public double ZigZagLowBound { get; set; }
             public double ZigZagUpBound { get; set; }
+            public double ZigZagUnsusGradient { get; set; }
+            public double ZigZagSusBeginningNPS { get; set; }
+            public double ZigZagUnsusStartingMultiplier { get; set; }
             public double ZigZagLowClamp { get; set; }
             public double ZigZagUpClamp { get; set; }
             public double EvenCircleLowBound { get; set; }
@@ -92,11 +96,15 @@ namespace MuseMapalyzr
             public double StreamUpBound { get; set; }
             public double StreamLowClamp { get; set; }
             public double StreamUpClamp { get; set; }
-            public double ZigZagLengthLowBound { get; set; }
-            public double ZigZagLengthUpBound { get; set; }
-            public double ZigZagLengthLowClamp { get; set; }
-            public double ZigZagLengthUpClamp { get; set; }
-            public double ZigZagLengthNpsThreshold { get; set; }
+            public double SusZigZagLengthLowBound { get; set; }
+            public double SusZigZagLengthUpBound { get; set; }
+            public double SusZigZagLengthLowClamp { get; set; }
+            public double SusZigZagLengthUpClamp { get; set; }
+            public double UnsusZigZagLengthLowBound { get; set; }
+            public double UnsusZigZagLengthUpBound { get; set; }
+            public double UnsusZigZagLengthLowClamp { get; set; }
+            public double UnsusZigZagLengthUpClamp { get; set; }
+            public double UnsusZigZagThresholdNPS { get; set; }
             public double FourStackLowBound { get; set; }
             public double FourStackUpBound { get; set; }
             public double FourStackLowClamp { get; set; }

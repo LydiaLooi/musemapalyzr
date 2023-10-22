@@ -1,10 +1,19 @@
 using System;
+using System.Collections;
 using static MuseMapalyzr.ConfigReader;
 
 namespace MuseMapalyzr
 {
+
+
     public class PatternMultiplier
     {
+        public enum ZigZagType
+        {
+            Sustainable,
+            Unsustainable
+        }
+
         private static MuseMapalyzrConfig Conf = ConfigReader.GetConfig();
         private static MuseMapalyzrConfig UnrankedConf = ConfigReader.GetUnrankedConfig();
 
@@ -49,39 +58,109 @@ namespace MuseMapalyzr
 
         public static double ZigZagMultiplier(double nps, bool ranked)
         {
-            double lowerBound = GetRightConfig(ranked).ZigZagLowBound;
-            double upperBound = GetRightConfig(ranked).ZigZagUpBound;
+            double maxSusMultiplier = GetRightConfig(ranked).ZigZagUpBound;
+
+            double zigZagBaseMultiplier = GetRightConfig(ranked).ZigZagBaseMultiplier;
+
+            double unsusThresholdNPS = GetRightConfig(ranked).UnsusZigZagThresholdNPS;
+
+            double minUnsusMultiplier = GetRightConfig(ranked).ZigZagUnsusStartingMultiplier;
+            double susBeginNPS = GetRightConfig(ranked).ZigZagSusBeginningNPS;
+
+            double unsusGradient = GetRightConfig(ranked).ZigZagUnsusGradient;
+
             double lowerClamp = GetRightConfig(ranked).ZigZagLowClamp;
             double upperClamp = GetRightConfig(ranked).ZigZagUpClamp;
 
-            // If nps is within the clamped range
+            double lowerBound = GetRightConfig(ranked).ZigZagLowBound;
+            double upperBound = maxSusMultiplier;
 
-            if (ranked)
+            // Initialize result variable
+            double result;
+
+
+            // Case 1: nps is less than b
+            if (nps < susBeginNPS)
             {
-                double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
+                return zigZagBaseMultiplier;
+            }
+            else if (nps >= susBeginNPS && nps < unsusThresholdNPS)
+            {
+
+                // Cubic function for ease-in-out curve
+                double t = (nps - susBeginNPS - lowerClamp) / (unsusThresholdNPS - susBeginNPS - upperClamp);
                 t = Clamp(t, 0, 1);
-                return lowerBound + (upperBound - lowerBound) * EaseInCubic(t);
+
+                return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
+            }
+            // Case 2: nps is greater than or equal to b
+            else
+            {
+                // Line with gradient, starting at (b, c)
+                result = unsusGradient * (nps - unsusThresholdNPS) + minUnsusMultiplier;
+            }
+
+            // Return the result
+            return result;
+
+        }
+
+
+
+        public static double ZigZagLengthMultiplier(double numNotes, double nps, bool ranked)
+        {
+
+
+            double susLowerClamp = GetRightConfig(ranked).SusZigZagLengthLowClamp;
+            double susUpperClamp = GetRightConfig(ranked).SusZigZagLengthUpClamp;
+            double susLowerBound = GetRightConfig(ranked).SusZigZagLengthLowBound;
+            double susUpperBound = GetRightConfig(ranked).SusZigZagLengthUpBound;
+
+            double unsusLowerClamp = GetRightConfig(ranked).UnsusZigZagLengthLowClamp;
+            double unsusUpperClamp = GetRightConfig(ranked).UnsusZigZagLengthUpClamp;
+            double unsusLowerBound = GetRightConfig(ranked).UnsusZigZagLengthLowBound;
+            double unsusUpperBound = GetRightConfig(ranked).UnsusZigZagLengthUpBound;
+
+
+            double unsusThresholdNPS = GetRightConfig(ranked).UnsusZigZagThresholdNPS;
+
+
+
+            ZigZagType zigZagType;
+            if (!ranked)
+            {
+                zigZagType = ZigZagType.Sustainable;
+            }
+            else if (ranked && nps < unsusThresholdNPS)
+            {
+                zigZagType = ZigZagType.Sustainable;
             }
             else
             {
-
-                if (nps <= upperClamp)
-                {
-                    double t = (nps - lowerClamp) / (upperClamp - lowerClamp);
-                    t = Clamp(t, 0, 1);
-                    return lowerBound + (upperBound - lowerBound) * EaseInCubic(t);
-                }
-                // If nps is greater than the upper clamp
-                else
-                {
-                    // Apply a logarithmic function here.
-                    // The constants 'a' and 'b' can be adjusted to control the curve.
-                    double a = 10; // Controls the steepness of the curve
-                    double b = upperBound - a * Math.Log(upperClamp); // Ensures the curve starts at (upperClamp, upperBound)
-                    double result = a * Math.Log(nps) + b;
-                    return result;
-                }
+                zigZagType = ZigZagType.Unsustainable;
             }
+
+            // Console.WriteLine(zigZagType.ToString());
+
+            if (zigZagType == ZigZagType.Sustainable)
+            {
+                // Cubic function for ease-in-out curve
+                double t = (numNotes - susLowerClamp) / (susUpperClamp - susLowerClamp);
+                t = Clamp(t, 0, 1);
+
+                return susLowerBound + (susUpperBound - susLowerBound) * SmoothStep(t);
+            }
+            else
+            {
+                // Cubic function for ease-in-out curve
+                double t = (numNotes - unsusLowerClamp) / (unsusUpperClamp - unsusLowerClamp);
+                t = Clamp(t, 0, 1);
+                t = 1 - t; // Flip the curve horizontally by replacing t with 1 - t
+
+
+                return unsusLowerBound + (unsusUpperBound - unsusLowerBound) * SmoothStep(t);
+            }
+
 
 
         }
@@ -116,22 +195,6 @@ namespace MuseMapalyzr
             return lowerBound + (upperBound - lowerBound) * SmoothStep(t);
         }
 
-        public static double ZigZagLengthMultiplier(double numNotes, double nps, bool ranked)
-        {
-            double lowerBound = GetRightConfig(ranked).ZigZagLengthLowBound;
-            double upperBound = GetRightConfig(ranked).ZigZagLengthUpBound;
-            double lowerClamp = GetRightConfig(ranked).ZigZagLengthLowClamp;
-            double upperClamp = GetRightConfig(ranked).ZigZagLengthUpClamp;
-            double npsThreshold = GetRightConfig(ranked).ZigZagLengthNpsThreshold;
-
-            if (nps > npsThreshold)
-            {
-                double t = (numNotes - lowerClamp) / (upperClamp - lowerClamp);
-                t = Clamp(t, 0, 1);
-                return lowerBound + (upperBound - lowerBound) * EaseInCubic(t);
-            }
-            return 1;
-        }
 
         public static double NothingButTheoryLengthMultiplier(double numNotes, double multiplier, bool ranked)
         {

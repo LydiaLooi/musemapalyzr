@@ -69,7 +69,17 @@ namespace MuseMapalyzr
                 else
                 {
                     prevNPS = -1;
-                    zigZagChainNoteCount = 0;
+
+                    if (segment.SegmentName == Constants.ZigZag)
+                    {
+                        zigZagChainNoteCount = segment.Notes.Count - 1;
+
+                    }
+                    else
+                    {
+                        zigZagChainNoteCount = 0;
+
+                    }
                 }
 
 
@@ -80,10 +90,25 @@ namespace MuseMapalyzr
                         multiplier = conf.OtherSwitchMultiplier;
                         break;
                     case Constants.ZigZag:
+
+                        double baseValue;
+                        if (ranked)
+                        {
+                            baseValue = ConfigReader.GetConfig().ZigZagBaseMultiplier;
+                        }
+                        else
+                        {
+                            baseValue = ConfigReader.GetUnrankedConfig().ZigZagBaseMultiplier;
+
+                        }
+
                         // Zig zags are special as they can have many notes in them.
                         double zigZagMultiplier = PatternMultiplier.ZigZagMultiplier(segment.NotesPerSecond, ranked);
                         double zigZagLengthMultiplier = PatternMultiplier.ZigZagLengthMultiplier(zigZagChainNoteCount, segment.NotesPerSecond, ranked);
-                        multiplier = zigZagMultiplier * zigZagLengthMultiplier;
+                        multiplier = baseValue + ((zigZagMultiplier - baseValue) * zigZagLengthMultiplier);
+                        // Console.WriteLine($"({ranked}) ZIG ZAG | NPS: {segment.NotesPerSecond} | NC: {zigZagChainNoteCount} | Multi: {zigZagMultiplier} | Length: {zigZagLengthMultiplier} | Final: {multiplier}");
+
+
                         break;
                     case Constants.TwoStack:
                         multiplier = PatternMultiplier.TwoStackMultiplier(segment.NotesPerSecond, ranked);

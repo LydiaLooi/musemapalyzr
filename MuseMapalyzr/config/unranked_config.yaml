@@ -32,7 +32,7 @@ GetPatternWeightingBottomWeight: 0.1
 
 # Density Average
 SampleWindowSecs: 1 # Default 1 DO NOT CHANGE THIS LOL Since NPS calculations will be messed up
-MovingAvgWindow: 5 # Default 5
+MovingAvgWindow: 3 # Default 5
 
 # Interval NPS Thresholds
 ShortIntervalNps: 5 # Default 5
@@ -62,10 +62,14 @@ NothingButTheoryLowClamp: 2.5
 NothingButTheoryUpClamp: 21.5
 
 # ZigZagMultiplier
+ZigZagBaseMultiplier: 1
 ZigZagLowBound: 1
-ZigZagUpBound: 2
-ZigZagLowClamp: 6
-ZigZagUpClamp: 18
+ZigZagUpBound: 1.25 # Maximum sustainable stream multiplier
+ZigZagSusBeginningNPS: 13
+ZigZagUnsusGradient: 0.01
+ZigZagUnsusStartingMultiplier: 1.6
+ZigZagLowClamp: 0 # Clamps unused but could be used to adjust curve
+ZigZagUpClamp: 0 
 
 # EvenCircleMultiplier
 EvenCircleLowBound: 1
@@ -82,11 +86,18 @@ StreamLowClamp: 5
 StreamUpClamp: 14
 
 # ZigZagLengthMultiplier
-ZigZagLengthLowBound: 1
-ZigZagLengthUpBound: 2
-ZigZagLengthLowClamp: 15
-ZigZagLengthUpClamp: 50
-ZigZagLengthNpsThreshold: 17 # Slightly faster than EWF
+SusZigZagLengthLowBound: 1
+SusZigZagLengthUpBound: 2
+SusZigZagLengthLowClamp: 10
+SusZigZagLengthUpClamp: 50
+
+UnsusZigZagLengthLowBound: 0.5
+UnsusZigZagLengthUpBound: 1
+UnsusZigZagLengthLowClamp: 10
+UnsusZigZagLengthUpClamp: 20
+
+UnsusZigZagThresholdNPS: 20
+
 
 # FourStackMultiplier
 FourStackLowBound: 1.0
