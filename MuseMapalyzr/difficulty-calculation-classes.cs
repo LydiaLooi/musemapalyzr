@@ -31,6 +31,7 @@ namespace MuseMapalyzr
     }
     public class MapDetails
     {
+
         public List<Note> Notes;
         public int SampleRate;
         public List<double> RankedDensities = new List<double>();
@@ -43,6 +44,30 @@ namespace MuseMapalyzr
         public double RankedDifficulty = -1;
         public double PeakDifficulty = -1;
 
+        private Dictionary<string, int>? _SimpleSegmentData = null;
+        public Dictionary<string, int> SimpleSegmentData
+        {
+            get
+            {
+                if (_SimpleSegmentData != null) return _SimpleSegmentData;
+
+                _SimpleSegmentData = GetSimpleSegmentData();
+                return _SimpleSegmentData;
+            }
+        }
+        private Dictionary<string, int>? _SimplePatternData = null;
+
+        public Dictionary<string, int> SimplePatternData
+        {
+            get
+            {
+                if (_SimplePatternData != null) return _SimplePatternData;
+
+                _SimplePatternData = GetSimplePatternData();
+                return _SimplePatternData;
+            }
+        }
+
         public MapDetails(
             List<Note> notes,
             int sampleRate
@@ -50,6 +75,37 @@ namespace MuseMapalyzr
         {
             Notes = notes;
             SampleRate = sampleRate;
+        }
+
+        private Dictionary<string, int> GetSimpleSegmentData()
+        {
+            Dictionary<string, int> results = new Dictionary<string, int>();
+            foreach (string segmentName in Constants.SegmentTypes)
+            {
+                results[segmentName] = 0;
+            }
+            foreach (Segment segment in AnalysedSegments)
+            {
+                results[segment.SegmentName]++;
+            }
+
+            return results;
+        }
+
+        public Dictionary<string, int> GetSimplePatternData()
+        {
+            Dictionary<string, int> results = new Dictionary<string, int>();
+            foreach (string patternName in Constants.PatternTypes)
+            {
+                results[patternName] = 0;
+            }
+
+            foreach (Pattern pattern in AnalysedPatterns)
+            {
+                results[pattern.PatternName]++;
+            }
+
+            return results;
         }
 
 

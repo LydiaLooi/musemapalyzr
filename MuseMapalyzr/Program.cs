@@ -97,6 +97,30 @@ namespace MuseMapalyzr
                             string peak = "Peak";
                             analysisWriter.WriteLine($"{ranked,6} {mapDetails.RankedDensityDetails.Ceiling,10:F3} {mapDetails.RankedDensityDetails.Hardest,10:F3} {mapDetails.RankedDensityDetails.Penalty,10:F3} {mapDetails.RankedDensityDetails.FinalPenalisedBase,10:F3} {mapDetails.RankedDensityDetails.AdditionalStars,16:F3} {mapDetails.RankedDensityDetails.CumulativeSum,10:F3} {mapDetails.RankedDensityDetails.AddedDifficulty,10:F3}          FinalPenalised + Added = {mapDetails.RankedDensityDetails.FinalPenalisedBase + mapDetails.RankedDensityDetails.AddedDifficulty:F2} * {Constants.BaseDifficultyMultiplier} = {(mapDetails.RankedDensityDetails.FinalPenalisedBase + mapDetails.RankedDensityDetails.AddedDifficulty) * Constants.BaseDifficultyMultiplier:F2}");
                             analysisWriter.WriteLine($"{peak,6} {mapDetails.PeakDensityDetails.Ceiling,10:F3} {mapDetails.PeakDensityDetails.Hardest,10:F3} {mapDetails.PeakDensityDetails.Penalty,10:F3} {mapDetails.PeakDensityDetails.FinalPenalisedBase,10:F3} {mapDetails.PeakDensityDetails.AdditionalStars,16:F3} {mapDetails.PeakDensityDetails.CumulativeSum,10:F3} {mapDetails.PeakDensityDetails.AddedDifficulty,10:F3}          FinalPenalised + Added = {mapDetails.PeakDensityDetails.FinalPenalisedBase + mapDetails.PeakDensityDetails.AddedDifficulty:F2} * {Constants.BaseDifficultyMultiplier} = {(mapDetails.PeakDensityDetails.FinalPenalisedBase + mapDetails.PeakDensityDetails.AddedDifficulty) * Constants.BaseDifficultyMultiplier:F2}");
+                            analysisWriter.WriteLine();
+                            analysisWriter.WriteLine("Pattern Type Counts:");
+                            foreach (KeyValuePair<string, int> kvp in mapDetails.SimplePatternData)
+                            {
+                                // Access the key and value
+                                string key = kvp.Key;
+                                int value = kvp.Value;
+
+                                // Do something with the key and value
+                                analysisWriter.WriteLine($"{key,20} {value,2}");
+                            }
+
+                            analysisWriter.WriteLine("\nSegment Type Counts:");
+                            foreach (KeyValuePair<string, int> kvp in mapDetails.SimpleSegmentData)
+                            {
+                                // Access the key and value
+                                string key = kvp.Key;
+                                int value = kvp.Value;
+
+                                // Do something with the key and value
+                                analysisWriter.WriteLine($"{key,20} {value,2}");
+                            }
+
+
                             analysisWriter.WriteLine("\n\n");
 
                         }

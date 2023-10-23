@@ -24,9 +24,10 @@ namespace MuseMapalyzr
         public const string SkewedCircles = "Skewed Circles";
         public const string VaryingStacks = "Varying Stacks";
         public const string NothingButTheory = "Nothing But Theory";
-        public const string VariableStream = "Variable Stream";
         public const string Other = "Other";
 
+        public static List<string> PatternTypes = new List<string> { SlowStretch, EvenCircles, SkewedCircles, VaryingStacks, NothingButTheory, Other };
+        public static List<string> SegmentTypes = new List<string> { Switch, ZigZag, TwoStack, ThreeStack, FourStack, SingleStreams, ShortInterval, MedInterval, LongInterval };
         public const double BaseDifficultyMultiplier = 0.5f;
         public static int GetTolerance()
         {

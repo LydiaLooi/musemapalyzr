@@ -20,9 +20,9 @@ CeilingProportion: 0.2
 
 
 DensitySingleStreamNPSCap: 6
-DensityFourStackNPSCap: 9
-DensityThreeStackNPSCap: 10
-DensityTwoStackNPSCap: 11
+DensityFourStackNPSCap: 11
+DensityThreeStackNPSCap: 12
+DensityTwoStackNPSCap: 13
 
 # Tolerances
 PatternToleranceMs: 20

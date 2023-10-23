@@ -390,6 +390,8 @@ namespace MuseMapalyzr
             List<double> unrankedMovingAvg = MovingAverageNoteDensity(unrankedSections, unrankedMovingAverageWindow);
             mapDetails.PeakDensities = unrankedMovingAvg;
 
+            mapDetails.AnalysedPatterns = patternWeightingResults.IdentifiedPatterns;
+            mapDetails.AnalysedSegments = patternWeightingResults.IdentifiedSegments;
             mapDetails.CalculateRankedAndPeakValues(patternWeightingResults);
 
             return mapDetails;
