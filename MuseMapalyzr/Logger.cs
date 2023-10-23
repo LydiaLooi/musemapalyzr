@@ -14,7 +14,7 @@ namespace MuseMapalyzr
     {
 
         private static LogLevel DebugLevel = LogLevel.Info;
-        private static bool LogPatternMultipliers = false;
+        private static bool LogPatternMultipliers = true;
 
         private static readonly object locker = new object();
         private static CustomLogger instance = null;

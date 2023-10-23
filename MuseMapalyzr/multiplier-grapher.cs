@@ -4,10 +4,23 @@ using OxyPlot.WindowsForms;
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.Legends;
+using static MuseMapalyzr.ConfigReader;
+
 namespace MuseMapalyzr
 {
     public class MultiplierGraphing
     {
+
+        private static MuseMapalyzrConfig Conf = ConfigReader.GetConfig();
+        private static MuseMapalyzrConfig UnrankedConf = ConfigReader.GetUnrankedConfig();
+
+        private static MuseMapalyzrConfig GetRightConfig(bool ranked)
+        {
+            if (ranked) return Conf;
+            return UnrankedConf;
+        }
+
+
         public static PlotModel GraphMethods(bool ranked)
         {
             PlotModel plotModel = new PlotModel
@@ -19,7 +32,7 @@ namespace MuseMapalyzr
 
             int count = 1000;
             double[] npsValues = new double[count];
-            double step = (50 - 1) / (double)count;
+            double step = 50 / (double)count;
 
             for (int i = 0; i < count; i++)
             {
@@ -34,7 +47,10 @@ namespace MuseMapalyzr
             AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.FourStackMultiplier(nps, ranked), "4-Stacks");
             AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.ThreeStackMultiplier(nps, ranked), "3-Stacks");
             AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.TwoStackMultiplier(nps, ranked), "2-Stacks");
-            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.VaryingStacksMultiplier(nps, ranked), "Varying Stacks");
+
+            // Uncomment to see the zig zag length multiplier
+            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.ZigZagLengthMultiplier(nps, 19, ranked), "Sust. Zig Zag Length Multiplier");
+            AddLineSeries(plotModel, npsValues, (nps) => PatternMultiplier.ZigZagLengthMultiplier(nps, 20, ranked), "Unsust. Zig Zag Length Multiplier");
 
 
             return plotModel;

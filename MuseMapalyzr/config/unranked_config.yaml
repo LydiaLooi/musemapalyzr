@@ -7,13 +7,16 @@
 
 # Note that some of these aren't used and the ranked config is used (e.g., sample window threshold etc.)
 
+# V9
+
 # Normal Sized Map Threshold
 NormalSizedMapThreshold: 0
 
 # Density 
-DensityTopProportion: 0.2
-DensityTopWeighting: 1.2
-DensityBottomWeighting: 0.1
+HardestSeconds: 15
+Arbitrary90PercentThreshold: 1000
+RankedPenaltyProportion: 0
+CeilingProportion: 0.2
 
 DensitySingleStreamNPSCap: 13
 DensityFourStackNPSCap: 14
@@ -31,7 +34,7 @@ GetPatternWeightingBottomWeight: 0.1
 
 # Density Average
 SampleWindowSecs: 1 # Default 1 DO NOT CHANGE THIS LOL Since NPS calculations will be messed up
-MovingAvgWindow: 5 # Default 5
+MovingAvgWindow: 1 # Default 5
 
 # Interval NPS Thresholds
 ShortIntervalNps: 5 # Default 5
@@ -39,8 +42,8 @@ MedIntervalNps: 1 # Default 1
 LongIntervalNps: 0.5 # Default 0.5
 
 #### Pattern Class Attributes
-DefaultVariationWeighting: 0.5
-DefaultPatternWeighting: 0.5
+DefaultVariationWeighting: 0.2
+DefaultPatternWeighting: 0.8
 ShortIntDebuff: 0.7
 MedIntDebuff: 0.6
 LongIntDebuff: 0.4
@@ -61,10 +64,14 @@ NothingButTheoryLowClamp: 2.5
 NothingButTheoryUpClamp: 21.5
 
 # ZigZagMultiplier
-ZigZagLowBound: 1
-ZigZagUpBound: 2
-ZigZagLowClamp: 6
-ZigZagUpClamp: 18
+ZigZagBaseMultiplier: 0.8
+ZigZagLowBound: 0.8
+ZigZagUpBound: 1 # Maximum sustainable stream multiplier
+ZigZagSusBeginningNPS: 13
+ZigZagUnsusGradient: 0.01
+ZigZagUnsusStartingMultiplier: 2
+ZigZagLowClamp: 0 # Clamps unused but could be used to adjust curve
+ZigZagUpClamp: 0 
 
 # EvenCircleMultiplier
 EvenCircleLowBound: 1
@@ -81,11 +88,18 @@ StreamLowClamp: 5
 StreamUpClamp: 14
 
 # ZigZagLengthMultiplier
-ZigZagLengthLowBound: 1
-ZigZagLengthUpBound: 15
-ZigZagLengthLowClamp: 15
-ZigZagLengthUpClamp: 50
-ZigZagLengthNpsThreshold: 17 # Slightly faster than EWF
+SusZigZagLengthLowBound: 1
+SusZigZagLengthUpBound: 2
+SusZigZagLengthLowClamp: 10
+SusZigZagLengthUpClamp: 50
+
+UnsusZigZagLengthLowBound: 0.5
+UnsusZigZagLengthUpBound: 1
+UnsusZigZagLengthLowClamp: 10
+UnsusZigZagLengthUpClamp: 20
+
+UnsusZigZagThresholdNPS: 20
+
 
 # FourStackMultiplier
 FourStackLowBound: 1.0
@@ -106,7 +120,5 @@ TwoStackLowClamp: 5
 TwoStackUpClamp: 14
 
 # VaryingStacksMultiplier
-VaryingStacksLowBound: 1.0
-VaryingStacksUpBound: 1.35
-VaryingStacksLowClamp: 4
-VaryingStacksUpClamp: 14
+VaryingStackMultiplier: 1.25
+

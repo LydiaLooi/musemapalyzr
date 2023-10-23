@@ -1,172 +1,77 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using static MuseMapalyzr.ConfigReader;
+
 using System.Text;
 
 namespace MuseMapalyzr
 {
     public class DifficultyCalculation
     {
-        public class WeightingResults // Named Tuple "Weighting" in python code
+        private void PutPatternsIntoSections(
+            List<Segment> segmentsWithMultipliers,
+            double songStartSamples,
+            int sectionThreshold,
+            PatternWeightingResults patternWeightingResults,
+            int sampleRate
+            )
         {
-            public double RankedWeighting;
-            public double RankedDifficulty;
-            public double RankedWeightedDifficulty;
-
-            public double UnrankedWeighting;
-            public double UnrankedDifficulty;
-            public double UnrankedWeightedDifficulty;
-
-            public WeightingResults(
-                double rankedWeighting,
-                double rankedDifficulty,
-                double rankedWeightedDifficulty,
-                double unrankedWeighting,
-                double unrankedDifficulty,
-                double unrankedWeightedDifficulty
-                )
+            int sectionsCount = patternWeightingResults.RankedPatternWeightingSections.Count();
+            foreach (Segment segment in segmentsWithMultipliers)
             {
-                RankedWeighting = rankedWeighting;
-                RankedDifficulty = rankedDifficulty;
-                RankedWeightedDifficulty = rankedWeightedDifficulty;
-
-                UnrankedWeighting = unrankedWeighting;
-                UnrankedDifficulty = unrankedDifficulty;
-                UnrankedWeightedDifficulty = unrankedWeightedDifficulty;
-
-            }
-        }
-
-        public class PatternScore
-        {
-            public string PatternName;
-            public double Score;
-            public bool HasInterval;
-            public int TotalNotes;
-            public PatternScore(string patternName, double score, bool hasInterval, int totalNotes)
-            {
-                PatternName = patternName;
-                Score = score;
-                HasInterval = hasInterval;
-                TotalNotes = totalNotes;
-            }
-        }
-
-
-        public class ScoreResults
-        {
-            public List<double> UnrankedScores;
-            public List<double> RankedScores;
-            public ScoreResults()
-            {
-                UnrankedScores = new List<double>();
-                RankedScores = new List<double>();
-            }
-        }
-
-        public class PatternWeightingResults
-        {
-            public double RankedPatternWeighting;
-            public double UnrankedPatternWeighting;
-            public List<Pattern> IdentifiedPatterns = new List<Pattern>();
-            public List<Segment> IdentifiedSegments = new List<Segment>();
-            public List<Segment>? _StreamSegments;
-            public List<Segment> StreamSegments
-            {
-                get
+                int firstNoteSectionIndex = (int)(segment.Notes.First().SampleTime - songStartSamples) / sectionThreshold;
+                if (0 <= firstNoteSectionIndex && firstNoteSectionIndex < sectionsCount)
                 {
-                    if (_StreamSegments == null)
+                    patternWeightingResults.RankedPatternWeightingSections[firstNoteSectionIndex].Add(segment.RankedMultiplier);
+                    patternWeightingResults.UnrankedPatternWeightingSections[firstNoteSectionIndex].Add(segment.UnrankedMultiplier);
+
+                    // Now check the section index of the final note.
+                    int lastNoteSectionIndex = (int)(segment.Notes.Last().SampleTime - songStartSamples) / sectionThreshold;
+                    // If the last note's section index is more than +1 compared to the first note's section index
+                    if (lastNoteSectionIndex > firstNoteSectionIndex + 1)
                     {
-                        List<Segment> temp = new List<Segment>();
-                        foreach (Segment segment in IdentifiedSegments)
+                        // Fill in the section indexes up to but not including the last note section index
+                        for (int i = firstNoteSectionIndex + 1; i < lastNoteSectionIndex; i++)
                         {
-                            if (
-                                segment.SegmentName == Constants.SingleStreams
-                                || segment.SegmentName == Constants.FourStack
-                                || segment.SegmentName == Constants.ThreeStack
-                                || segment.SegmentName == Constants.TwoStack
-                                )
+                            if (i < sectionsCount) // Safety check
                             {
-                                temp.Add(segment);
+                                patternWeightingResults.RankedPatternWeightingSections[i].Add(segment.RankedMultiplier);
+                                patternWeightingResults.UnrankedPatternWeightingSections[i].Add(segment.UnrankedMultiplier);
                             }
                         }
-                        _StreamSegments = temp;
                     }
-                    return _StreamSegments;
+
+
                 }
             }
         }
 
-
-        /// Creates sections of section_threshold_seconds length to help with calculating
-        /// density over the course of a map.
-        public List<List<Note>> CreateSections(
+        private void PutNotesIntoSections(
             List<Note> notes,
-            int sectionThresholdSeconds,
-            int sampleRate,
-            List<Segment> streamSegments, // Is ordered 
-            bool ranked
-        // double streamNpsCap, // E.g., cap is 13 NPS, then if there is a stream thats 42 NPS, we treat it like its 13 NPS.
-        )
+            double songStartSamples,
+            int sectionThreshold,
+            List<List<Note>> sections,
+            List<Segment> streamSegments,
+            double streamNpsCap,
+            double fourStackNpsCap,
+            double threeStackNpsCap,
+            double twoStackNpsCap,
+            int sampleRate
+
+            )
         {
-            double streamNpsCap;
-            double fourStackNpsCap;
-            double threeStackNpsCap;
-            double twoStackNpsCap;
-            double normalSizedMapThreshold;
-            if (ranked)
-            {
-                streamNpsCap = ConfigReader.GetConfig().DensitySingleStreamNPSCap;
-                fourStackNpsCap = ConfigReader.GetConfig().DensityFourStackNPSCap;
-                threeStackNpsCap = ConfigReader.GetConfig().DensityThreeStackNPSCap;
-                twoStackNpsCap = ConfigReader.GetConfig().DensityTwoStackNPSCap;
-                normalSizedMapThreshold = ConfigReader.GetConfig().NormalSizedMapThreshold;
-
-            }
-            else
-            {
-                streamNpsCap = ConfigReader.GetUnrankedConfig().DensitySingleStreamNPSCap;
-                fourStackNpsCap = ConfigReader.GetUnrankedConfig().DensityFourStackNPSCap;
-                threeStackNpsCap = ConfigReader.GetUnrankedConfig().DensityThreeStackNPSCap;
-                twoStackNpsCap = ConfigReader.GetUnrankedConfig().DensityTwoStackNPSCap;
-                normalSizedMapThreshold = ConfigReader.GetUnrankedConfig().NormalSizedMapThreshold;
-            }
-
-            double songLength = (notes.Last().SampleTime - notes.First().SampleTime) / sampleRate;
-            if (songLength < normalSizedMapThreshold)
-            {
-                // If the song length is less than the threshold, then add a note at the threshold time
-                // so that when calculating density, it looks at that whole time.
-                notes.Add(new Note(0, normalSizedMapThreshold * sampleRate));
-            }
 
 
-            int sectionThreshold = sectionThresholdSeconds * sampleRate;
-            double songStartSamples = notes.Min(note => note.SampleTime);
-            double songDurationSamples = notes.Max(note => note.SampleTime);
-
+            int skipped = 0;
+            // Note lastAddedNote = new Note(0, -1);
+            double skipIfBeforeOrEqualToThisTime = 0;
 
             HashSet<double> streamSegmentStartSampleTimes = new HashSet<double>();
             foreach (Segment segment in streamSegments)
             {
                 streamSegmentStartSampleTimes.Add(segment.Notes.First().SampleTime);
             }
-
-            // Sorting the 'notes' list based on the 'SampleTime' property
-            notes = notes.OrderBy(note => note.SampleTime).ToList();
-
-            int numSections = (int)(songDurationSamples - songStartSamples + sectionThreshold) / sectionThreshold;
-
-            List<List<Note>> sections = new List<List<Note>>();
-
-            // Initialize empty sections
-            for (int i = 0; i < numSections; i++)
-            {
-                sections.Add(new List<Note>());
-            }
-
-            int skipped = 0;
-            // Note lastAddedNote = new Note(0, -1);
-            double skipIfBeforeOrEqualToThisTime = 0;
-            // Fill sections with notes
-
 
             foreach (Note note in notes)
             {
@@ -176,7 +81,7 @@ namespace MuseMapalyzr
                     if (streamSegmentStartSampleTimes.Contains(note.SampleTime))
                     {
 
-                        Segment? foundSegment = FindSegmentFromStartNote(note, streamSegments);
+                        Segment? foundSegment = Utils.FindSegmentFromStartNote(note, streamSegments);
                         if (foundSegment == null)
                         {
                             CustomLogger.Instance.Warning($"Didn't actually find a segment.. Adding the note anyways SampleTime{note.SampleTime}");
@@ -243,7 +148,7 @@ namespace MuseMapalyzr
 
 
 
-                                    double nextNoteTime = tempNote.SampleTime + GetTimeDifferenceWithNPS(npsCap, sampleRate);
+                                    double nextNoteTime = tempNote.SampleTime + Utils.GetTimeDifferenceWithNPS(npsCap, sampleRate);
                                     int nextSectionIndex = (int)(nextNoteTime - songStartSamples) / sectionThreshold;
                                     tempNote = new Note(note.Lane, nextNoteTime);
                                     if (nextNoteTime <= segmentNotes.Last().SampleTime)
@@ -281,25 +186,107 @@ namespace MuseMapalyzr
                 }
             }
 
-            return sections;
         }
 
-        private double GetTimeDifferenceWithNPS(double NPS, double sampleRate)
-        {
-            return sampleRate / NPS;
-        }
 
-        private Segment? FindSegmentFromStartNote(Note note, List<Segment> segments)
+        /// Creates sections of section_threshold_seconds length to help with calculating
+        /// density over the course of a map.
+        /// Also creates the sections for pattern weightings
+        public SectionResults CreateSections(
+            List<Note> notes,
+            int sectionThresholdSeconds,
+            int sampleRate,
+            PatternWeightingResults patternWeightingResults
+        // double streamNpsCap, // E.g., cap is 13 NPS, then if there is a stream thats 42 NPS, we treat it like its 13 NPS.
+        )
         {
-            foreach (Segment seg in segments)
+
+            List<Segment> streamSegments = patternWeightingResults.StreamSegments;  // Is ordered 
+
+
+            double rankedStreamNpsCap = ConfigReader.GetConfig().DensitySingleStreamNPSCap;
+            double rankedFourStackNpsCap = ConfigReader.GetConfig().DensityFourStackNPSCap;
+            double rankedThreeStackNpsCap = ConfigReader.GetConfig().DensityThreeStackNPSCap;
+            double rankedTwoStackNpsCap = ConfigReader.GetConfig().DensityTwoStackNPSCap;
+            double rankedNormalSizedMapThreshold = ConfigReader.GetConfig().NormalSizedMapThreshold;
+
+            double unrankedStreamNpsCap = ConfigReader.GetUnrankedConfig().DensitySingleStreamNPSCap;
+            double unrankedFourStackNpsCap = ConfigReader.GetUnrankedConfig().DensityFourStackNPSCap;
+            double unrankedThreeStackNpsCap = ConfigReader.GetUnrankedConfig().DensityThreeStackNPSCap;
+            double unrankedTwoStackNpsCap = ConfigReader.GetUnrankedConfig().DensityTwoStackNPSCap;
+            //double unrankedNormalSizedMapThreshold = ConfigReader.GetUnrankedConfig().NormalSizedMapThreshold;
+
+            List<Note> rankedNotes = new List<Note>(notes);
+
+            int sectionThreshold = sectionThresholdSeconds * sampleRate;
+            double songStartSamples = notes.Min(note => note.SampleTime);
+            double songDurationSamples = notes.Max(note => note.SampleTime);
+
+            // Sorting the 'notes' list based on the 'SampleTime' property
+            notes = notes.OrderBy(note => note.SampleTime).ToList();
+
+            int numSections = (int)(songDurationSamples - songStartSamples + sectionThreshold) / sectionThreshold;
+
+            List<List<Note>> rankedSections = new List<List<Note>>();
+            List<List<Note>> unrankedSections = new List<List<Note>>();
+
+            List<List<double>> rankedPatternWeightingSections = new List<List<double>>();
+            List<List<double>> unrankedPatternWeightingSections = new List<List<double>>();
+
+            // Initialize empty sections
+            for (int i = 0; i < numSections; i++)
             {
-                if (seg.Notes.First().SampleTime == note.SampleTime)
-                {
-                    return seg;
-                }
+                rankedSections.Add(new List<Note>());
+                unrankedSections.Add(new List<Note>());
+
+                rankedPatternWeightingSections.Add(new List<double>());
+                unrankedPatternWeightingSections.Add(new List<double>());
             }
-            return null;
+
+            patternWeightingResults.RankedPatternWeightingSections = rankedPatternWeightingSections;
+            patternWeightingResults.UnrankedPatternWeightingSections = unrankedPatternWeightingSections;
+
+            // Fill sections with notes
+            PutNotesIntoSections(
+                notes,
+                songStartSamples,
+                sectionThreshold,
+                rankedSections,
+                streamSegments,
+                rankedStreamNpsCap,
+                rankedFourStackNpsCap,
+                rankedThreeStackNpsCap,
+                rankedTwoStackNpsCap,
+                sampleRate
+                );
+
+            PutNotesIntoSections(
+                notes,
+                songStartSamples,
+                sectionThreshold,
+                unrankedSections,
+                streamSegments,
+                unrankedStreamNpsCap,
+                unrankedFourStackNpsCap,
+                unrankedThreeStackNpsCap,
+                unrankedTwoStackNpsCap,
+                sampleRate
+                );
+
+            PutPatternsIntoSections(
+                patternWeightingResults.IdentifiedSegments,
+                songStartSamples,
+                sectionThreshold,
+                patternWeightingResults,
+                sampleRate
+            );
+
+
+            return new SectionResults(rankedSections, unrankedSections);
         }
+
+
+
 
         public static List<double> MovingAverageNoteDensity(List<List<Note>> sections, int windowSize)
         {
@@ -329,164 +316,104 @@ namespace MuseMapalyzr
         }
 
 
-        public static double WeightedAverageOfValues(List<double> values, double topPercentage = 0.3, double topWeight = 0.7, double bottomWeight = 0.3)
-        {
-            if (values == null || values.Count == 0)
-            {
-                throw new ArgumentException("The input list 'values' cannot be empty.");
-            }
 
-            // Find the threshold that separates the top 30% highest densities from the rest
-            List<double> movingAveragesSorted = new List<double>(values);
-            movingAveragesSorted.Sort();
-            movingAveragesSorted.Reverse();
 
-            // Console.WriteLine(string.Join(",", movingAveragesSorted));
 
-            int thresholdIndex = (int)(values.Count * topPercentage);
-            if (thresholdIndex >= movingAveragesSorted.Count)
-            {
-                thresholdIndex = movingAveragesSorted.Count - 1;
-            }
-            // Console.WriteLine(thresholdIndex);
-            // double threshold = movingAveragesSorted[thresholdIndex];
-            // Console.WriteLine($"Top %{topPercentage} Index: {thresholdIndex} ... Threshold {threshold}");
 
-            // Calculate the weighted average
-            double totalWeight = 0;
-            double weightedSum = 0;
-
-            for (int i = 0; i < movingAveragesSorted.Count; i++)
-            {
-                double value = movingAveragesSorted[i];
-                double weight;
-                if (i <= thresholdIndex)
-                {
-                    weight = topWeight;
-                }
-                else
-                {
-                    weight = bottomWeight;
-                }
-
-                weightedSum += value * weight;
-                totalWeight += weight;
-            }
-            // Console.WriteLine($"Weighted Sum: {weightedSum} (Actual: {values.Sum()}) Total Weight: {totalWeight}");
-            double weightedAverage = weightedSum / totalWeight;
-            return weightedAverage;
-        }
 
         public PatternWeightingResults GetPatternWeighting(List<Note> notes, int sampleRate)
         {
             // Need Mapalyzr Class that identifies patterns
-            Mapalyzr mpg = new();
+            Mapalyzr mpg = new Mapalyzr();
 
             List<Segment> segments = SegmentAnalyser.AnalyseSegments(notes, sampleRate);
 
             List<Pattern> patterns = mpg.IdentifyPatterns(segments);
 
-            ScoreResults scoreResults = CalculateScoresFromPatterns(patterns);
+            SegmentMultipliers segmentMultipliers = CalculateSegmentMultipliers(patterns);
 
-            double rankedPatternWeighting = WeightedAverageOfValues(
-                scoreResults.RankedScores,
+            double rankedPatternWeighting = Utils.WeightedAverageOfValues(
+                segmentMultipliers.RankedMultipliers,
                 ConfigReader.GetConfig().GetPatternWeightingTopPercentage,
                 ConfigReader.GetConfig().GetPatternWeightingTopWeight,
                 ConfigReader.GetConfig().GetPatternWeightingBottomWeight
                 );
 
-            double unrankedPatternWeighting = WeightedAverageOfValues(
-                scoreResults.UnrankedScores,
+            double unrankedPatternWeighting = Utils.WeightedAverageOfValues(
+                segmentMultipliers.PeakMultipliers,
                 ConfigReader.GetUnrankedConfig().GetPatternWeightingTopPercentage,
                 ConfigReader.GetUnrankedConfig().GetPatternWeightingTopWeight,
                 ConfigReader.GetUnrankedConfig().GetPatternWeightingBottomWeight
                 );
+
             PatternWeightingResults results = new PatternWeightingResults
             {
                 RankedPatternWeighting = rankedPatternWeighting,
                 UnrankedPatternWeighting = unrankedPatternWeighting,
                 IdentifiedPatterns = patterns,
-                IdentifiedSegments = segments
+                IdentifiedSegments = segments,
+                SegmentMultipliers = segmentMultipliers
             };
 
             return results;
         }
 
 
-        public WeightingResults CalculateDifficulty(List<Note> notes, StreamWriter outfile, int sampleRate)
+        public MapDetails AnalyzeMap(List<Note> notes, int sampleRate)
         {
-
+            MapDetails mapDetails = new MapDetails(notes, sampleRate);
             PatternWeightingResults patternWeightingResults = GetPatternWeighting(notes, sampleRate);
+            int sampleWindowSecs = 1; // Should not change or will mess up with NPS calculations.
 
-            int sampleWindowSecs = ConfigReader.GetConfig().SampleWindowSecs;
-
-            // TODO: This could be optimised - instead of running CreateSections twice, just do both ranked and 
-            // unranked in it.
-
-            List<List<Note>> rankedSections = CreateSections(
+            SectionResults sectionResults = CreateSections(
                 notes.ToList(),
                 sampleWindowSecs,
                 sampleRate,
-                patternWeightingResults.StreamSegments,
-                true
+                patternWeightingResults
                 );
 
-            List<List<Note>> unrankedSections = CreateSections(
-                notes.ToList(),
-                sampleWindowSecs,
-                sampleRate,
-                patternWeightingResults.StreamSegments,
-                false
-                );
+
+            List<List<Note>> unrankedSections = sectionResults.UnrankedSections;
+            List<List<Note>> rankedSections = sectionResults.RankedSections;
 
             int movingAverageWindow = ConfigReader.GetConfig().MovingAvgWindow;
+            int unrankedMovingAverageWindow = ConfigReader.GetUnrankedConfig().MovingAvgWindow;
 
             List<double> rankedMovingAvg = MovingAverageNoteDensity(rankedSections, movingAverageWindow);
-            List<double> unrankedMovingAvg = MovingAverageNoteDensity(unrankedSections, movingAverageWindow);
+            mapDetails.RankedDensities = rankedMovingAvg;
+            List<double> unrankedMovingAvg = MovingAverageNoteDensity(unrankedSections, unrankedMovingAverageWindow);
+            mapDetails.PeakDensities = unrankedMovingAvg;
 
-            if (outfile != null)
-            {
-                foreach (var s in rankedMovingAvg)
-                {
-                    outfile.WriteLine($"{s}");
-                }
-            }
+            mapDetails.AnalysedPatterns = patternWeightingResults.IdentifiedPatterns;
+            mapDetails.AnalysedSegments = patternWeightingResults.IdentifiedSegments;
+            mapDetails.CalculateRankedAndPeakValues(patternWeightingResults);
 
-            double rankedDifficulty = WeightedAverageOfValues(
-                rankedMovingAvg,
-                ConfigReader.GetConfig().DensityTopProportion,
-                ConfigReader.GetConfig().DensityTopWeighting,
-                ConfigReader.GetConfig().DensityBottomWeighting
-                );
-            double unrankedDifficulty = WeightedAverageOfValues(
-                unrankedMovingAvg,
-                ConfigReader.GetUnrankedConfig().DensityTopProportion,
-                ConfigReader.GetUnrankedConfig().DensityTopWeighting,
-                ConfigReader.GetUnrankedConfig().DensityBottomWeighting
-                );
+            return mapDetails;
+        }
 
 
-            double rankedWeightedDifficulty = patternWeightingResults.RankedPatternWeighting * rankedDifficulty;
-            double unrankedWeightedDifficulty = patternWeightingResults.UnrankedPatternWeighting * unrankedDifficulty;
+        // When copying over to museswipr, we just get rid of the outfile param.
+        public WeightingResults CalculateDifficulty(List<Note> notes, int sampleRate)
+        {
 
-            WeightingResults weightResults = new(
-                patternWeightingResults.RankedPatternWeighting,
-                rankedDifficulty,
-                rankedWeightedDifficulty,
+            MapDetails mapDetails = AnalyzeMap(notes, sampleRate);
 
-                patternWeightingResults.UnrankedPatternWeighting,
-                unrankedDifficulty,
-                unrankedWeightedDifficulty
+            WeightingResults weightResults = new WeightingResults(
+                -1,
+                -1,
+                mapDetails.RankedDifficulty,
+
+                -1,
+                -1,
+                mapDetails.PeakDifficulty
                 );
 
 
             return weightResults;
         }
 
-        public static ScoreResults CalculateScoresFromPatterns(List<Pattern> patterns)
+        public static SegmentMultipliers CalculateSegmentMultipliers(List<Pattern> patterns)
         {
-            List<PatternScore> rankedPatternScores = new List<PatternScore>();
-            List<PatternScore> unrankedPatternScores = new List<PatternScore>();
             // Console.WriteLine($"Checking {patterns.Count} Patterns");
             CustomLogger.Instance.PatternLog(String.Format("\n{0,20} {1,10} {2,18} {3,18}", "Pattern Name", "# Segments", "Start SampleTime", "End SampleTime"));
             foreach (Pattern pattern in patterns)
@@ -515,17 +442,17 @@ namespace MuseMapalyzr
                 }
             }
 
-            ScoreResults scoreResults = new ScoreResults();
+            SegmentMultipliers segmentMultipliers = new SegmentMultipliers();
 
             foreach (Pattern pattern in patterns)
             {
                 foreach (Segment segment in pattern.Segments)
                 {
-                    scoreResults.RankedScores.Add(segment.RankedMultiplier);
-                    scoreResults.UnrankedScores.Add(segment.UnrankedMultiplier);
+                    segmentMultipliers.RankedMultipliers.Add(segment.RankedMultiplier);
+                    segmentMultipliers.PeakMultipliers.Add(segment.UnrankedMultiplier);
                 }
             }
-            return scoreResults;
+            return segmentMultipliers;
         }
     }
 

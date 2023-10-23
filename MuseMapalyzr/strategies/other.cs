@@ -50,19 +50,65 @@ namespace MuseMapalyzr
             }
 
 
-            foreach (var segment in Pattern.Segments)
+            int zigZagChainNoteCount = 0;
+            double prevNPS = -1;
+            foreach (Segment segment in Pattern.Segments)
             {
                 double multiplier = 1;
+
+                // This is to keep track of how many zig zag segments we have seen so we can properly
+                // use the zig zag length multiplier
+                if (segment.SegmentName == Constants.ZigZag &&
+                    (prevNPS == -1 || prevNPS == segment.NotesPerSecond))
+                {
+
+                    zigZagChainNoteCount += segment.Notes.Count - 1; // Due to the overlap of segments
+                    prevNPS = (double)segment.NotesPerSecond;
+
+                }
+                else
+                {
+                    prevNPS = -1;
+
+                    if (segment.SegmentName == Constants.ZigZag)
+                    {
+                        zigZagChainNoteCount = segment.Notes.Count - 1;
+
+                    }
+                    else
+                    {
+                        zigZagChainNoteCount = 0;
+
+                    }
+                }
+
+
+
                 switch (segment.SegmentName)
                 {
                     case Constants.Switch:
                         multiplier = conf.OtherSwitchMultiplier;
                         break;
                     case Constants.ZigZag:
+
+                        double baseValue;
+                        if (ranked)
+                        {
+                            baseValue = ConfigReader.GetConfig().ZigZagBaseMultiplier;
+                        }
+                        else
+                        {
+                            baseValue = ConfigReader.GetUnrankedConfig().ZigZagBaseMultiplier;
+
+                        }
+
                         // Zig zags are special as they can have many notes in them.
                         double zigZagMultiplier = PatternMultiplier.ZigZagMultiplier(segment.NotesPerSecond, ranked);
-                        double zigZagLengthMultiplier = PatternMultiplier.ZigZagLengthMultiplier(segment.Notes.Count, segment.NotesPerSecond, ranked);
-                        multiplier = zigZagMultiplier * zigZagLengthMultiplier;
+                        double zigZagLengthMultiplier = PatternMultiplier.ZigZagLengthMultiplier(zigZagChainNoteCount, segment.NotesPerSecond, ranked);
+                        multiplier = baseValue + ((zigZagMultiplier - baseValue) * zigZagLengthMultiplier);
+                        // Console.WriteLine($"({ranked}) ZIG ZAG | NPS: {segment.NotesPerSecond} | NC: {zigZagChainNoteCount} | Multi: {zigZagMultiplier} | Length: {zigZagLengthMultiplier} | Final: {multiplier}");
+
+
                         break;
                     case Constants.TwoStack:
                         multiplier = PatternMultiplier.TwoStackMultiplier(segment.NotesPerSecond, ranked);
@@ -89,6 +135,7 @@ namespace MuseMapalyzr
                         multipliers.Add(multiplier);
                         break;
                 }
+
                 multipliers.Add(multiplier);
                 if (ranked)
                 {
@@ -106,11 +153,11 @@ namespace MuseMapalyzr
             double weightedAverage;
             if (multipliers.Count > 5 || Pattern.TotalNotes > 20) // Hard coded for now. Numbers are kinda arbitrary.
             {
-                weightedAverage = DifficultyCalculation.WeightedAverageOfValues(multipliers, 0.3, 0.9, 0.1);
+                weightedAverage = Utils.WeightedAverageOfValues(multipliers, 0.3, 0.9, 0.1);
             }
             else
             {
-                weightedAverage = DifficultyCalculation.WeightedAverageOfValues(multipliers, 0.3, 0.6, 0.4);
+                weightedAverage = Utils.WeightedAverageOfValues(multipliers, 0.3, 0.6, 0.4);
             }
             return weightedAverage;
         }

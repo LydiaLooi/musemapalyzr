@@ -6,8 +6,6 @@ namespace MuseMapalyzr
         private static MuseMapalyzrConfig? _rankedConfig;
         private static MuseMapalyzrConfig? _unrankedConfig;
 
-        public static bool Debug = true;
-
         public static string GetConfigPath(bool ranked = true)
         {
             string currentDirectory = Directory.GetCurrentDirectory();
@@ -32,6 +30,26 @@ namespace MuseMapalyzr
             return config;
         }
 
+        //// This is the method that is needed when copying over the MuseSwipr
+        // private static MuseMapalyzrConfig DeserializeConfig(bool ranked)
+        // {
+        //     string configFile;
+        //     if (ranked)
+        //     {
+        //         configFile = "musemapalyzrconfig";
+        //     }
+        //     else
+        //     {
+        //         configFile = "musemapalyzrunrankedconfig";
+        //     }
+        //     string yamlContent = Resources.Load<TextAsset>(configFile).text;
+        //     var input = new StringReader(yamlContent);
+        //     var deserializer = new DeserializerBuilder().WithNamingConvention(PascalCaseNamingConvention.Instance).Build();
+        //     var config = deserializer.Deserialize<MuseMapalyzrConfig>(input);
+        //     return config;
+        // }
+
+
         public static MuseMapalyzrConfig GetConfig()
         {
             _rankedConfig ??= DeserializeConfig(true);
@@ -47,9 +65,11 @@ namespace MuseMapalyzr
         public class MuseMapalyzrConfig
         {
             public int NormalSizedMapThreshold { get; set; }
-            public double DensityTopProportion { get; set; }
-            public double DensityTopWeighting { get; set; }
-            public double DensityBottomWeighting { get; set; }
+            public int HardestSeconds { get; set; }
+            public double Arbitrary90PercentThreshold { get; set; }
+            public double RankedPenaltyProportion { get; set; }
+            public double CeilingProportion { get; set; }
+
             public double DensitySingleStreamNPSCap { get; set; }
             public double DensityFourStackNPSCap { get; set; }
             public double DensityThreeStackNPSCap { get; set; }
@@ -78,8 +98,12 @@ namespace MuseMapalyzr
             public double NothingButTheoryUpBound { get; set; }
             public double NothingButTheoryLowClamp { get; set; }
             public double NothingButTheoryUpClamp { get; set; }
+            public double ZigZagBaseMultiplier { get; set; }
             public double ZigZagLowBound { get; set; }
             public double ZigZagUpBound { get; set; }
+            public double ZigZagUnsusGradient { get; set; }
+            public double ZigZagSusBeginningNPS { get; set; }
+            public double ZigZagUnsusStartingMultiplier { get; set; }
             public double ZigZagLowClamp { get; set; }
             public double ZigZagUpClamp { get; set; }
             public double EvenCircleLowBound { get; set; }
@@ -90,11 +114,15 @@ namespace MuseMapalyzr
             public double StreamUpBound { get; set; }
             public double StreamLowClamp { get; set; }
             public double StreamUpClamp { get; set; }
-            public double ZigZagLengthLowBound { get; set; }
-            public double ZigZagLengthUpBound { get; set; }
-            public double ZigZagLengthLowClamp { get; set; }
-            public double ZigZagLengthUpClamp { get; set; }
-            public double ZigZagLengthNpsThreshold { get; set; }
+            public double SusZigZagLengthLowBound { get; set; }
+            public double SusZigZagLengthUpBound { get; set; }
+            public double SusZigZagLengthLowClamp { get; set; }
+            public double SusZigZagLengthUpClamp { get; set; }
+            public double UnsusZigZagLengthLowBound { get; set; }
+            public double UnsusZigZagLengthUpBound { get; set; }
+            public double UnsusZigZagLengthLowClamp { get; set; }
+            public double UnsusZigZagLengthUpClamp { get; set; }
+            public double UnsusZigZagThresholdNPS { get; set; }
             public double FourStackLowBound { get; set; }
             public double FourStackUpBound { get; set; }
             public double FourStackLowClamp { get; set; }
@@ -107,10 +135,7 @@ namespace MuseMapalyzr
             public double TwoStackUpBound { get; set; }
             public double TwoStackLowClamp { get; set; }
             public double TwoStackUpClamp { get; set; }
-            public double VaryingStacksLowBound { get; set; }
-            public double VaryingStacksUpBound { get; set; }
-            public double VaryingStacksLowClamp { get; set; }
-            public double VaryingStacksUpClamp { get; set; }
+            public double VaryingStackMultiplier { get; set; }
         }
 
     }
