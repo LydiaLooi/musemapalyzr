@@ -595,7 +595,7 @@ namespace MuseMapalyzr
         {
             // Target value
             double target = 6.0;
-            double scalingFactor = 1.5;
+            double scalingFactor = 2;
 
             // If the original difficulty is less than or equal to the target, return it as is
             if (originalDifficulty <= target)
