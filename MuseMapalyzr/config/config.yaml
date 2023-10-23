@@ -94,7 +94,7 @@ SusZigZagLengthUpBound: 1.25
 SusZigZagLengthLowClamp: 10
 SusZigZagLengthUpClamp: 50
 
-UnsusZigZagLengthLowBound: 0.5
+UnsusZigZagLengthLowBound: 0.1
 UnsusZigZagLengthUpBound: 1
 UnsusZigZagLengthLowClamp: 10
 UnsusZigZagLengthUpClamp: 20

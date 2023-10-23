@@ -103,5 +103,11 @@ namespace MuseMapalyzr
             return sampleRate / NPS;
         }
 
+        public static double GetSongLengthFromNotes(List<Note> notes, int sampleRate)
+        {
+            double songLength = (notes.Last().SampleTime - notes.First().SampleTime) / sampleRate;
+            return songLength;
+        }
+
     }
 }

@@ -215,15 +215,6 @@ namespace MuseMapalyzr
 
             List<Note> rankedNotes = new List<Note>(notes);
 
-            double songLength = (notes.Last().SampleTime - notes.First().SampleTime) / sampleRate;
-            if (songLength < rankedNormalSizedMapThreshold)
-            {
-                // If the song length is less than the threshold, then add a note at the threshold time
-                // so that when calculating density, it looks at that whole time.
-                rankedNotes.Add(new Note(0, rankedNormalSizedMapThreshold * sampleRate));
-            }
-
-
             int sectionThreshold = sectionThresholdSeconds * sampleRate;
             double songStartSamples = notes.Min(note => note.SampleTime);
             double songDurationSamples = notes.Max(note => note.SampleTime);
