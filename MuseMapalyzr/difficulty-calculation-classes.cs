@@ -27,6 +27,7 @@ namespace MuseMapalyzr
         public double AdditionalStars;
         public double CumulativeSum;
         public double AddedDifficulty;
+        public double BeforeLengthScale;
 
     }
 

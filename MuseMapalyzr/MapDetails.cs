@@ -17,6 +17,7 @@ namespace MuseMapalyzr
         public List<List<double>> PatternMultiplierSections = new List<List<double>>();
         public double RankedDifficulty = -1;
         public double PeakDifficulty = -1;
+        public double Length = -1;
 
         private Dictionary<string, int>? _SimpleSegmentData = null;
         public Dictionary<string, int> SimpleSegmentData
@@ -49,6 +50,9 @@ namespace MuseMapalyzr
         {
             Notes = notes;
             SampleRate = sampleRate;
+
+            Length = Utils.GetSongLengthFromNotes(Notes, SampleRate);
+
         }
 
         private Dictionary<string, int> GetSimpleSegmentData()
@@ -182,7 +186,16 @@ namespace MuseMapalyzr
 
 
 
-            double finalDifficulty = finalPenalisedBase + addedDifficulty;
+            double difficulty = finalPenalisedBase + addedDifficulty;
+            double finalDifficulty;
+            if (isRanked)
+            {
+                finalDifficulty = ScaleBasedOnLengthOfSong(difficulty, Length);
+            }
+            else
+            {
+                finalDifficulty = difficulty;
+            }
 
             DensityDetails densityDetails = new DensityDetails
             {
@@ -195,7 +208,8 @@ namespace MuseMapalyzr
                 CumulativeSum = cumulativeSumOfDensities,
                 AddedDifficulty = addedDifficulty,
                 PatternAveragedMultipliers = patternMultiplierAverages,
-                DensitiesAfterPatternMultiplication = values
+                DensitiesAfterPatternMultiplication = values,
+                BeforeLengthScale = difficulty
             };
 
             if (isRanked)
@@ -211,8 +225,29 @@ namespace MuseMapalyzr
             return finalDifficulty;
         }
 
+        private static double ScaleBasedOnLengthOfSong(double difficulty, double length)
+        {
+            // If difficulty is greater than 90, return it as is
+            double threshold = ConfigReader.GetConfig().NormalSizedMapThreshold;
+            if (difficulty > threshold)
+            {
+                return difficulty;
+            }
+            // Calculate the difference between 90 and the difficulty
+            double difference = threshold - length;
+            double minScaling = 0.5;
+            double gradient = 0.005495; // So that at x = 91, y = 0.5
+            double scaling = Math.Min(1, Math.Max(1 - gradient * difference, minScaling));
+
+            double scaledDifficulty = difficulty * scaling;
+
+
+            // Return the scaled difficulty
+            return scaledDifficulty;
 
 
 
+
+        }
     }
 }
