@@ -4,119 +4,8 @@ using System.Text;
 
 namespace MuseMapalyzr
 {
-
-    public class SectionResults
-    {
-        public List<List<Note>> RankedSections;
-        public List<List<Note>> UnrankedSections;
-
-        public SectionResults(List<List<Note>> rankedSections, List<List<Note>> unrankedSections)
-        {
-            RankedSections = rankedSections;
-            UnrankedSections = unrankedSections;
-        }
-    }
     public class DifficultyCalculation
     {
-
-
-        private static float BaseDifficultyMultiplier = 0.5f; // So that the difficulty range is somewhat more palatable
-
-        public class WeightingResults // Named Tuple "Weighting" in python code
-        {
-            public double RankedWeighting;
-            public double RankedDifficulty;
-            public double RankedWeightedDifficulty;
-
-            public double UnrankedWeighting;
-            public double UnrankedDifficulty;
-            public double UnrankedWeightedDifficulty;
-
-            public WeightingResults(
-                double rankedWeighting,
-                double rankedDifficulty,
-                double rankedWeightedDifficulty,
-                double unrankedWeighting,
-                double unrankedDifficulty,
-                double unrankedWeightedDifficulty
-                )
-            {
-                RankedWeighting = rankedWeighting;
-                RankedDifficulty = rankedDifficulty;
-                RankedWeightedDifficulty = rankedWeightedDifficulty;
-
-                UnrankedWeighting = unrankedWeighting;
-                UnrankedDifficulty = unrankedDifficulty;
-                UnrankedWeightedDifficulty = unrankedWeightedDifficulty;
-
-            }
-        }
-
-        public class PatternScore
-        {
-            public string PatternName;
-            public double Score;
-            public bool HasInterval;
-            public int TotalNotes;
-            public PatternScore(string patternName, double score, bool hasInterval, int totalNotes)
-            {
-                PatternName = patternName;
-                Score = score;
-                HasInterval = hasInterval;
-                TotalNotes = totalNotes;
-            }
-        }
-
-
-        public class ScoreResults
-        {
-            public List<double> UnrankedScores;
-            public List<double> RankedScores;
-            public ScoreResults()
-            {
-                UnrankedScores = new List<double>();
-                RankedScores = new List<double>();
-            }
-        }
-
-        public class PatternWeightingResults
-        {
-            public double RankedPatternWeighting;
-            public double UnrankedPatternWeighting;
-            public List<Pattern> IdentifiedPatterns = new List<Pattern>();
-            public List<Segment> IdentifiedSegments = new List<Segment>();
-
-            public List<List<double>> RankedPatternWeightingSections = new List<List<double>>();
-            public List<List<double>> UnrankedPatternWeightingSections = new List<List<double>>();
-
-            public List<Segment>? _StreamSegments;
-            public List<Segment> StreamSegments
-            {
-                get
-                {
-                    if (_StreamSegments == null)
-                    {
-                        List<Segment> temp = new List<Segment>();
-                        foreach (Segment segment in IdentifiedSegments)
-                        {
-                            if (
-                                segment.SegmentName == Constants.SingleStreams
-                                || segment.SegmentName == Constants.FourStack
-                                || segment.SegmentName == Constants.ThreeStack
-                                || segment.SegmentName == Constants.TwoStack
-                                )
-                            {
-                                temp.Add(segment);
-                            }
-                        }
-                        _StreamSegments = temp;
-                    }
-                    return _StreamSegments;
-                }
-            }
-        }
-
-
         private void PutPatternsIntoSections(
             List<Segment> segmentsWithMultipliers,
             double songStartSamples,
@@ -189,7 +78,7 @@ namespace MuseMapalyzr
                     if (streamSegmentStartSampleTimes.Contains(note.SampleTime))
                     {
 
-                        Segment? foundSegment = FindSegmentFromStartNote(note, streamSegments);
+                        Segment? foundSegment = Utils.FindSegmentFromStartNote(note, streamSegments);
                         if (foundSegment == null)
                         {
                             CustomLogger.Instance.Warning($"Didn't actually find a segment.. Adding the note anyways SampleTime{note.SampleTime}");
@@ -256,7 +145,7 @@ namespace MuseMapalyzr
 
 
 
-                                    double nextNoteTime = tempNote.SampleTime + GetTimeDifferenceWithNPS(npsCap, sampleRate);
+                                    double nextNoteTime = tempNote.SampleTime + Utils.GetTimeDifferenceWithNPS(npsCap, sampleRate);
                                     int nextSectionIndex = (int)(nextNoteTime - songStartSamples) / sectionThreshold;
                                     tempNote = new Note(note.Lane, nextNoteTime);
                                     if (nextNoteTime <= segmentNotes.Last().SampleTime)
@@ -402,22 +291,8 @@ namespace MuseMapalyzr
             return new SectionResults(rankedSections, unrankedSections);
         }
 
-        private double GetTimeDifferenceWithNPS(double NPS, double sampleRate)
-        {
-            return sampleRate / NPS;
-        }
 
-        private Segment? FindSegmentFromStartNote(Note note, List<Segment> segments)
-        {
-            foreach (Segment seg in segments)
-            {
-                if (seg.Notes.First().SampleTime == note.SampleTime)
-                {
-                    return seg;
-                }
-            }
-            return null;
-        }
+
 
         public static List<double> MovingAverageNoteDensity(List<List<Note>> sections, int windowSize)
         {
@@ -447,190 +322,10 @@ namespace MuseMapalyzr
         }
 
 
-        public static double WeightedAverageOfValues(List<double> values, double topPercentage, double topWeight, double bottomWeight, int? numMax = null)
-        {
-            // Check if the list is empty
-            if (values.Count == 0 || values == null)
-            {
-                throw new ArgumentException("Input list is empty.");
-            }
-
-            int numTopValues;
-            if (numMax != null)
-            {
-                // Calculate the number of top values to consider based on the percentage
-                numTopValues = Math.Min((int)(values.Count * topPercentage), (int)numMax);
-            }
-            else
-            {
-                numTopValues = (int)(values.Count * topPercentage);
-            }
-
-
-            // Sort the list in descending order
-            values.Sort((a, b) => -a.CompareTo(b));
-
-            //Console.WriteLine(string.Join(",", values));
-
-
-            // Calculate the sum of top values with the topWeight
-            double topSum = values.Take(numTopValues).Sum() * topWeight;
-
-            // Calculate the sum of the remaining values with the bottomWeight
-            double bottomSum = values.Skip(numTopValues).Sum() * bottomWeight;
-
-            // Calculate the final weighted average
-            double totalWeight = (numTopValues * topWeight) + ((values.Count - numTopValues) * bottomWeight);
-            double weightedAverage = (topSum + bottomSum) / totalWeight;
-
-            //Console.WriteLine($"{weightedAverage} | Top {topPercentage * 100}% Index: {numTopValues} ... Threshold {values[numTopValues]}\n");
-
-
-            return weightedAverage;
-        }
-
-
-        public static double CalculateDensityAverage(
-            List<double> values,
-            int hardestSeconds,
-            double arbitrary90PercentThreshold,
-            double rankedPenaltyProportion,
-            double ceilingProportion,
-            List<List<double>> patternMultiplierSections
-            )
-        {
-
-            // Values should be the densities * pattern multipliers in each 1 second windows
-
-            // Check if the list is empty
-            if (values.Count == 0 || values == null)
-            {
-                throw new ArgumentException("Input list is empty.");
-            }
-
-            int numTopValues = hardestSeconds;
-
-            // int k = 0;
-            // foreach (var value in values)
-            // {
-
-
-            //     string multipliersString = string.Join(", ", patternMultiplierSections[k]);
-
-            //     Console.WriteLine($"{value} | {multipliersString}x");
-            //     k++;
-            // }
-
-            // Console.WriteLine("ENDDDDDDDDDDDDDDDDD");
-
-
-            //Console.WriteLine($"DENSITY LENGTH: {values.Count}");
-
-            // Console.WriteLine(values.Count == patternMultiplierSections.Count);
-
-            int index = 0;
-            foreach (List<double> patternMultipliers in patternMultiplierSections)
-            {
-                if (patternMultipliers.Count == 0)
-                {
-                    patternMultipliers.Add(1);
-                }
-                // double averagePatternMultiplier = patternMultipliers.Average();
-                double averagePatternMultiplier = WeightedAverageOfValues(patternMultipliers, 0.2, 0.9, 0.1);
-                double before = values[index];
-                values[index] *= averagePatternMultiplier;
-                string multipliersString = string.Join(", ", patternMultipliers);
-                // Console.WriteLine($"Index: {index} [{multipliersString}] | Before: {before} After: {values[index]} {averagePatternMultiplier}x");
-                index++;
-
-            }
 
 
 
-            // Sort the list in descending order
-            values = values.OrderByDescending(d => d).ToList();
 
-            // Console.WriteLine(string.Join(",", values));
-
-
-
-            // IEnumerable<double> something = values.Take(numTopValues);
-            // foreach (double s in something)
-            // {
-            //     Console.WriteLine(s);
-            // }
-            // Console.WriteLine("END");
-
-
-            List<double> topValues = values.Take(numTopValues).ToList();
-            double hardest = WeightedAverageOfValues(topValues, 0.2, 0.9, 0.1);
-
-            double additionalStars = ceilingProportion * hardest;
-
-            // Console.WriteLine(additionalStars + " Additional stars");
-            double ceiling = hardest + additionalStars;
-
-
-
-            double cumulativeSumOfDensities = CalculateWeightedSum(values, hardest);
-
-            double penalty = hardest * rankedPenaltyProportion; // 0 if calculating peak difficulty
-            double finalPenalisedBase = hardest - penalty; // Is just hardest if calculating peak difficulty
-
-            double X = ceiling - finalPenalisedBase; // The number to approach
-            double N = arbitrary90PercentThreshold;  // The point where the function should be 90% of X
-            double addedDifficulty = LogarithmicGrowth(cumulativeSumOfDensities, X, N);
-
-
-
-            double finalDifficulty = finalPenalisedBase + addedDifficulty;
-            // Console.WriteLine($"X: {X} | added diff: {addedDifficulty}");
-            // Console.WriteLine($"Final diff: {finalDifficulty} | ... {rankedPenaltyProportion} Ceiling: {ceiling} | Hardest: {hardest} | final penalised: {finalPenalisedBase} | Cumulative sum: {cumulativeSumOfDensities}");
-
-
-
-            return finalDifficulty;
-        }
-        public static double ScaleDifficulty(double originalDifficulty)
-        {
-            // Target value
-            double target = 6.0;
-            double scalingFactor = 2;
-
-            // If the original difficulty is less than or equal to the target, return it as is
-            if (originalDifficulty <= target)
-            {
-                return originalDifficulty;
-            }
-
-            // Apply a logarithmic transformation to compress values greater than the target
-            // The "+ 1" ensures that the value is always greater than the target
-            // The "Math.Log(originalDifficulty - target + 1)" compresses the values
-            double adjustedDifficulty = target + Math.Log(originalDifficulty - target + 1) * scalingFactor;
-
-            return adjustedDifficulty;
-        }
-
-        private static double LogarithmicGrowth(double x, double X, double N)
-        {
-            double b = (Math.Exp(0.9) - 1) / N;
-            return X * Math.Log(b * x + 1);
-        }
-
-        private static double CalculateWeightedSum(IEnumerable<double> bottomNums, double hardest)
-        {
-            double weightedSum = 0;
-
-            double strength = 2.5; // yeah
-
-            foreach (double num in bottomNums)
-            {
-                double weight = strength / Math.Max(Math.Abs(hardest - num) + 1, 1); // Math.Max 1 to avoid div by 0... 
-                weightedSum += num * weight;
-            }
-
-            return weightedSum;
-        }
 
         public PatternWeightingResults GetPatternWeighting(List<Note> notes, int sampleRate)
         {
@@ -641,40 +336,40 @@ namespace MuseMapalyzr
 
             List<Pattern> patterns = mpg.IdentifyPatterns(segments);
 
-            ScoreResults scoreResults = CalculateScoresFromPatterns(patterns);
+            SegmentMultipliers segmentMultipliers = CalculateSegmentMultipliers(patterns);
 
-            double rankedPatternWeighting = WeightedAverageOfValues(
-                scoreResults.RankedScores,
+            double rankedPatternWeighting = Utils.WeightedAverageOfValues(
+                segmentMultipliers.RankedMultipliers,
                 ConfigReader.GetConfig().GetPatternWeightingTopPercentage,
                 ConfigReader.GetConfig().GetPatternWeightingTopWeight,
                 ConfigReader.GetConfig().GetPatternWeightingBottomWeight
                 );
 
-            double unrankedPatternWeighting = WeightedAverageOfValues(
-                scoreResults.UnrankedScores,
+            double unrankedPatternWeighting = Utils.WeightedAverageOfValues(
+                segmentMultipliers.PeakMultipliers,
                 ConfigReader.GetUnrankedConfig().GetPatternWeightingTopPercentage,
                 ConfigReader.GetUnrankedConfig().GetPatternWeightingTopWeight,
                 ConfigReader.GetUnrankedConfig().GetPatternWeightingBottomWeight
                 );
+
             PatternWeightingResults results = new PatternWeightingResults
             {
                 RankedPatternWeighting = rankedPatternWeighting,
                 UnrankedPatternWeighting = unrankedPatternWeighting,
                 IdentifiedPatterns = patterns,
-                IdentifiedSegments = segments
+                IdentifiedSegments = segments,
+                SegmentMultipliers = segmentMultipliers
             };
 
             return results;
         }
 
 
-        // When copying over to museswipr, we just get rid of the outfile param.
-        public WeightingResults CalculateDifficulty(List<Note> notes, StreamWriter outfile, int sampleRate)
+        public MapDetails AnalyzeMap(List<Note> notes, int sampleRate)
         {
-
+            MapDetails mapDetails = new MapDetails(notes, sampleRate);
             PatternWeightingResults patternWeightingResults = GetPatternWeighting(notes, sampleRate);
-
-            int sampleWindowSecs = ConfigReader.GetConfig().SampleWindowSecs;
+            int sampleWindowSecs = 1; // Should not change or will mess up with NPS calculations.
 
             SectionResults sectionResults = CreateSections(
                 notes.ToList(),
@@ -691,60 +386,38 @@ namespace MuseMapalyzr
             int unrankedMovingAverageWindow = ConfigReader.GetUnrankedConfig().MovingAvgWindow;
 
             List<double> rankedMovingAvg = MovingAverageNoteDensity(rankedSections, movingAverageWindow);
+            mapDetails.RankedDensities = rankedMovingAvg;
             List<double> unrankedMovingAvg = MovingAverageNoteDensity(unrankedSections, unrankedMovingAverageWindow);
+            mapDetails.PeakDensities = unrankedMovingAvg;
 
-            // When copying over to museswipr, we just get rid of the if below.
-            if (outfile != null)
-            {
-                foreach (var s in rankedMovingAvg)
-                {
-                    outfile.WriteLine($"{s}");
-                }
-            }
+            mapDetails.CalculateRankedAndPeakValues(patternWeightingResults);
 
-            double rankedDifficulty = CalculateDensityAverage(
-                rankedMovingAvg,
-                ConfigReader.GetConfig().HardestSeconds,
-                ConfigReader.GetConfig().Arbitrary90PercentThreshold,
-                ConfigReader.GetConfig().RankedPenaltyProportion,
-                ConfigReader.GetConfig().CeilingProportion,
-                patternWeightingResults.RankedPatternWeightingSections
-                ) * BaseDifficultyMultiplier;
+            return mapDetails;
+        }
 
 
+        // When copying over to museswipr, we just get rid of the outfile param.
+        public WeightingResults CalculateDifficulty(List<Note> notes, int sampleRate)
+        {
 
-            double unrankedDifficulty = CalculateDensityAverage(
-                unrankedMovingAvg,
-                ConfigReader.GetUnrankedConfig().HardestSeconds,
-                ConfigReader.GetUnrankedConfig().Arbitrary90PercentThreshold,
-                ConfigReader.GetUnrankedConfig().RankedPenaltyProportion,
-                ConfigReader.GetUnrankedConfig().CeilingProportion,
-                patternWeightingResults.UnrankedPatternWeightingSections
-                ) * BaseDifficultyMultiplier;
-
-
-            double scaledPeakDifficulty = ScaleDifficulty(unrankedDifficulty);
-
-            Console.WriteLine($"Peak: {unrankedDifficulty} (Scaled: {scaledPeakDifficulty}) Ranked: {rankedDifficulty}");
+            MapDetails mapDetails = AnalyzeMap(notes, sampleRate);
 
             WeightingResults weightResults = new WeightingResults(
-                patternWeightingResults.RankedPatternWeighting,
-                rankedDifficulty,
-                rankedDifficulty,
+                -1,
+                -1,
+                mapDetails.RankedDifficulty,
 
-                patternWeightingResults.UnrankedPatternWeighting,
-                scaledPeakDifficulty,
-                scaledPeakDifficulty
+                -1,
+                -1,
+                mapDetails.PeakDifficulty
                 );
 
 
             return weightResults;
         }
 
-        public static ScoreResults CalculateScoresFromPatterns(List<Pattern> patterns)
+        public static SegmentMultipliers CalculateSegmentMultipliers(List<Pattern> patterns)
         {
-            List<PatternScore> rankedPatternScores = new List<PatternScore>();
-            List<PatternScore> unrankedPatternScores = new List<PatternScore>();
             // Console.WriteLine($"Checking {patterns.Count} Patterns");
             CustomLogger.Instance.PatternLog(String.Format("\n{0,20} {1,10} {2,18} {3,18}", "Pattern Name", "# Segments", "Start SampleTime", "End SampleTime"));
             foreach (Pattern pattern in patterns)
@@ -773,17 +446,17 @@ namespace MuseMapalyzr
                 }
             }
 
-            ScoreResults scoreResults = new ScoreResults();
+            SegmentMultipliers segmentMultipliers = new SegmentMultipliers();
 
             foreach (Pattern pattern in patterns)
             {
                 foreach (Segment segment in pattern.Segments)
                 {
-                    scoreResults.RankedScores.Add(segment.RankedMultiplier);
-                    scoreResults.UnrankedScores.Add(segment.UnrankedMultiplier);
+                    segmentMultipliers.RankedMultipliers.Add(segment.RankedMultiplier);
+                    segmentMultipliers.PeakMultipliers.Add(segment.UnrankedMultiplier);
                 }
             }
-            return scoreResults;
+            return segmentMultipliers;
         }
     }
 

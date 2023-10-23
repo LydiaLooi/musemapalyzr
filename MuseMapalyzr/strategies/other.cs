@@ -153,11 +153,11 @@ namespace MuseMapalyzr
             double weightedAverage;
             if (multipliers.Count > 5 || Pattern.TotalNotes > 20) // Hard coded for now. Numbers are kinda arbitrary.
             {
-                weightedAverage = DifficultyCalculation.WeightedAverageOfValues(multipliers, 0.3, 0.9, 0.1);
+                weightedAverage = Utils.WeightedAverageOfValues(multipliers, 0.3, 0.9, 0.1);
             }
             else
             {
-                weightedAverage = DifficultyCalculation.WeightedAverageOfValues(multipliers, 0.3, 0.6, 0.4);
+                weightedAverage = Utils.WeightedAverageOfValues(multipliers, 0.3, 0.6, 0.4);
             }
             return weightedAverage;
         }

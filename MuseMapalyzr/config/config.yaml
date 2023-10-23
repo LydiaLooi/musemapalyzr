@@ -6,6 +6,8 @@
 #                                                                                   #
 #####################################################################################
 
+# V8.1
+
 # Normal Sized Map Threshold
 NormalSizedMapThreshold: 91 # Screw you TV-sized maps :)
 

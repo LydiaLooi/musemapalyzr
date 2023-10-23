@@ -6,8 +6,6 @@ namespace MuseMapalyzr
         private static MuseMapalyzrConfig? _rankedConfig;
         private static MuseMapalyzrConfig? _unrankedConfig;
 
-        public static bool Debug = true;
-
         public static string GetConfigPath(bool ranked = true)
         {
             string currentDirectory = Directory.GetCurrentDirectory();
@@ -31,6 +29,26 @@ namespace MuseMapalyzr
             MuseMapalyzrConfig config = deserializer.Deserialize<MuseMapalyzrConfig>(yamlContent);
             return config;
         }
+
+        //// This is the method that is needed when copying over the MuseSwipr
+        // private static MuseMapalyzrConfig DeserializeConfig(bool ranked)
+        // {
+        //     string configFile;
+        //     if (ranked)
+        //     {
+        //         configFile = "musemapalyzrconfig";
+        //     }
+        //     else
+        //     {
+        //         configFile = "musemapalyzrunrankedconfig";
+        //     }
+        //     string yamlContent = Resources.Load<TextAsset>(configFile).text;
+        //     var input = new StringReader(yamlContent);
+        //     var deserializer = new DeserializerBuilder().WithNamingConvention(PascalCaseNamingConvention.Instance).Build();
+        //     var config = deserializer.Deserialize<MuseMapalyzrConfig>(input);
+        //     return config;
+        // }
+
 
         public static MuseMapalyzrConfig GetConfig()
         {

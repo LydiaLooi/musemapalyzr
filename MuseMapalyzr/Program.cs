@@ -44,8 +44,7 @@ namespace MuseMapalyzr
             {
                 foreach (string filename in files)
                 {
-                    // try
-                    // {
+
                     string charSeparator = "\\";
                     MuseSwiprMap mMap = MuseSwiprMap.FromKoreographAsset(filename);
                     string name = filename.Split(new string[] { charSeparator }, StringSplitOptions.None)[^1].Split(".asset")[0];
@@ -54,19 +53,9 @@ namespace MuseMapalyzr
                     CustomLogger.Instance.Info($"Analysing : {name} Samplerate: {mMap.SampleRate}");
                     CustomLogger.Instance.PatternLog($"Analysing : {name} Samplerate: {mMap.SampleRate}");
 
-                    using (StreamWriter outfile = new StreamWriter($"{Constants.AnalysisDir}/{name}", false, Encoding.UTF8))
-                    {
-                        DifficultyCalculation.WeightingResults weightResults = difficultyCalculation.CalculateDifficulty(mMap.Notes, outfile, mMap.SampleRate);
-                        writer.WriteLine($"{filename.Split(new string[] { charSeparator }, StringSplitOptions.None)[^1].Split(".asset")[0]}||{weightResults.RankedWeightedDifficulty:F2}||{weightResults.RankedWeighting:F2}||{weightResults.RankedDifficulty:F2}||{weightResults.UnrankedWeightedDifficulty:F2}||{weightResults.UnrankedWeighting:F2}||{weightResults.UnrankedDifficulty:F2}");
-                    }
-                    // }
-                    // catch (Exception e)
-                    // {
-                    //     // Log the error
-                    //     // // Console.WriteLine($"ERROR parsing a file: {e.Message}");
-                    //     throw e;
-                    //     // continue;
-                    // }
+
+                    WeightingResults weightResults = difficultyCalculation.CalculateDifficulty(mMap.Notes, mMap.SampleRate);
+                    writer.WriteLine($"{filename.Split(new string[] { charSeparator }, StringSplitOptions.None)[^1].Split(".asset")[0]}||{weightResults.RankedWeightedDifficulty:F2}||{weightResults.RankedWeighting:F2}||{weightResults.RankedDifficulty:F2}||{weightResults.UnrankedWeightedDifficulty:F2}||{weightResults.UnrankedWeighting:F2}||{weightResults.UnrankedDifficulty:F2}");
                 }
             }
         }
@@ -102,7 +91,7 @@ namespace MuseMapalyzr
             {
                 for (double i = 0; i < 50; i++)
                 {
-                    double result = DifficultyCalculation.ScaleDifficulty(i);
+                    double result = Utils.ScaleDifficulty(i);
                     Console.WriteLine($"{i} -> {result}");
                 }
             }

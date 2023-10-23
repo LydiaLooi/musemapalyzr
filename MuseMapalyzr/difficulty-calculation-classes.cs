@@ -1,0 +1,266 @@
+using System.Collections;
+using System.Diagnostics;
+using System.Text;
+namespace MuseMapalyzr
+{
+    public class SectionResults
+    {
+        public List<List<Note>> RankedSections;
+        public List<List<Note>> UnrankedSections;
+
+        public SectionResults(List<List<Note>> rankedSections, List<List<Note>> unrankedSections)
+        {
+            RankedSections = rankedSections;
+            UnrankedSections = unrankedSections;
+        }
+    }
+
+    public class DensityDetails
+    {
+        public double Ceiling;
+        public double Hardest;
+        public double Penalty;
+        public double FinalPenalisedBase;
+        public double AdditionalStars;
+        public double CumulativeSum;
+        public double AddedDifficulty;
+
+    }
+    public class MapDetails
+    {
+        public List<Note> Notes;
+        public int SampleRate;
+        private static float BaseDifficultyMultiplier = 0.5f; // So that the difficulty range is somewhat more palatable
+        public List<double> RankedDensities = new List<double>();
+        public List<double> PeakDensities = new List<double>();
+        public List<double> RankedDensitiesAfterPatternMultiplication = new List<double>();
+        public List<double> PeakDensitiesAfterPatternMultiplication = new List<double>();
+        public DensityDetails RankedDensityDetails = new DensityDetails();
+        public DensityDetails PeakDensityDetails = new DensityDetails();
+        public List<Segment> AnalysedSegments = new List<Segment>();
+        public List<Pattern> AnalysedPatterns = new List<Pattern>();
+        public List<List<double>> PatternMultiplierSections = new List<List<double>>();
+        public double RankedDifficulty = -1;
+        public double PeakDifficulty = -1;
+
+        public MapDetails(
+            List<Note> notes,
+            int sampleRate
+            )
+        {
+            Notes = notes;
+            SampleRate = sampleRate;
+        }
+
+
+        public void CalculateRankedAndPeakValues(PatternWeightingResults patternWeightingResults)
+        {
+            // Do it for ranked
+            double rankedDifficulty = _CalculateDensityAverage(
+                new List<double>(RankedDensities),
+                ConfigReader.GetConfig().HardestSeconds,
+                ConfigReader.GetConfig().Arbitrary90PercentThreshold,
+                ConfigReader.GetConfig().RankedPenaltyProportion,
+                ConfigReader.GetConfig().CeilingProportion,
+                patternWeightingResults.RankedPatternWeightingSections,
+                true
+                ) * BaseDifficultyMultiplier;
+
+
+            // Do it for peak
+
+            double peakDifficulty = _CalculateDensityAverage(
+                new List<double>(PeakDensities),
+                ConfigReader.GetUnrankedConfig().HardestSeconds,
+                ConfigReader.GetUnrankedConfig().Arbitrary90PercentThreshold,
+                ConfigReader.GetUnrankedConfig().RankedPenaltyProportion,
+                ConfigReader.GetUnrankedConfig().CeilingProportion,
+                patternWeightingResults.UnrankedPatternWeightingSections,
+                false
+                ) * BaseDifficultyMultiplier;
+
+            double scaledPeakDifficulty = Utils.ScaleDifficulty(peakDifficulty);
+
+            RankedDifficulty = rankedDifficulty;
+            PeakDifficulty = scaledPeakDifficulty;
+
+        }
+
+        private double _CalculateDensityAverage(
+            List<double> values,
+            int hardestSeconds,
+            double arbitrary90PercentThreshold,
+            double rankedPenaltyProportion,
+            double ceilingProportion,
+            List<List<double>> patternMultiplierSections,
+            bool isRanked
+            )
+        {
+
+            // Values should be the densities * pattern multipliers in each 1 second windows
+
+            // Check if the list is empty
+            if (values.Count == 0 || values == null)
+            {
+                throw new ArgumentException("Input list is empty.");
+            }
+
+            int numTopValues = hardestSeconds;
+
+            int index = 0;
+            foreach (List<double> patternMultipliers in patternMultiplierSections)
+            {
+                if (patternMultipliers.Count == 0)
+                {
+                    patternMultipliers.Add(1);
+                }
+                // double averagePatternMultiplier = patternMultipliers.Average();
+                double averagePatternMultiplier = Utils.WeightedAverageOfValues(patternMultipliers, 0.2, 0.9, 0.1);
+                double before = values[index];
+                values[index] *= averagePatternMultiplier;
+                string multipliersString = string.Join(", ", patternMultipliers);
+                // Console.WriteLine($"Index: {index} [{multipliersString}] | Before: {before} After: {values[index]} {averagePatternMultiplier}x");
+                index++;
+
+            }
+
+
+
+            // Sort the list in descending order
+            List<double> sortedValues = values.OrderByDescending(d => d).ToList();
+
+
+            List<double> topValues = sortedValues.Take(numTopValues).ToList();
+            double hardest = Utils.WeightedAverageOfValues(topValues, 0.2, 0.9, 0.1);
+
+            double additionalStars = ceilingProportion * hardest;
+
+            double ceiling = hardest + additionalStars;
+
+
+
+            double cumulativeSumOfDensities = Utils.CalculateWeightedSum(sortedValues, hardest);
+
+            double penalty = hardest * rankedPenaltyProportion; // 0 if calculating peak difficulty
+            double finalPenalisedBase = hardest - penalty; // Is just hardest if calculating peak difficulty
+
+            double X = ceiling - finalPenalisedBase; // The number to approach
+            double N = arbitrary90PercentThreshold;  // The point where the function should be 90% of X
+            double addedDifficulty = Utils.LogarithmicGrowth(cumulativeSumOfDensities, X, N);
+
+
+
+            double finalDifficulty = finalPenalisedBase + addedDifficulty;
+
+            DensityDetails densityDetails = new DensityDetails
+            {
+                Ceiling = ceiling,
+                Hardest = hardest,
+                Penalty = penalty,
+                FinalPenalisedBase = finalPenalisedBase,
+                CumulativeSum = cumulativeSumOfDensities,
+                AddedDifficulty = addedDifficulty
+            };
+
+            if (isRanked)
+            {
+                RankedDensitiesAfterPatternMultiplication = values;
+                RankedDensityDetails = densityDetails;
+
+            }
+            else
+            {
+                PeakDensitiesAfterPatternMultiplication = values;
+                PeakDensityDetails = densityDetails;
+            }
+
+            return finalDifficulty;
+        }
+
+
+
+
+    }
+
+
+    public class WeightingResults
+    {
+        public double RankedWeighting;
+        public double RankedDifficulty;
+        public double RankedWeightedDifficulty;
+
+        public double UnrankedWeighting;
+        public double UnrankedDifficulty;
+        public double UnrankedWeightedDifficulty;
+
+        public WeightingResults(
+            double rankedWeighting,
+            double rankedDifficulty,
+            double rankedWeightedDifficulty,
+            double unrankedWeighting,
+            double unrankedDifficulty,
+            double unrankedWeightedDifficulty
+            )
+        {
+            RankedWeighting = rankedWeighting;
+            RankedDifficulty = rankedDifficulty;
+            RankedWeightedDifficulty = rankedWeightedDifficulty;
+
+            UnrankedWeighting = unrankedWeighting;
+            UnrankedDifficulty = unrankedDifficulty;
+            UnrankedWeightedDifficulty = unrankedWeightedDifficulty;
+
+        }
+    }
+
+
+    public class SegmentMultipliers
+    {
+        public List<double> PeakMultipliers;
+        public List<double> RankedMultipliers;
+        public SegmentMultipliers()
+        {
+            PeakMultipliers = new List<double>();
+            RankedMultipliers = new List<double>();
+        }
+    }
+
+    public class PatternWeightingResults
+    {
+        public double RankedPatternWeighting;
+        public double UnrankedPatternWeighting;
+        public List<Pattern> IdentifiedPatterns = new List<Pattern>();
+        public List<Segment> IdentifiedSegments = new List<Segment>();
+        public SegmentMultipliers SegmentMultipliers = new SegmentMultipliers();
+
+        public List<List<double>> RankedPatternWeightingSections = new List<List<double>>();
+        public List<List<double>> UnrankedPatternWeightingSections = new List<List<double>>();
+
+        public List<Segment>? _StreamSegments;
+        public List<Segment> StreamSegments
+        {
+            get
+            {
+                if (_StreamSegments == null)
+                {
+                    List<Segment> temp = new List<Segment>();
+                    foreach (Segment segment in IdentifiedSegments)
+                    {
+                        if (
+                            segment.SegmentName == Constants.SingleStreams
+                            || segment.SegmentName == Constants.FourStack
+                            || segment.SegmentName == Constants.ThreeStack
+                            || segment.SegmentName == Constants.TwoStack
+                            )
+                        {
+                            temp.Add(segment);
+                        }
+                    }
+                    _StreamSegments = temp;
+                }
+                return _StreamSegments;
+            }
+        }
+    }
+
+}
