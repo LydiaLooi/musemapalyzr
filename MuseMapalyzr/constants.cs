@@ -27,6 +27,7 @@ namespace MuseMapalyzr
         public const string VariableStream = "Variable Stream";
         public const string Other = "Other";
 
+        public const double BaseDifficultyMultiplier = 0.5f;
         public static int GetTolerance()
         {
             var config = ConfigReader.GetConfig();

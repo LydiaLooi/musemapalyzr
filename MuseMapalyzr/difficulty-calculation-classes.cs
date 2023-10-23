@@ -19,6 +19,9 @@ namespace MuseMapalyzr
     {
         public double Ceiling;
         public double Hardest;
+        public List<double> HardestDensities = new List<double>();
+        public List<double> PatternAveragedMultipliers = new List<double>();
+        public List<double> DensitiesAfterPatternMultiplication = new List<double>();
         public double Penalty;
         public double FinalPenalisedBase;
         public double AdditionalStars;
@@ -30,11 +33,8 @@ namespace MuseMapalyzr
     {
         public List<Note> Notes;
         public int SampleRate;
-        private static float BaseDifficultyMultiplier = 0.5f; // So that the difficulty range is somewhat more palatable
         public List<double> RankedDensities = new List<double>();
         public List<double> PeakDensities = new List<double>();
-        public List<double> RankedDensitiesAfterPatternMultiplication = new List<double>();
-        public List<double> PeakDensitiesAfterPatternMultiplication = new List<double>();
         public DensityDetails RankedDensityDetails = new DensityDetails();
         public DensityDetails PeakDensityDetails = new DensityDetails();
         public List<Segment> AnalysedSegments = new List<Segment>();
@@ -64,7 +64,7 @@ namespace MuseMapalyzr
                 ConfigReader.GetConfig().CeilingProportion,
                 patternWeightingResults.RankedPatternWeightingSections,
                 true
-                ) * BaseDifficultyMultiplier;
+                ) * Constants.BaseDifficultyMultiplier;
 
 
             // Do it for peak
@@ -77,7 +77,7 @@ namespace MuseMapalyzr
                 ConfigReader.GetUnrankedConfig().CeilingProportion,
                 patternWeightingResults.UnrankedPatternWeightingSections,
                 false
-                ) * BaseDifficultyMultiplier;
+                ) * Constants.BaseDifficultyMultiplier;
 
             double scaledPeakDifficulty = Utils.ScaleDifficulty(peakDifficulty);
 
@@ -106,7 +106,7 @@ namespace MuseMapalyzr
             }
 
             int numTopValues = hardestSeconds;
-
+            List<double> patternMultiplierAverages = new List<double>();
             int index = 0;
             foreach (List<double> patternMultipliers in patternMultiplierSections)
             {
@@ -117,7 +117,9 @@ namespace MuseMapalyzr
                 // double averagePatternMultiplier = patternMultipliers.Average();
                 double averagePatternMultiplier = Utils.WeightedAverageOfValues(patternMultipliers, 0.2, 0.9, 0.1);
                 double before = values[index];
-                values[index] *= averagePatternMultiplier;
+                values[index] = values[index] * averagePatternMultiplier;
+
+                patternMultiplierAverages.Add(averagePatternMultiplier);
                 string multipliersString = string.Join(", ", patternMultipliers);
                 // Console.WriteLine($"Index: {index} [{multipliersString}] | Before: {before} After: {values[index]} {averagePatternMultiplier}x");
                 index++;
@@ -156,21 +158,23 @@ namespace MuseMapalyzr
             {
                 Ceiling = ceiling,
                 Hardest = hardest,
+                HardestDensities = topValues,
+                AdditionalStars = additionalStars,
                 Penalty = penalty,
                 FinalPenalisedBase = finalPenalisedBase,
                 CumulativeSum = cumulativeSumOfDensities,
-                AddedDifficulty = addedDifficulty
+                AddedDifficulty = addedDifficulty,
+                PatternAveragedMultipliers = patternMultiplierAverages,
+                DensitiesAfterPatternMultiplication = values
             };
 
             if (isRanked)
             {
-                RankedDensitiesAfterPatternMultiplication = values;
                 RankedDensityDetails = densityDetails;
 
             }
             else
             {
-                PeakDensitiesAfterPatternMultiplication = values;
                 PeakDensityDetails = densityDetails;
             }
 
