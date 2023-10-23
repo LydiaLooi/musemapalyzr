@@ -1,5 +1,8 @@
-using System.Collections;
-using System.Diagnostics;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using static MuseMapalyzr.ConfigReader;
+
 using System.Text;
 
 namespace MuseMapalyzr
@@ -14,7 +17,7 @@ namespace MuseMapalyzr
             int sampleRate
             )
         {
-            int sectionsCount = patternWeightingResults.RankedPatternWeightingSections.Count;
+            int sectionsCount = patternWeightingResults.RankedPatternWeightingSections.Count();
             foreach (Segment segment in segmentsWithMultipliers)
             {
                 int firstNoteSectionIndex = (int)(segment.Notes.First().SampleTime - songStartSamples) / sectionThreshold;

@@ -7,7 +7,7 @@
 
 # Note that some of these aren't used and the ranked config is used (e.g., sample window threshold etc.)
 
-# V8.1
+# V9
 
 # Normal Sized Map Threshold
 NormalSizedMapThreshold: 0
