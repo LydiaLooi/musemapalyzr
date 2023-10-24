@@ -110,14 +110,16 @@ namespace MuseMapalyzr
                             }
 
                             analysisWriter.WriteLine("\nSegment Type Counts:");
-                            foreach (KeyValuePair<string, int> kvp in mapDetails.SimpleSegmentData)
+                            analysisWriter.WriteLine(String.Format("{0, 20} {1, 15} {2, 15} {3, 15} {4, 15} {5, 15} {6, 15}", "Name", "Seg. Count", "Note Count", "% of map", "Min NPS", "Avg NPS", "Max NPS"));
+
+                            foreach (KeyValuePair<string, MapDetails.SegmentData> kvp in mapDetails.MapSegmentData)
                             {
                                 // Access the key and value
                                 string key = kvp.Key;
-                                int value = kvp.Value;
+                                MapDetails.SegmentData value = kvp.Value;
 
                                 // Do something with the key and value
-                                analysisWriter.WriteLine($"{key,20} {value,2}");
+                                analysisWriter.WriteLine($"{key,20} {value.Count,15} {value.TotalNotes,15} {value.Proportion * 100,15:F2} {value.MinNPS,15:F2} {value.AvgNPS,15:F2} {value.MaxNPS,15:F2}");
                             }
 
 

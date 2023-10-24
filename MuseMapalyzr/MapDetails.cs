@@ -3,11 +3,89 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 namespace MuseMapalyzr
 {
     public class MapDetails
     {
+
+        public class SegmentData
+        {
+            public string SegmentName;
+            public int Count = 0;
+            public int TotalNotes = 0;
+            public double Proportion
+            {
+                get
+                {
+                    if (MapNoteCount == 0) return -1;
+                    double result = (double)TotalNotes / (double)MapNoteCount;
+                    return result;
+                }
+            }
+            public double MinNPS
+            {
+                get
+                {
+                    if (NPSs.Count() == 0) return 0;
+
+                    return NPSs.Min();
+                }
+            }
+            public double MaxNPS
+            {
+                get
+                {
+                    if (NPSs.Count() == 0) return 0;
+
+                    return NPSs.Max();
+                }
+            }
+            public double AvgNPS
+            {
+                get
+                {
+                    if (NPSs.Count() == 0) return 0;
+                    return NPSs.Average();
+                }
+            }
+            public List<double> NPSs = new List<double>();
+
+            private int MapNoteCount;
+
+            public SegmentData(string name, int mapNoteCount)
+            {
+                SegmentName = name;
+                MapNoteCount = mapNoteCount;
+            }
+        }
+
+        public class PatternData
+        {
+            public string PatternName;
+            public int Count = 0;
+            public int TotalNotes = 0;
+            public int ProportionOfMap
+            {
+                get
+                {
+                    if (TotalMapNotes == 0) return -1;
+                    return TotalNotes / TotalMapNotes;
+                }
+            }
+
+
+            private int TotalMapNotes;
+
+            public Dictionary<string, SegmentData> SegmentsInPattern = new Dictionary<string, SegmentData>();
+
+            public PatternData(string name, int totalMapNotes)
+            {
+                PatternName = name;
+                TotalMapNotes = totalMapNotes;
+            }
+        }
 
         public List<Note> Notes;
         public int SampleRate;
@@ -21,6 +99,17 @@ namespace MuseMapalyzr
         public double RankedDifficulty = -1;
         public double PeakDifficulty = -1;
         public double Length = -1;
+
+        private Dictionary<string, SegmentData>? _MapSegmentData = null;
+        public Dictionary<string, SegmentData> MapSegmentData
+        {
+            get
+            {
+                if (_MapSegmentData != null) return _MapSegmentData;
+                _MapSegmentData = GetMapSegmentData();
+                return _MapSegmentData;
+            }
+        }
 
         private Dictionary<string, int>? _SimpleSegmentData = null;
         public Dictionary<string, int> SimpleSegmentData
@@ -56,6 +145,29 @@ namespace MuseMapalyzr
 
             Length = Utils.GetSongLengthFromNotes(Notes, SampleRate);
 
+        }
+
+        private Dictionary<string, SegmentData> GetMapSegmentData()
+        {
+            Dictionary<string, SegmentData> results = new Dictionary<string, SegmentData>();
+            foreach (string segmentName in Constants.SegmentTypes)
+            {
+                SegmentData data = new SegmentData(segmentName, Notes.Count());
+                results[segmentName] = data;
+            }
+
+
+            foreach (Segment segment in AnalysedSegments)
+            {
+                results[segment.SegmentName].Count++;
+
+                results[segment.SegmentName].TotalNotes += segment.Notes.Count() - 1; // due to notes overlapping... this is kinda an estimate lol
+
+                results[segment.SegmentName].NPSs.Add(segment.NotesPerSecond);
+            }
+
+
+            return results;
         }
 
         private Dictionary<string, int> GetSimpleSegmentData()
